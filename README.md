@@ -9,12 +9,14 @@ A typesetting extension for Adobe Photoshop CC. Tested with PS version 2015.5+.
 
 2. Download the [latest release](https://github.com/Ikkyusan1/typeset-buddy/releases/latest) and extract the archive in Photoshop's extension folder. It's one of these (create the folders if they don't exist):
 - System extension folder
--- Win(x86): C:\Program Files\Common Files\Adobe\CEP\extensions
--- Win(x64): C:\Program Files (x86)\Common Files\Adobe\CEP\extensions
--- Mac: /Library/Application Support/Adobe/CEP/extensions
+ - Win(x86): C:\Program Files\Common Files\Adobe\CEP\extensions
+ - Win(x64): C:\Program Files (x86)\Common Files\Adobe\CEP\extensions
+ - Mac: /Library/Application Support/Adobe/CEP/extensions
 - Per-user extension folder
--- Win: C:\Users\{USER}\AppData\Roaming\Adobe\CEP/extensions
--- Mac: ~/Library/Application Support/Adobe/CEP/extensions
+ - Win: C:\Users\{USER}\AppData\Roaming\Adobe\CEP/extensions
+ - Mac: ~/Library/Application Support/Adobe/CEP/extensions
 
 3. Start Photoshop. You'll find the extension under the menu Windows > Extensions > Typeset Buddy.
 
+## Translation script format
+Follow the readme from [Typeset Helper](https://github.com/Ikkyusan1/typeset-helper/). The rules are the same.
