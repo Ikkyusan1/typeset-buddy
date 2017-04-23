@@ -1,0 +1,102 @@
+<div class="row no-shrink">
+	<div class="col-md-6 col-xs-6 flex-input">
+		<div class="input-wrapper">
+			<label class="">
+				<span>Script</span>
+			</label>
+			<input type="text" class="topcoat-text-input" readonly="true" ng-model="filename" ng-click="browseScript()">
+		</div>
+		<!-- <button class="topcoat-button" ng-click="browseScript()">Browse...</button> -->
+	</div>
+	<div class="col-md-5 col-xs-5 flex-input">
+		<div class="input-wrapper">
+			<label class="">
+				<span>Style Set</span>
+			</label>
+			<styleset-selector selected-value="selectedStyleset"></styleset-selector>
+		</div>
+
+	</div>
+	<div class="col-md-1 col-xs-1 flex-input">
+		<div class="btn-group" uib-dropdown is-open="status.isopen">
+			<button class="topcoat-button" uib-dropdown-toggle>
+				<span class="glyphicon glyphicon-cog"></span>
+			</button>
+			<ul class="dropdown-menu dropdown-menu-right" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+				<li class="dropdown-header">Panel separator</li>
+				<li role="menuitem" ng-class="{'active': panelSeparator == '–'}" ng-click="setPanelSeparator('–')"><span>Long dash –</span></li>
+				<li role="menuitem" ng-class="{'active': panelSeparator == '-'}" ng-click="setPanelSeparator('-')"><span>Single dash -</span></li>
+				<li role="menuitem" ng-class="{'active': panelSeparator == '--'}" ng-click="setPanelSeparator('--')"><span>Double dash --</span></li>
+				<li role="menuitem" ng-class="{'active': panelSeparator == '='}" ng-click="setPanelSeparator('=')"><span>Equal sign =</span></li>
+				<li class="dropdown-header">Use layer groups</li>
+				<li role="menuitem" ng-class="{'active': useLayerGroups === true}" ng-click="setUseLayerGroups(true)"><span>Yes</span></li>
+				<li role="menuitem" ng-class="{'active': useLayerGroups === false}" ng-click="setUseLayerGroups(false)" ><span>No</span></li>
+			</ul>
+		</div>
+	</div>
+</div>
+<div class="no-shrink row pb header">
+	<div class="col-lg-4 col-md-4 col-xs-4">
+		<label>Page</label>
+		<button class="topcoat-icon-button--quiet" ng-disabled="!!!pageNumbers.length">
+			<span class="glyphicon glyphicon-minus" ng-click="incPageNumber(false)"></span>
+		</button>
+
+			<select ng-options="pageNumber as pageNumber for pageNumber in pageNumbers" ng-model="selectedPage">
+				<option value="">-</option>
+			</select>
+
+		<button class="topcoat-icon-button--quiet" ng-disabled="!!!pageNumbers.length">
+			<span class="glyphicon glyphicon-plus" ng-click="incPageNumber(true)"></span>
+		</button>
+	</div>
+	<div class="col-lg-4 col-md-4 col-xs-4">
+		<label ng-if="!!selectedPage && !!bubbles.length">
+			Page style: {{pageStyle.keyword}} <span class="glyphicon glyphicon-warning-sign" ng-if="!!!pageStyle.inStyleSet"></span>
+		</label>
+	</div>
+	<div class="col-lg-4 col-md-4 col-xs-4">
+		<label>
+			Force
+		</label>
+		<tb-style-selector styleset="selectedStyleset" selected-value="selectedForcedStyle"></tb-style-selector>
+
+		<!-- <div class="input-flex">
+			<label>
+				<span>Multi mode</span>
+			</label>
+			<div>
+				<label class="topcoat-switch">
+					<input type="checkbox" ng-model="multiMode" ng-true-value="true" class="topcoat-switch__input">
+					<div class="topcoat-switch__toggle"></div>
+				</label>
+			</div>
+		</div> -->
+	</div>
+
+</div>
+<div class="page-note" ng-repeat="pageNote in pageNotes">
+	{{pageNote}}
+</div>
+<div class="list scrollable">
+	<div class="list-item" ng-if="!!selectedPage && !!!bubbles.length">Nothing to typeset on this page</div>
+	<!-- <bubble-item class="list-item" ng-repeat="bubble in bubbles" bubble="bubble" typeset-action="typeset(text, style)"></bubble-item> -->
+
+	<div class="list-item row bubble-item" ng-class="{'double-bubble': !!bubble.doublePart, 'panel-separator': !!bubble.panelSeparator}" ng-repeat="bubble in bubbles">
+		<div class="col-lg-2 col-md-3 col-xs-3 text-center" ng-if="!!!bubble.panelSeparator">
+			<button class="topcoat-button" ng-repeat="style in bubble.styles track by $index" ng-click="typeset(bubble.text, style)" ng-if="!!!multiMode" uib-tooltip="Create it or use the force :D" tooltip-popup-delay="500" tooltip-placement="bottom" tooltip-enable="!!!style.inStyleSet">
+				<span>{{style.keyword}}</span>
+				<span class="glyphicon glyphicon-warning-sign" ng-if="!!!style.inStyleSet"></span>
+			</button>
+			<label class="topcoat-checkbox" ng-if="!!multiMode">
+			  <input type="checkbox" ng-model="bubble.selected" ng-true-value="true">
+				<div class="topcoat-checkbox__checkmark"></div>
+			</label>
+		</div>
+		<div class="col-lg-10 col-md-9 col-xs-9">
+			<div class="bubble-content">{{bubble.text}}</div>
+			<div class="bubble-note" ng-repeat="note in bubble.notes">{{note}}</div>
+		</div>
+	</div>
+
+</div>

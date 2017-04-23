@@ -1,0 +1,16 @@
+<div class="no-shrink p header">
+	<button class="topcoat-button" ng-click="clearLog()">
+		<span class="glyphicon glyphicon-trash"></span>
+		Clear log
+	</button>
+</div>
+<div class="list scrollable">
+	<div class="no-shrink row pb" ng-repeat="entry in $root.logContent">
+		<div class="col-md-2 col-xs-2">
+			<label>{{entry.label}}</label>
+		</div>
+		<div class="col-md-10 col-xs-10">
+			<pre>{{entry.value|json}}</pre>
+		</div>
+	</div>
+</div>

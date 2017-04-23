@@ -1,0 +1,19 @@
+{
+  "name": "typeset_buddy",
+  "private": "true",
+  "dependencies": {
+    "angular": "^1.6.0",
+    "angular-animate": "^1.6.0",
+    "angular-bootstrap": "^2.5.0",
+    "angular-loading-bar": "^0.9.0",
+    "angular-sanitize": "1.6.3",
+    "angular-ui-router": "^1.0.0",
+    "animate.css": "^3.5.2",
+    "bootstrap": "^3.3.7",
+    "font-awesome": "^4.7.0",
+    "jquery": "^2.2.3",
+    "ngstorage": "^0.3.11",
+    "topcoat": "^0.8.0",
+    "ngToast": "ngtoast#^2.0.0"
+  }
+}

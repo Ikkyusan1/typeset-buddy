@@ -1,0 +1,131 @@
+<div class="row m0">
+	<div class="col-md-4 col-xs-4">
+		<label class="input-flex">
+			<span>Keyword</span>
+			<input type="text" class="topcoat-text-input" placeholder="Keyword" ng-model="preset.keyword" ng-disabled="preset.default" ng-pattern="/^[\d\w_]+$/i">
+		</label>
+	</div>
+	<div class="col-md-6 col-xs-6">
+		<label class="input-flex input-flex-larger">
+			<span>Font</span>
+			<font-selector selected-value="preset.fontName"></font-selector>
+		</label>
+	</div>
+	<div class="col-md-2 col-xs-2 text-right">
+		<button class="topcoat-button" ng-click="duplicateAction()">
+			<span class="glyphicon glyphicon-duplicate"></span>
+		</button>
+		<button class="topcoat-button" ng-click="removeAction()" ng-if="!!!preset.default">
+			<span class="glyphicon glyphicon-trash"></span>
+		</button>
+	</div>
+</div>
+
+<div class="row m0">
+	<div class="col-md-4 col-xs-4">
+		<div>
+			<label class="input-flex">
+				<span>Size (px)</span>
+				<input type="number" class="topcoat-text-input" min="1" max="1000" step="1" ng-model="preset.size" placeholder="1 to 1000 px">
+			</label>
+		</div>
+		<div>
+			<label class="input-flex">
+				<span>VScale</span>
+				<input type="number" class="topcoat-text-input" min="0" max="1000" step="1" ng-model="preset.vScale" placeholder="1 to 1000 %">
+			</label>
+		</div>
+		<div>
+			<label class="input-flex">
+				<span>HScale</span>
+				<input type="number" class="topcoat-text-input" min="0" max="1000" step="1" ng-model="preset.hScale" placeholder="1 to 1000 %">
+			</label>
+		</div>
+		<div class="input-flex">
+			<label>
+				<span>Hyphenate</span>
+			</label>
+			<div>
+				<label class="topcoat-switch">
+					<input type="checkbox" ng-model="preset.hyphenate" ng-true-value="true" class="topcoat-switch__input">
+					<div class="topcoat-switch__toggle"></div>
+				</label>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-4 col-xs-4">
+		<div>
+			<label class="input-flex">
+				<span>Leading</span>
+				<input type="number" class="topcoat-text-input" min="0" max="1000" step="1" ng-model="preset.leading" placeholder="0 to 1000">
+			</label>
+		</div>
+		<div>
+			<label class="input-flex">
+				<span>Tracking</span>
+				<input type="number" class="topcoat-text-input" min="-1000" max="10000" step="1" ng-model="preset.tracking" placeholder="-1000 to 10000">
+			</label>
+		</div>
+		<div class="input-flex">
+			<label>
+				<span>FauxBold</span>
+			</label>
+			<div>
+				<label class="topcoat-switch">
+					<input type="checkbox" ng-model="preset.fauxBold" ng-true-value="true" class="topcoat-switch__input">
+					<div class="topcoat-switch__toggle"></div>
+				</label>
+			</div>
+		</div>
+		<div class="input-flex">
+			<label>
+				<span>FauxItalic</span>
+			</label>
+			<div>
+				<label class="topcoat-switch">
+					<input type="checkbox" ng-model="preset.fauxItalic" ng-true-value="true" class="topcoat-switch__input">
+					<div class="topcoat-switch__toggle"></div>
+				</label>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-4 col-xs-4">
+		<div>
+			<label class="input-flex">
+				<span>Antialias</span>
+				<antialias-selector selected-value="preset.antialias"></antialias-selector>
+			</label>
+		</div>
+		<div>
+			<label class="input-flex">
+				<span>Capitalization</span>
+				<capitalization-selector selected-value="preset.capitalization"></capitalization-selector>
+			</label>
+		</div>
+		<div>
+			<label class="input-flex">
+				<span>Justification</span>
+				<justification-selector selected-value="preset.justification"></justification-selector>
+			</label>
+		</div>
+		<div>
+			<label class="input-flex">
+				<span>Kerning</span>
+				<kerning-selector selected-value="preset.kerning"></kerning-selector>
+			</label>
+		</div>
+	</div>
+</div>
+<div class="row m0">
+	<div class="col-md-4 col-xs-4">
+		<label class="input-flex">
+			<span>Layer group</span>
+			<input type="text" class="topcoat-text-input" placeholder="Layer group" ng-model="preset.layerGroup" >
+		</label>
+	</div>
+	<div class="col-md-8 col-xs-8 text-right">
+		<label ng-if="preset.default">Default style</label>
+	</div>
+</div>

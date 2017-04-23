@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- 	<base href="/"> -->
+	<meta charset="UTF-8">
+	<title>Typeset Buddy</title>
+
+	<link rel="stylesheet" href="css/animate.min.css?v=appVersion" type="text/css" />
+	<link rel="stylesheet" href="css/bootstrap.min.css?v=appVersion" type="text/css" />
+	<link rel="stylesheet" href="css/ngToast.min.css?v=appVersion" type="text/css" />
+	<link rel="stylesheet" id="theme" href="css/topcoat-desktop-light.css?v=appVersion" type="text/css" />
+<%if (isProd) {%>
+	<link rel="stylesheet" href="css/<%= appFileName  %>.min.css?v=appVersion">
+<% } else { %>
+	<link rel="stylesheet" href="css/<%= appFileName  %>.css?v=appVersion">
+<% } %>
+</head>
+<body id="tb">
+	<toast></toast>
+	<ui-view class="app-container"></ui-view>
+
+	<script src="js/CSInterface.js"></script>
+<%if (isProd) {%>
+	<script src="js/deps.min.js?v=appVersion"></script>
+	<script src="js/<%= appFileName  %>.min.js?v=appVersion"></script>
+<% } else { %>
+	<script src="js/deps.min.js?v=appVersion"></script>
+	<script src="js/templates.js?v=appVersion"></script>
+	<!--<script src="//unpkg.com/ui-router-visualizer@2"></script>-->
+	<script src="js/<%= appFileName %>.js?v=appVersion"></script>
+<% } %>
+
+	<script>
+		angular.bootstrap(document.getElementById('tb'), ['tb']);
+	</script>
+</body>
+</html>

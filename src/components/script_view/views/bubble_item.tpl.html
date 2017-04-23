@@ -1,0 +1,12 @@
+<div class="row bubble-item" ng-class="{'double-bubble': !!bubble.doublePart, 'panel-separator': !!bubble.panelSeparator}">
+	<div class="col-lg-2 col-md-3 col-xs-3 text-center" ng-if="!!!bubble.panelSeparator">
+		<button class="topcoat-button" ng-repeat="style in bubble.styles track by $index" ng-click="typesetAction({text: bubble.text, style: style.keyword})">
+			<span>{{style.keyword}}</span>
+			<span class="glyphicon glyphicon-warning-sign" ng-if="!!!style.inStyleSet"></span>
+		</button>
+	</div>
+	<div class="col-lg-10 col-md-9 col-xs-9">
+		<div class="bubble-content">{{bubble.text}}</div>
+		<div class="bubble-note" ng-repeat="note in bubble.notes">{{note}}</div>
+	</div>
+</div>

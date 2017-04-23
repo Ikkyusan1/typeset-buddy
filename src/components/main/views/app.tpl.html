@@ -1,0 +1,9 @@
+<uib-tabset active="null" class="">
+	<uib-tab index="one.name" heading="{{one.label}}" ui-sref="{{one.name}}" ui-sref-active="active" ng-repeat="one in routes"></uib-tab>
+	<uib-tab index="9" heading="Log" ui-sref="log_view" ui-sref-active="active" ng-if="$root.debug"></uib-tab>
+	<uib-tab index="10" heading="RESET" ng-click="resetLocalStorage()" ng-if="$root.debug"></uib-tab>
+
+
+</uib-tabset>
+
+<ui-view name="app" class="flex-col"></ui-view>

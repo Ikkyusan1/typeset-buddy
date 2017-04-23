@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ExtensionList>
+	<Extension Id="com.typeset.buddy.extension" Version="1.0.0">
+		<HostList>
+			<Host Name="PHXS" Port="8000"/>
+		</HostList>
+	</Extension>
+</ExtensionList>

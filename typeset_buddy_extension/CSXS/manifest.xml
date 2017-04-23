@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ExtensionManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ExtensionBundleId="com.typeset.buddy" ExtensionBundleVersion="1.0" Version="6.0">
+	<ExtensionList>
+		<Extension Id="com.typeset.buddy.extension" Version="1.0.0"/>
+	</ExtensionList>
+	<ExecutionEnvironment>
+		<HostList>
+			<!-- <Host Name="PHSP" Version="16.0"/> -->
+			<Host Name="PHXS" Version="14.0"/>
+		</HostList>
+		<LocaleList>
+			<Locale Code="All"/>
+		</LocaleList>
+		<RequiredRuntimeList>
+			<RequiredRuntime Name="CSXS" Version="6.0"/> <!-- MAJOR-VERSION-UPDATE-MARKER -->
+		</RequiredRuntimeList>
+	</ExecutionEnvironment>
+	<DispatchInfoList>
+		<Extension Id="com.typeset.buddy.extension">
+			<DispatchInfo>
+				<Resources>
+					<MainPath>./index.html</MainPath>
+					<ScriptPath>./jsx/main.jsx</ScriptPath>
+				</Resources>
+				<Lifecycle>
+					<AutoVisible>true</AutoVisible>
+				</Lifecycle>
+				<UI>
+					<Type>Panel</Type>
+					<Menu>Typeset Buddy</Menu>
+					<Geometry>
+						<Size>
+							<Height>400</Height>
+							<Width>600</Width>
+						</Size>
+						<MaxSize>
+							<Height>800</Height>
+							<Width>1200</Width>
+						</MaxSize>
+						<MinSize>
+							<Height>400</Height>
+							<Width>600</Width>
+						</MinSize>
+					</Geometry>
+				</UI>
+<!-- 				<Icons>
+					<Icon Type="Normal">./tb.png</Icon>
+				</Icons> -->
+			</DispatchInfo>
+		</Extension>
+	</DispatchInfoList>
+</ExtensionManifest>
