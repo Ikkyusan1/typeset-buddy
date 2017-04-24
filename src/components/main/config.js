@@ -1,7 +1,7 @@
 tb.config(['$stateProvider', '$urlRouterProvider',
 	function($stateProvider, $urlRouterProvider) {
 
-		$urlRouterProvider.otherwise('script_view');
+		$urlRouterProvider.otherwise('/script_view');
 
 		$stateProvider
 		.state('app', {

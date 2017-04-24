@@ -299,7 +299,7 @@ gulp.task('watch', function () {
 	gulp.watch(path.join(srcDirectory, '/**/*.tpl.html'), ['templates']);
 	gulp.watch(path.join(srcDirectory, '/**/*.js'), ['buildJs']);
 	gulp.watch(path.join(srcDirectory, 'index.template.html'), ['render']);
-	gulp.watch(path.join(srcDirectory, '/jsx/*.jsx'), ['copyJsx']);
+	gulp.watch(path.join(srcDirectory, '/adobe/*.jsx'), ['copyJsx']);
 });
 
 // Precompile the Angular templates to avoid ajax calls for every template path

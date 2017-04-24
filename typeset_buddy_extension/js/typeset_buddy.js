@@ -144,7 +144,7 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$templateCache', '$ro
 tb.config(['$stateProvider', '$urlRouterProvider',
 	function($stateProvider, $urlRouterProvider) {
 
-		$urlRouterProvider.otherwise('script_view');
+		$urlRouterProvider.otherwise('/script_view');
 
 		$stateProvider
 		.state('app', {
@@ -526,10 +526,6 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 			}
 		};
 
-		$scope.loadStyleSet = function() {
-			$scope.styleSet = StylesService.getStyleSet($scope.selectedStyleset);
-		};
-
 		$scope.typeset = function(text, style) {
 			if (!!$scope.selectedForcedStyle) {
 				$scope.$root.log('force style', $scope.selectedForcedStyle);
@@ -555,6 +551,10 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 		};
 
 		$scope.reset();
+
+		$scope.loadStyleSet = function() {
+			$scope.styleSet = StylesService.getStyleSet($scope.selectedStyleset);
+		};
 
 		// autoload last openedscript
 		$timeout(function() {
@@ -926,10 +926,6 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 			}
 		};
 
-		$scope.loadStyleSet = function() {
-			$scope.styleSet = StylesService.getStyleSet($scope.selectedStyleset);
-		};
-
 		$scope.addStyle = function() {
 			$scope.styleSet.styles.push(StylesService.getDummyStyle());
 		};
@@ -983,6 +979,22 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 				},
 				function() {}
 			);
+		};
+
+		$scope.applyStyle = function(style){
+			StylesService.applyStyle(style)
+			.then(
+				function() {
+					ngToast.create({className: 'success', content: 'Done'});
+				},
+				function(err) {
+					ngToast.create({className: 'danger', content: err});
+				}
+			);
+		};
+
+		$scope.loadStyleSet = function() {
+			$scope.styleSet = StylesService.getStyleSet($scope.selectedStyleset);
 		};
 
 		$scope.loadCurrentStyleSet = function() {
@@ -1104,7 +1116,8 @@ tb.directive('tbStylePreset', [
 			scope: {
 				preset: '=',
 				removeAction: '&',
-				duplicateAction: '&'
+				duplicateAction: '&',
+				applyAction: '&'
 			},
 			templateUrl: 'style_preset.tpl.html',
 			controller: ['$scope', 'StylesService',
@@ -1357,6 +1370,20 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 				$rootScope.$broadcast('refresh-styleset-list');
 				return true;
 			}
+		};
+
+		self.applyStyle = function(style) {
+			let def = $q.defer();
+			$rootScope.$root.CSI.evalScript('applyStyleToSelectedLayers('+ JSON.stringify(style) +')', function(res) {
+				if (res === 'done') {
+					def.resolve();
+				}
+				else{
+					$rootScope.log('Apply style error', res);
+					def.reject(res);
+				}
+			});
+			return def.promise;
 		};
 
 		// init

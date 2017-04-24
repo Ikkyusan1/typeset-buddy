@@ -16,7 +16,7 @@ A typesetting extension for Adobe Photoshop CC. Tested with PS version 2015.5+.
   - Win: C:\Users\{USER}\AppData\Roaming\Adobe\CEP/extensions
   - Mac: ~/Library/Application Support/Adobe/CEP/extensions
 
-3. Start Photoshop. You'll find the extension under the menu Windows > Extensions > Typeset Buddy.
+3. Start Photoshop. You'll find the extension under the menu Window > Extensions > Typeset Buddy.
 
 ## Translation script format
 Follow the readme from [Typeset Helper](https://github.com/Ikkyusan1/typeset-helper/). The rules are the same.

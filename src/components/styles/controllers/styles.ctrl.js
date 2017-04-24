@@ -127,10 +127,6 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 			}
 		};
 
-		$scope.loadStyleSet = function() {
-			$scope.styleSet = StylesService.getStyleSet($scope.selectedStyleset);
-		};
-
 		$scope.addStyle = function() {
 			$scope.styleSet.styles.push(StylesService.getDummyStyle());
 		};
@@ -184,6 +180,22 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 				},
 				function() {}
 			);
+		};
+
+		$scope.applyStyle = function(style){
+			StylesService.applyStyle(style)
+			.then(
+				function() {
+					ngToast.create({className: 'success', content: 'Done'});
+				},
+				function(err) {
+					ngToast.create({className: 'danger', content: err});
+				}
+			);
+		};
+
+		$scope.loadStyleSet = function() {
+			$scope.styleSet = StylesService.getStyleSet($scope.selectedStyleset);
 		};
 
 		$scope.loadCurrentStyleSet = function() {

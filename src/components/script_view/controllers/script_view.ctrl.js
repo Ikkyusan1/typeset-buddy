@@ -143,10 +143,6 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 			}
 		};
 
-		$scope.loadStyleSet = function() {
-			$scope.styleSet = StylesService.getStyleSet($scope.selectedStyleset);
-		};
-
 		$scope.typeset = function(text, style) {
 			if (!!$scope.selectedForcedStyle) {
 				$scope.$root.log('force style', $scope.selectedForcedStyle);
@@ -172,6 +168,10 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 		};
 
 		$scope.reset();
+
+		$scope.loadStyleSet = function() {
+			$scope.styleSet = StylesService.getStyleSet($scope.selectedStyleset);
+		};
 
 		// autoload last openedscript
 		$timeout(function() {

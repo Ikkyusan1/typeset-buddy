@@ -182,6 +182,20 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 			}
 		};
 
+		self.applyStyle = function(style) {
+			let def = $q.defer();
+			$rootScope.$root.CSI.evalScript('applyStyleToSelectedLayers('+ JSON.stringify(style) +')', function(res) {
+				if (res === 'done') {
+					def.resolve();
+				}
+				else{
+					$rootScope.log('Apply style error', res);
+					def.reject(res);
+				}
+			});
+			return def.promise;
+		};
+
 		// init
 		if (!!!$localStorage.styleSets) {
 			$localStorage.styleSets = [];

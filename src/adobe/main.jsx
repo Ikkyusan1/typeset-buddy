@@ -84,25 +84,39 @@ function adjustTextLayer(textLayer) {
 	textLayer.textItem.height = dimensions.height;
 }
 
-// function addTextLayer(text, fontSetting, hyphenate, layerGroup, nth) {
-// 	var textLayer = activeDocument.artLayers.add();
-// 	textLayer.kind = LayerKind.TEXT;
-// 	var textItem = textLayer.textItem;
-// 	textItem.kind = TextType.PARAGRAPHTEXT;
-// 	textItem.width = getBasicTextboxWidth(fontSetting.size);
-// 	textItem.height = activeDocument.height;
-// 	textItem.justification = Justification.CENTER;
-// 	textItem.hyphenation = hyphenate;
-// 	textItem.font = fontSetting.name;
-// 	textItem.antiAliasMethod = AntiAlias.SMOOTH;
-// 	textItem.size = getAdjustedSize(fontSetting.size) + 'px';
-// 	textItem.position = [nth * 20,  nth * 20];
-// 	textItem.contents = text;
-// 	adjustTextLayer(textLayer);
-// 	if (!!layerGroup) textLayer.move(layerGroup, ElementPlacement.INSIDE);
-// 	textLayer = null;
-// 	textItem = null;
-// }
+function applyStyleToLayer(layer, style) {
+	if(layer.kind !== LayerKind.TEXT) {
+		throw 'Not a text layer: ' + layer.name;
+	}
+	var textItem = layer.textItem;
+	textItem.kind = TextType.PARAGRAPHTEXT;
+	textItem.width = getBasicTextboxWidth(style.size);
+	textItem.height = activeDocument.height;
+	textItem.font = style.fontName;
+	textItem.size = getAdjustedSize(style.size) + 'px';
+	textItem.leading = style.leading;
+	textItem.tracking = style.tracking;
+	textItem.verticalScale = style.vScale;
+	textItem.horizontalScale = style.hScale;
+	textItem.fauxBold = style.fauxBold;
+	textItem.fauxItalic = style.fauxItalic;
+	textItem.capitalization = TextCase[style.capitalization];
+	textItem.justification = Justification[style.justification];
+	textItem.antiAliasMethod = AntiAlias[style.antialias];
+	textItem.autoKerning = AutoKernType[style.kerning];
+	textItem.hyphenation = style.hyphenate;
+	if (typeof style.coords != 'undefined' && typeof style.dimensions == 'undefined') {
+		style.dimensions = getDimensionsFromCoords(style.coords);
+	}
+	if (typeof style.dimensions != 'undefined'){
+		textItem.position = dimensions.p;
+		textItem.height = dimensions.h;
+		textItem.width = dimensions.w;
+	}
+	else{
+		adjustTextLayer(layer);
+	}
+}
 
 function typesetEX(typesetObj) {
 	var originalTypeUnits = app.preferences.typeUnits;
@@ -112,38 +126,12 @@ function typesetEX(typesetObj) {
 	try{
 		if(app.documents.length == 0) return 'No document';
 		var style = typesetObj.style;
-		var textLayer = activeDocument.artLayers.add();
+		var textLayer = app.activeDocument.artLayers.add();
 		textLayer.kind = LayerKind.TEXT;
+		applyStyleToLayer(textLayer, style);
 		var textItem = textLayer.textItem;
-		textItem.kind = TextType.PARAGRAPHTEXT;
-		textItem.width = getBasicTextboxWidth(style.size);
-		textItem.height = activeDocument.height;
-		textItem.font = style.fontName;
-		textItem.size = getAdjustedSize(style.size) + 'px';
-		textItem.leading = style.leading;
-		textItem.tracking = style.tracking;
-		textItem.verticalScale = style.vScale;
-		textItem.horizontalScale = style.hScale;
-		textItem.fauxBold = style.fauxBold;
-		textItem.fauxItalic = style.fauxItalic;
-		textItem.capitalization = TextCase[style.capitalization];
-		textItem.justification = Justification[style.justification];
-		textItem.antiAliasMethod = AntiAlias[style.antialias];
-		textItem.autoKerning = AutoKernType[style.kerning];
-		textItem.hyphenation = style.hyphenate;
-		textItem.position = [20, 20];
 		textItem.contents = typesetObj.text;
-		if (typeof typesetObj.coords != 'undefined' && typeof typesetObj.dimensions == 'undefined') {
-			typesetObj.dimensions = getDimensionsFromCoords(typesetObj.coords);
-		}
-		if (typeof typesetObj.dimensions != 'undefined'){
-			textItem.position = dimensions.p;
-			textItem.height = dimensions.h;
-			textItem.width = dimensions.w;
-		}
-		else{
-			adjustTextLayer(textLayer);
-		}
+		textItem.position = [20, 20];
 		if (style.useLayerGroups && style.layerGroup) {
 			var layerRef;
 			try {
@@ -167,5 +155,57 @@ function typesetEX(typesetObj) {
 		app.preferences.rulerUnits = originalRulerUnits;
 		return JSON.stringify(e);
 	}
+}
+
+
+ function getSelectedLayers(){
+	var idGrp = stringIDToTypeID('groupLayersEvent');
+	var descGrp = new ActionDescriptor();
+	var refGrp = new ActionReference();
+	refGrp.putEnumerated(charIDToTypeID('Lyr '), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
+	descGrp.putReference(charIDToTypeID('null'), refGrp);
+	try {
+		executeAction(idGrp, descGrp, DialogModes.NO );
+	}
+	catch (e) {
+		throw 'No selected layers';
+	}
+	var resultLayers=new Array();
+	for (var ix = 0; ix < app.activeDocument.activeLayer.layers.length; ix++){
+		resultLayers.push(app.activeDocument.activeLayer.layers[ix]);
+	}
+	var id8 = charIDToTypeID('slct');
+	var desc5 = new ActionDescriptor();
+	var id9 = charIDToTypeID('null');
+	var ref2 = new ActionReference();
+	var id10 = charIDToTypeID('HstS');
+	var id11 = charIDToTypeID('Ordn');
+	var id12 = charIDToTypeID('Prvs');
+	ref2.putEnumerated(id10, id11, id12);
+	desc5.putReference(id9, ref2);
+	executeAction(id8, desc5, DialogModes.NO);
+	return resultLayers;
+}
+
+function applyStyleToSelectedLayers(style) {
+	var originalTypeUnits = app.preferences.typeUnits;
+	app.preferences.typeUnits = TypeUnits.PIXELS;
+	var originalRulerUnits = app.preferences.rulerUnits;
+	app.preferences.rulerUnits = Units.PIXELS;
+	try {
+		var layers = getSelectedLayers();
+		for (var i = 0; i < layers.length; i ++){
+			applyStyleToLayer(layers[i], style);
+		}
+		app.preferences.typeUnits = originalTypeUnits;
+		app.preferences.rulerUnits = originalRulerUnits;
+		return 'done';
+	}
+	catch(e){
+		app.preferences.typeUnits = originalTypeUnits;
+		app.preferences.rulerUnits = originalRulerUnits;
+		return e;
+	}
+
 }
 
