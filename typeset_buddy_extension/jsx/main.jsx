@@ -128,9 +128,9 @@ function typesetEX(typesetObj) {
 		var style = typesetObj.style;
 		var textLayer = app.activeDocument.artLayers.add();
 		textLayer.kind = LayerKind.TEXT;
-		applyStyleToLayer(textLayer, style);
 		var textItem = textLayer.textItem;
 		textItem.contents = typesetObj.text;
+		applyStyleToLayer(textLayer, style);
 		textItem.position = [20, 20];
 		if (style.useLayerGroups && style.layerGroup) {
 			var layerRef;

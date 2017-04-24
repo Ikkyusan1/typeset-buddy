@@ -57,7 +57,7 @@ var tb = angular.module('tb', [
 tb.constant('CONF', {
 	appName: 'typeset_buddy', // will be replaced by package.json name when compiled
 	debug: false,	// will be true for when compiled for dev environment, false otherwise
-	version: '0.1.1' // will be replaced when compiled
+	version: '0.1.2' // will be replaced when compiled
 });
 tb.config(['cfpLoadingBarProvider', '$localStorageProvider',
 	function(cfpLoadingBarProvider, $localStorageProvider) {
