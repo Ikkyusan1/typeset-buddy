@@ -1,34 +1,36 @@
 <div class="no-shrink p">
-	<button class="topcoat-button" ng-click="newStyleSet()" uib-tooltip="New" tooltip-popup-delay="500" tooltip-placement="right-bottom">
+	<button class="topcoat-button" ng-click="newStyleSet()" uib-tooltip="Create a new set" tooltip-popup-delay="1000" tooltip-placement="bottom-left">
 	<span class="glyphicon glyphicon-plus"></span>
 		<!-- New -->
 	</button>
-	<button class="topcoat-button" ng-click="importStyleSet()" uib-tooltip="Import" tooltip-popup-delay="500" tooltip-placement="bottom">
+	<button class="topcoat-button" ng-click="importStyleSet()" uib-tooltip="Import a set from a json file" tooltip-popup-delay="1000" tooltip-placement="bottom-left">
 		<span class="glyphicon glyphicon-import"></span>
 		<!-- Import -->
 	</button>
-	<button class="topcoat-button" ng-click="extendStyleSet()" uib-tooltip="Analyze a script and extend current set with styles found within it" tooltip-popup-delay="500" tooltip-placement="bottom-left">
+	<button class="topcoat-button" ng-click="extendStyleSet()" uib-tooltip="Analyze a translation script and extend the current set with keywords found within it" tooltip-popup-delay="1000" tooltip-placement="bottom-left">
 		<span class="glyphicon glyphicon-indent-right"></span>
 		<!-- Extend -->
 	</button>
-	<button class="topcoat-button" ng-click="saveStyleSet()" uib-tooltip="Save" tooltip-popup-delay="500" tooltip-placement="bottom">
+	<button class="topcoat-button" ng-click="saveStyleSet()" uib-tooltip="Save current set" tooltip-popup-delay="1000" tooltip-placement="bottom">
 		<span class="glyphicon glyphicon-floppy-disk"></span>
 		<!-- Save -->
 	</button>
-	<button class="topcoat-button" ng-click="exportStyleSet()" ng-disabled="selectedStyleset == undefined" uib-tooltip="Export" tooltip-popup-delay="500" tooltip-placement="bottom">
+	<button class="topcoat-button" ng-click="exportStyleSet()" ng-disabled="selectedStyleset == undefined" uib-tooltip="Export current set as a json file" tooltip-popup-delay="1000" tooltip-placement="bottom">
 		<span class="glyphicon glyphicon-export"></span>
 		<!-- Export -->
 	</button>
-	<button class="topcoat-button" ng-click="duplicateStyleSet()" ng-disabled="selectedStyleset == undefined" uib-tooltip="Duplicate" tooltip-popup-delay="500" tooltip-placement="bottom">
+	<button class="topcoat-button" ng-click="duplicateStyleSet()" ng-disabled="selectedStyleset == undefined" uib-tooltip="Duplicate current set
+	" tooltip-popup-delay="1000" tooltip-placement="bottom">
 		<span class="glyphicon glyphicon-duplicate"></span>
 		<!-- Duplicate -->
 	</button>
-	<button class="topcoat-button" ng-click="deleteStyleSet()" ng-disabled="!!!selectedStyleset" uib-tooltip="Delete" tooltip-popup-delay="500" tooltip-placement="bottom">
+	<button class="topcoat-button" ng-click="deleteStyleSet()" ng-disabled="!!!selectedStyleset" uib-tooltip="Delete current set
+	" tooltip-popup-delay="1000" tooltip-placement="bottom">
 		<span class="glyphicon glyphicon-trash"></span>
 		<!-- Delete -->
 	</button>
 	<styleset-selector selected-value="selectedStyleset"></styleset-selector>
-	<button class="topcoat-button pull-right" ng-click="exportConstants()" uib-tooltip="Export available fonts and constant values" tooltip-popup-delay="500" tooltip-placement="left-bottom">
+	<button class="topcoat-button pull-right" ng-click="exportConstants()" uib-tooltip="Export available fonts and constant values" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
 		<span class="glyphicon glyphicon-save"></span>
 		<span class="glyphicon glyphicon-book"></span>
 	</button>
@@ -41,20 +43,21 @@
 			<input type="text" class="topcoat-text-input" placeholder="Styleset name" ng-model="styleSet.name" ng-disabled="selectedStyleset === 0" ng-pattern="/[\d\w]{1,30}/">
 		</label>
 	</div>
-	<div class="col-md-4 col-xs-4">
-
+	<div class="col-md-5 col-xs-5">
+		<label>
+			Style filter
+			<input type="text" class="topcoat-text-input" placeholder="filter..." ng-model="styleFilter">
+		</label>
+		<button class="topcoat-button" ng-click="clearStyleFilter()" ng-if="!!styleFilter">
+		<span class="glyphicon glyphicon-remove"></span>
+	</button>
 	</div>
-	<div class="col-md-4 col-xs-4 text-right">
+	<div class="col-md-3 col-xs-3 text-right">
 		<button class="topcoat-button" ng-click="addStyle()">Add Style</button>
 	</div>
 </div>
 <div class="list scrollable padded">
-	<div class="list-item" ng-repeat="style in styleSet.styles">
+	<div class="list-item" ng-repeat="style in styleSet.styles |filter: {keyword: styleFilter||undefined}">
 		<tb-style-preset preset="style" remove-action="removeStyle(style)" duplicate-action="duplicateStyle(style)" apply-action="applyStyle(style)" ng-class="{'default-style': style.default}"></tb-style-preset>
 	</div>
-
 </div>
-
-<!--<pre style="max-width: 100%; max-height: 200px; overflow-y: auto; word-wrap: break-word;" class="no-shrink">
-{{styleSet|json}}
-</pre>-->

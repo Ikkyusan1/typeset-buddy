@@ -150,7 +150,7 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 		self.typeset = function(typesetObj) {
 			let def = $q.defer();
 			$rootScope.$root.CSI.evalScript('typesetEX(' + JSON.stringify(typesetObj) + ')', function(res) {
-				if(res === 'typesetted') {
+				if(res === 'done') {
 					def.resolve();
 				}
 				else{

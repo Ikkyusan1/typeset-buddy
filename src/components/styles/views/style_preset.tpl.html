@@ -12,10 +12,10 @@
 		</label>
 	</div>
 	<div class="col-md-2 col-xs-2 text-right">
-		<button class="topcoat-button" ng-click="duplicateAction()">
+		<button class="topcoat-button" ng-click="duplicateAction()" uib-tooltip="Duplicate style" tooltip-popup-delay="500" tooltip-placement="bottom-right">
 			<span class="glyphicon glyphicon-duplicate"></span>
 		</button>
-		<button class="topcoat-button" ng-click="removeAction()" ng-if="!!!preset.default">
+		<button class="topcoat-button" ng-click="removeAction()" ng-if="!!!preset.default" uib-tooltip="Remove style" tooltip-popup-delay="500" tooltip-placement="bottom-right">
 			<span class="glyphicon glyphicon-trash"></span>
 		</button>
 	</div>
@@ -26,19 +26,19 @@
 		<div>
 			<label class="input-flex">
 				<span>Size (px)</span>
-				<input type="number" class="topcoat-text-input" min="1" max="1000" step="1" ng-model="preset.size" placeholder="1 to 1000 px">
+				<input type="number" class="topcoat-text-input" min="1" max="1000" step="1" ng-model="preset.size" placeholder="1 to 1000 px" uib-tooltip="min:1 max:1000 default:20" tooltip-popup-delay="500" tooltip-placement="bottom-right">
 			</label>
 		</div>
 		<div>
 			<label class="input-flex">
-				<span>VScale</span>
-				<input type="number" class="topcoat-text-input" min="0" max="1000" step="1" ng-model="preset.vScale" placeholder="1 to 1000 %">
+				<span>VScale (%)</span>
+				<input type="number" class="topcoat-text-input" min="1" max="1000" step="1" ng-model="preset.vScale" placeholder="1 to 1000 %" uib-tooltip="min:1 max:1000 default:100" tooltip-popup-delay="500" tooltip-placement="bottom-right">
 			</label>
 		</div>
 		<div>
 			<label class="input-flex">
-				<span>HScale</span>
-				<input type="number" class="topcoat-text-input" min="0" max="1000" step="1" ng-model="preset.hScale" placeholder="1 to 1000 %">
+				<span>HScale (%)</span>
+				<input type="number" class="topcoat-text-input" min="1" max="1000" step="1" ng-model="preset.hScale" placeholder="1 to 1000 %" uib-tooltip="min:1 max:1000 default:100" tooltip-popup-delay="500" tooltip-placement="bottom-right">
 			</label>
 		</div>
 		<div class="input-flex">
@@ -57,14 +57,14 @@
 	<div class="col-md-4 col-xs-4">
 		<div>
 			<label class="input-flex">
-				<span>Leading</span>
-				<input type="number" class="topcoat-text-input" min="0" max="1000" step="1" ng-model="preset.leading" placeholder="0 to 1000">
+				<span>Leading (px)</span>
+				<input type="number" class="topcoat-text-input" min="0" max="1000" step="1" ng-model="preset.leading" placeholder="0 to 1000" uib-tooltip="min:1 max:1000 default:0 (auto)" tooltip-popup-delay="500" tooltip-placement="bottom-right">
 			</label>
 		</div>
 		<div>
 			<label class="input-flex">
 				<span>Tracking</span>
-				<input type="number" class="topcoat-text-input" min="-1000" max="10000" step="1" ng-model="preset.tracking" placeholder="-1000 to 10000">
+				<input type="number" class="topcoat-text-input" min="-1000" max="10000" step="1" ng-model="preset.tracking" placeholder="-1000 to 10000" uib-tooltip="min:-1000 max:10000 default:0" tooltip-popup-delay="500" tooltip-placement="bottom-right">
 			</label>
 		</div>
 		<div class="input-flex">
@@ -126,9 +126,9 @@
 		</label>
 	</div>
 	<div class="col-md-8 col-xs-8 text-right">
-		<button class="topcoat-button" ng-click="applyAction()">
+		<button class="topcoat-button" ng-click="applyAction()" uib-tooltip="Apply style on selected text layers" tooltip-popup-delay="500" tooltip-placement="bottom-right">
 			<span class="glyphicon glyphicon-screenshot"></span>
-			<span>Apply style on selected layers</span>
+			<!-- <span>Apply style on selected layers</span> -->
 		</button>
 	</div>
 </div>

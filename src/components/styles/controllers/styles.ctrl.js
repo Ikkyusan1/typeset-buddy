@@ -1,6 +1,10 @@
 tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToast', 'Utils', '$uibModal',
 	function($scope, StylesService, ScriptService, ngToast, Utils, $uibModal) {
 
+		$scope.clearStyleFilter = function(){
+			$scope.styleFilter = undefined;
+		}
+
 		$scope.newStyleSet = function() {
 			$scope.styleSet = StylesService.getDummyStyleSet();
 			$scope.selectedStyleset = null;
@@ -22,7 +26,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 				let styleSet = StylesService.getStyleSet($scope.selectedStyleset);
 				delete styleSet.id;
 				// window.cep.fs.showSaveDialogEx(SSDEXTitleVal, SSDEXInitialPathVal, SSDEXFileTypesVal, SSDEXDefaultNameVal, SSDEXFriendlyFilePrefixVal, SSDEXPromptVal, SSDEXNameFieldLabelVal);
-				let result = window.cep.fs.showSaveDialogEx('Export styleset', undefined, Utils.getValidFileSuffix('*.json'), styleSet.name + '_styleset.json', undefined, 'Export', undefined);
+				let result = window.cep.fs.showSaveDialogEx('Export styleset', undefined, Utils.getValidFileSuffix('*.json'), styleSet.name + '_styleset.json', undefined, 'Export style set', undefined);
 				if (!!result.data) {
 					let writeResult = window.cep.fs.writeFile(result.data, JSON.stringify(styleSet, null, 2));
 					if (writeResult.err != 0) {
@@ -91,7 +95,8 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 				let result = window.cep.fs.readFile(file.data[0]);
 				if (result.err === 0) {
 					try{
-						let tmp = angular.merge({}, StylesService.getDummyStyleSet(), JSON.parse(result.data));
+						let tmp = JSON.parse(result.data);
+						$scope.log('parsed', tmp);
 						StylesService.cleanAndCheckStyleSet(tmp);
 						delete tmp.id;
 						$scope.styleSet = angular.copy(tmp);
