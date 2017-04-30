@@ -37,7 +37,6 @@ if (!String.prototype.trim) {
 function getAppFonts() {
 	var fontNames = [];
 	for (var i=0; i < app.fonts.length; i++) {
-		// fontNames.push(app.fonts[i].postScriptName);
 		fontNames.push({
 			value: app.fonts[i].postScriptName,
 			label: app.fonts[i].name,
@@ -47,8 +46,20 @@ function getAppFonts() {
 }
 
 // WTF, Adobe, seriously. We shouldn't even need this.
+function getTransformFactor() {
+	var ref = new ActionReference();
+	ref.putEnumerated(charIDToTypeID('Lyr '), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
+	var desc = executeActionGet(ref).getObjectValue(stringIDToTypeID('textKey'));
+	var textSize =  desc.getList(stringIDToTypeID('textStyleRange')).getObjectValue(0).getObjectValue(stringIDToTypeID('textStyle')).getDouble(stringIDToTypeID('size'));
+	if (desc.hasKey(stringIDToTypeID('transform'))) {
+		var mFactor = desc.getObjectValue(stringIDToTypeID('transform')).getUnitDoubleValue(stringIDToTypeID('yy'));
+		return mFactor;
+	}
+	return 1;
+}
+
 function getAdjustedSize(size) {
-	return size / (activeDocument.resolution / 72);
+	return size / (getTransformFactor() * activeDocument.resolution / 72);
 }
 
 function getBasicTextboxWidth(fontSize) {
@@ -65,8 +76,8 @@ function getDimensionsFromCoords(coords){
 
 function getLayerDimensions(layer) {
 	return {
-		width: layer.bounds[2] - layer.bounds[0],
-		height: layer.bounds[3] - layer.bounds[1]
+		width: getAdjustedSize(layer.bounds[2] - layer.bounds[0]),
+		height: getAdjustedSize(layer.bounds[3] - layer.bounds[1])
 	};
 }
 
@@ -108,12 +119,12 @@ function applyStyleToLayer(layer, style) {
 	if (typeof style.coords != 'undefined' && typeof style.dimensions == 'undefined') {
 		style.dimensions = getDimensionsFromCoords(style.coords);
 	}
-	if (typeof style.dimensions != 'undefined'){
+	if (typeof style.dimensions != 'undefined') {
 		textItem.position = dimensions.p;
 		textItem.height = dimensions.h;
 		textItem.width = dimensions.w;
 	}
-	else{
+	else {
 		adjustTextLayer(layer);
 	}
 }
@@ -123,8 +134,8 @@ function typesetEX(typesetObj) {
 	app.preferences.typeUnits = TypeUnits.PIXELS;
 	var originalRulerUnits = app.preferences.rulerUnits;
 	app.preferences.rulerUnits = Units.PIXELS;
-	try{
-		if(app.documents.length == 0) return 'No document';
+	try {
+		if (app.documents.length == 0) return 'No document';
 		var style = typesetObj.style;
 		var textLayer = app.activeDocument.artLayers.add();
 		textLayer.kind = LayerKind.TEXT;
@@ -148,7 +159,7 @@ function typesetEX(typesetObj) {
 		textItem = null;
 		app.preferences.typeUnits = originalTypeUnits;
 		app.preferences.rulerUnits = originalRulerUnits;
-		return 'typesetted';
+		return 'done';
 	}
 	catch (e) {
 		app.preferences.typeUnits = originalTypeUnits;
@@ -170,7 +181,7 @@ function typesetEX(typesetObj) {
 	catch (e) {
 		throw 'No selected layers';
 	}
-	var resultLayers=new Array();
+	var resultLayers = new Array();
 	for (var ix = 0; ix < app.activeDocument.activeLayer.layers.length; ix++){
 		resultLayers.push(app.activeDocument.activeLayer.layers[ix]);
 	}
@@ -194,7 +205,7 @@ function applyStyleToSelectedLayers(style) {
 	app.preferences.rulerUnits = Units.PIXELS;
 	try {
 		var layers = getSelectedLayers();
-		for (var i = 0; i < layers.length; i ++){
+		for (var i = 0; i < layers.length; i++) {
 			applyStyleToLayer(layers[i], style);
 		}
 		app.preferences.typeUnits = originalTypeUnits;
