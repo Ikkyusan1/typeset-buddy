@@ -95,7 +95,8 @@ function adjustTextLayer(textLayer) {
 	textLayer.textItem.height = dimensions.height;
 }
 
-function applyStyleToLayer(layer, style) {
+function applyStyleToActiveLayer(style) {
+	var layer = app.activeDocument.activeLayer;
 	if(layer.kind !== LayerKind.TEXT) {
 		throw 'Not a text layer: ' + layer.name;
 	}
@@ -129,6 +130,30 @@ function applyStyleToLayer(layer, style) {
 	}
 }
 
+function createTextLayer(text) {
+	var textLayer = app.activeDocument.artLayers.add();
+	textLayer.kind = LayerKind.TEXT;
+	var textItem = textLayer.textItem;
+	textItem.contents = text;
+	textItem.position = [20, 20];
+	textLayer = null;
+	textItem = null;
+}
+
+function sortLayerInLayerGroup(layerGroup) {
+	var layerGroupRef;
+	var layer = app.activeDocument.activeLayer;
+	try {
+		layerGroupRef = app.activeDocument.layerSets.getByName(layerGroup);
+	}
+	catch (e) {
+		layerGroupRef = app.activeDocument.layerSets.add();
+		layerGroupRef.name = layerGroup;
+	}
+	layer.move(layerGroupRef, ElementPlacement.INSIDE);
+	layerGroupRef = null;
+}
+
 function typesetEX(typesetObj) {
 	var originalTypeUnits = app.preferences.typeUnits;
 	app.preferences.typeUnits = TypeUnits.PIXELS;
@@ -137,26 +162,11 @@ function typesetEX(typesetObj) {
 	try {
 		if (app.documents.length == 0) return 'No document';
 		var style = typesetObj.style;
-		var textLayer = app.activeDocument.artLayers.add();
-		textLayer.kind = LayerKind.TEXT;
-		var textItem = textLayer.textItem;
-		textItem.contents = typesetObj.text;
-		applyStyleToLayer(textLayer, style);
-		textItem.position = [20, 20];
+		app.activeDocument.suspendHistory('Create text layer', 'createTextLayer('+ JSON.stringify(typesetObj.text) + ');');
+		app.activeDocument.suspendHistory('Apply style', 'applyStyleToActiveLayer('+ JSON.stringify(style) + ');');
 		if (style.useLayerGroups && style.layerGroup) {
-			var layerRef;
-			try {
-				layerRef = app.activeDocument.layerSets.getByName(style.layerGroup);
-			}
-			catch (e) {
-				layerRef = app.activeDocument.layerSets.add();
-				layerRef.name = style.layerGroup;
-			}
-			textLayer.move(layerRef, ElementPlacement.INSIDE);
-			layerRef = null;
+			app.activeDocument.suspendHistory('Sort layer', 'sortLayerInLayerGroup("'+ style.layerGroup + '");');
 		}
-		textLayer = null;
-		textItem = null;
 		app.preferences.typeUnits = originalTypeUnits;
 		app.preferences.rulerUnits = originalRulerUnits;
 		return 'done';
@@ -169,14 +179,14 @@ function typesetEX(typesetObj) {
 }
 
 
- function getSelectedLayers(){
+function getSelectedLayers() {
 	var idGrp = stringIDToTypeID('groupLayersEvent');
 	var descGrp = new ActionDescriptor();
 	var refGrp = new ActionReference();
 	refGrp.putEnumerated(charIDToTypeID('Lyr '), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
 	descGrp.putReference(charIDToTypeID('null'), refGrp);
 	try {
-		executeAction(idGrp, descGrp, DialogModes.NO );
+		executeAction(idGrp, descGrp, DialogModes.NO);
 	}
 	catch (e) {
 		throw 'No selected layers';
@@ -206,7 +216,8 @@ function applyStyleToSelectedLayers(style) {
 	try {
 		var layers = getSelectedLayers();
 		for (var i = 0; i < layers.length; i++) {
-			applyStyleToLayer(layers[i], style);
+			app.activeDocument.activeLayer = layers[i];
+			app.activeDocument.suspendHistory('Apply style', 'applyStyleToActiveLayer('+ JSON.stringify(style) + ');');
 		}
 		app.preferences.typeUnits = originalTypeUnits;
 		app.preferences.rulerUnits = originalRulerUnits;
@@ -217,6 +228,5 @@ function applyStyleToSelectedLayers(style) {
 		app.preferences.rulerUnits = originalRulerUnits;
 		return e;
 	}
-
 }
 
