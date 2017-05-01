@@ -57,7 +57,7 @@ var tb = angular.module('tb', [
 tb.constant('CONF', {
 	appName: 'typeset_buddy', // will be replaced by package.json name when compiled
 	debug: false,	// will be true for when compiled for dev environment, false otherwise
-	version: '0.1.2' // will be replaced when compiled
+	version: '0.1.3' // will be replaced when compiled
 });
 tb.config(['cfpLoadingBarProvider', '$localStorageProvider',
 	function(cfpLoadingBarProvider, $localStorageProvider) {
@@ -145,7 +145,7 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$templateCache', '$ro
 tb.config(['$stateProvider', '$urlRouterProvider',
 	function($stateProvider, $urlRouterProvider) {
 
-		$urlRouterProvider.otherwise('/script_view');
+		$urlRouterProvider.otherwise('/styles');
 
 		$stateProvider
 		.state('app', {
@@ -763,7 +763,7 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 		self.typeset = function(typesetObj) {
 			let def = $q.defer();
 			$rootScope.$root.CSI.evalScript('typesetEX(' + JSON.stringify(typesetObj) + ')', function(res) {
-				if(res === 'typesetted') {
+				if(res === 'done') {
 					def.resolve();
 				}
 				else{
@@ -801,6 +801,10 @@ tb.config(['$stateProvider',
 tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToast', 'Utils', '$uibModal',
 	function($scope, StylesService, ScriptService, ngToast, Utils, $uibModal) {
 
+		$scope.clearStyleFilter = function(){
+			$scope.styleFilter = undefined;
+		}
+
 		$scope.newStyleSet = function() {
 			$scope.styleSet = StylesService.getDummyStyleSet();
 			$scope.selectedStyleset = null;
@@ -821,8 +825,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 			if (angular.isDefined($scope.selectedStyleset)) {
 				let styleSet = StylesService.getStyleSet($scope.selectedStyleset);
 				delete styleSet.id;
-				// window.cep.fs.showSaveDialogEx(SSDEXTitleVal, SSDEXInitialPathVal, SSDEXFileTypesVal, SSDEXDefaultNameVal, SSDEXFriendlyFilePrefixVal, SSDEXPromptVal, SSDEXNameFieldLabelVal);
-				let result = window.cep.fs.showSaveDialogEx('Export styleset', undefined, Utils.getValidFileSuffix('*.json'), styleSet.name + '_styleset.json', undefined, 'Export', undefined);
+				let result = window.cep.fs.showSaveDialogEx('Export styleset', undefined, Utils.getValidFileSuffix('*.json'), styleSet.name + '_styleset.json', undefined, 'Export style set', undefined);
 				if (!!result.data) {
 					let writeResult = window.cep.fs.writeFile(result.data, JSON.stringify(styleSet, null, 2));
 					if (writeResult.err != 0) {
@@ -891,7 +894,8 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 				let result = window.cep.fs.readFile(file.data[0]);
 				if (result.err === 0) {
 					try{
-						let tmp = angular.merge({}, StylesService.getDummyStyleSet(), JSON.parse(result.data));
+						let tmp = JSON.parse(result.data);
+						$scope.log('parsed', tmp);
 						StylesService.cleanAndCheckStyleSet(tmp);
 						delete tmp.id;
 						$scope.styleSet = angular.copy(tmp);

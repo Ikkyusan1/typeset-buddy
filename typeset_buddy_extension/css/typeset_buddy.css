@@ -203,6 +203,13 @@ tb-style-preset>div.row:first-child {
 
 }
 
+.selectable {
+	-webkit-user-select: initial;
+	-moz-user-select: initial;
+	-ms-user-select: initial;
+	user-select: initial;
+}
+
 .list > .list-item:not(last-child) {
 	border-bottom: 1px solid #ddd;
 }
@@ -219,6 +226,10 @@ tb-style-preset>div.row:first-child {
 .list-item.panel-separator {
 	background: #ddd;
 	padding: 2px !important;
+}
+
+.bubble-content {
+	display: inline-block;
 }
 
 .list-item.double-bubble .bubble-content:before {

@@ -25,7 +25,6 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 			if (angular.isDefined($scope.selectedStyleset)) {
 				let styleSet = StylesService.getStyleSet($scope.selectedStyleset);
 				delete styleSet.id;
-				// window.cep.fs.showSaveDialogEx(SSDEXTitleVal, SSDEXInitialPathVal, SSDEXFileTypesVal, SSDEXDefaultNameVal, SSDEXFriendlyFilePrefixVal, SSDEXPromptVal, SSDEXNameFieldLabelVal);
 				let result = window.cep.fs.showSaveDialogEx('Export styleset', undefined, Utils.getValidFileSuffix('*.json'), styleSet.name + '_styleset.json', undefined, 'Export style set', undefined);
 				if (!!result.data) {
 					let writeResult = window.cep.fs.writeFile(result.data, JSON.stringify(styleSet, null, 2));
