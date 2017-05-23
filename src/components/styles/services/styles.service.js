@@ -64,7 +64,7 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 		self.getAppFonts = function() {
 			let def = $q.defer();
 			if (!!!self.appFonts.length) {
-				$rootScope.CSI.evalScript('getAppFonts()', function(res) {
+				$rootScope.CSI.evalScript('getAppFonts();', function(res) {
 					self.appFonts = JSON.parse(res);
 					def.resolve(angular.copy(self.appFonts));
 				});
@@ -184,9 +184,9 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 			}
 		};
 
-		self.applyStyle = function(style) {
+		self.applyStyleToSelectedLayers = function(style) {
 			let def = $q.defer();
-			$rootScope.$root.CSI.evalScript('applyStyleToSelectedLayers('+ JSON.stringify(style) +')', function(res) {
+			$rootScope.$root.CSI.evalScript('applyStyleToSelectedLayers('+ JSON.stringify(style) +');', function(res) {
 				if (res === 'done') {
 					def.resolve();
 				}

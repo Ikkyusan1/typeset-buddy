@@ -147,9 +147,42 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 			return !!match;
 		};
 
+		self.maybeTypesetToPath = function(typesetObj) {
+			let def = $q.defer();
+			let tmpObj = angular.copy(typesetObj);
+			$rootScope.CSI.evalScript('getSingleRectangleSelectionDimensions();', function(res) {
+				$rootScope.log('maybeTypesetToPath return', res);
+				if (res == 'no_selection') {
+					return self.typeset(tmpObj)
+				}
+				else if (res == 'multiple_paths') {
+					def.reject('Too many paths. Only one path allowed.');
+				}
+				else if (res == 'too_many_anchors') {
+					def.reject('Too many anchors in path. Only rectangle paths are allowed (use the marquee tool).');
+				}
+				else {
+					try {
+						res = JSON.parse(res);
+						if (!angular.isDefined(res.p)) {
+							def.reject('The dimensions were malformed.');
+						}
+						else {
+							tmpObj.style.dimensions = res;
+							return self.typeset(tmpObj);
+						}
+					}
+					catch (e) {
+						def.reject('Could not parse the dimensions.');
+					}
+				}
+			});
+			return def.promise;
+		};
+
 		self.typeset = function(typesetObj) {
 			let def = $q.defer();
-			$rootScope.$root.CSI.evalScript('typesetEX(' + JSON.stringify(typesetObj) + ')', function(res) {
+			$rootScope.$root.CSI.evalScript('typesetEX(' + JSON.stringify(typesetObj) + ');', function(res) {
 				if(res === 'done') {
 					def.resolve();
 				}

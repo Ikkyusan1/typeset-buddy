@@ -541,7 +541,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 				stylePreset.useLayerGroups = ScriptService.useLayerGroups();
 				let typesetObj = {text: text, style: stylePreset};
 				$scope.$root.log('typesetObj', typesetObj);
-				ScriptService.typeset(typesetObj)
+				ScriptService.maybeTypesetToPath(typesetObj)
 				.then(
 					function() {},
 					function(err) {
@@ -760,9 +760,42 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 			return !!match;
 		};
 
+		self.maybeTypesetToPath = function(typesetObj) {
+			let def = $q.defer();
+			let tmpObj = angular.copy(typesetObj);
+			$rootScope.CSI.evalScript('getSingleRectangleSelectionDimensions();', function(res) {
+				$rootScope.log('maybeTypesetToPath return', res);
+				if (res == 'no_selection') {
+					return self.typeset(tmpObj)
+				}
+				else if (res == 'multiple_paths') {
+					def.reject('Too many paths. Only one path allowed.');
+				}
+				else if (res == 'too_many_anchors') {
+					def.reject('Too many anchors in path. Only rectangle paths are allowed (use the marquee tool).');
+				}
+				else {
+					try {
+						res = JSON.parse(res);
+						if (!angular.isDefined(res.p)) {
+							def.reject('The dimensions were malformed.');
+						}
+						else {
+							tmpObj.style.dimensions = res;
+							return self.typeset(tmpObj);
+						}
+					}
+					catch (e) {
+						def.reject('Could not parse the dimensions.');
+					}
+				}
+			});
+			return def.promise;
+		};
+
 		self.typeset = function(typesetObj) {
 			let def = $q.defer();
-			$rootScope.$root.CSI.evalScript('typesetEX(' + JSON.stringify(typesetObj) + ')', function(res) {
+			$rootScope.$root.CSI.evalScript('typesetEX(' + JSON.stringify(typesetObj) + ');', function(res) {
 				if(res === 'done') {
 					def.resolve();
 				}
@@ -900,7 +933,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 						delete tmp.id;
 						$scope.styleSet = angular.copy(tmp);
 					}
-					catch(e) {
+					catch (e) {
 						$scope.styleSet = StylesService.getDummyStyleSet();
 						ngToast.create({className: 'danger', content: 'Import error: ' + e});
 					}
@@ -986,8 +1019,10 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 			);
 		};
 
-		$scope.applyStyle = function(style){
-			StylesService.applyStyle(style)
+		$scope.applyStyleToSelectedLayers = function(style){
+			let tmpStyle = angular.copy(style);
+			tmpStyle.noSizeAdjustment = true;
+			StylesService.applyStyleToSelectedLayers(tmpStyle)
 			.then(
 				function() {
 					ngToast.create({className: 'success', content: 'Done'});
@@ -1259,7 +1294,7 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 		self.getAppFonts = function() {
 			let def = $q.defer();
 			if (!!!self.appFonts.length) {
-				$rootScope.CSI.evalScript('getAppFonts()', function(res) {
+				$rootScope.CSI.evalScript('getAppFonts();', function(res) {
 					self.appFonts = JSON.parse(res);
 					def.resolve(angular.copy(self.appFonts));
 				});
@@ -1379,9 +1414,9 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 			}
 		};
 
-		self.applyStyle = function(style) {
+		self.applyStyleToSelectedLayers = function(style) {
 			let def = $q.defer();
-			$rootScope.$root.CSI.evalScript('applyStyleToSelectedLayers('+ JSON.stringify(style) +')', function(res) {
+			$rootScope.$root.CSI.evalScript('applyStyleToSelectedLayers('+ JSON.stringify(style) +');', function(res) {
 				if (res === 'done') {
 					def.resolve();
 				}

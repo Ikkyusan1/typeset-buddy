@@ -100,7 +100,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 						delete tmp.id;
 						$scope.styleSet = angular.copy(tmp);
 					}
-					catch(e) {
+					catch (e) {
 						$scope.styleSet = StylesService.getDummyStyleSet();
 						ngToast.create({className: 'danger', content: 'Import error: ' + e});
 					}
@@ -186,8 +186,10 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 			);
 		};
 
-		$scope.applyStyle = function(style){
-			StylesService.applyStyle(style)
+		$scope.applyStyleToSelectedLayers = function(style){
+			let tmpStyle = angular.copy(style);
+			tmpStyle.noSizeAdjustment = true;
+			StylesService.applyStyleToSelectedLayers(tmpStyle)
 			.then(
 				function() {
 					ngToast.create({className: 'success', content: 'Done'});

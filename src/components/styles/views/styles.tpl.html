@@ -58,6 +58,6 @@
 </div>
 <div class="list scrollable padded">
 	<div class="list-item" ng-repeat="style in styleSet.styles |filter: {keyword: styleFilter||undefined}">
-		<tb-style-preset preset="style" remove-action="removeStyle(style)" duplicate-action="duplicateStyle(style)" apply-action="applyStyle(style)" ng-class="{'default-style': style.default}"></tb-style-preset>
+		<tb-style-preset preset="style" remove-action="removeStyle(style)" duplicate-action="duplicateStyle(style)" apply-action="applyStyleToSelectedLayers(style)" ng-class="{'default-style': style.default}"></tb-style-preset>
 	</div>
 </div>

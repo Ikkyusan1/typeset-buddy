@@ -34,6 +34,21 @@ if (!String.prototype.trim) {
 	};
 }
 
+var originalTypeUnits = app.preferences.typeUnits;
+var originalRulerUnits = app.preferences.rulerUnits;
+
+function setUnits() {
+	originalTypeUnits = app.preferences.typeUnits;
+	app.preferences.typeUnits = TypeUnits.PIXELS;
+	originalRulerUnits = app.preferences.rulerUnits;
+	app.preferences.rulerUnits = Units.PIXELS;
+}
+
+function resetUnits() {
+	app.preferences.typeUnits = originalTypeUnits;
+	app.preferences.rulerUnits = originalRulerUnits;
+}
+
 function getAppFonts() {
 	var fontNames = [];
 	for (var i=0; i < app.fonts.length; i++) {
@@ -47,15 +62,21 @@ function getAppFonts() {
 
 // WTF, Adobe, seriously. We shouldn't even need this.
 function getTransformFactor() {
-	var ref = new ActionReference();
-	ref.putEnumerated(charIDToTypeID('Lyr '), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
-	var desc = executeActionGet(ref).getObjectValue(stringIDToTypeID('textKey'));
-	var textSize =  desc.getList(stringIDToTypeID('textStyleRange')).getObjectValue(0).getObjectValue(stringIDToTypeID('textStyle')).getDouble(stringIDToTypeID('size'));
-	if (desc.hasKey(stringIDToTypeID('transform'))) {
-		var mFactor = desc.getObjectValue(stringIDToTypeID('transform')).getUnitDoubleValue(stringIDToTypeID('yy'));
-		return mFactor;
+	try {
+		var ref = new ActionReference();
+		ref.putEnumerated(charIDToTypeID('Lyr '), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
+		var desc = executeActionGet(ref).getObjectValue(stringIDToTypeID('textKey'));
+		var textSize =  desc.getList(stringIDToTypeID('textStyleRange')).getObjectValue(0).getObjectValue(stringIDToTypeID('textStyle')).getDouble(stringIDToTypeID('size'));
+		if (desc.hasKey(stringIDToTypeID('transform'))) {
+			var mFactor = desc.getObjectValue(stringIDToTypeID('transform')).getUnitDoubleValue(stringIDToTypeID('yy'));
+			return mFactor;
+		}
+		return 1;
 	}
-	return 1;
+	catch (e) {
+		throw 'Error during the retrieval of the transform factor.';
+	}
+
 }
 
 function getAdjustedSize(size) {
@@ -90,9 +111,9 @@ function getRealTextLayerDimensions(textLayer) {
 	return dimensions;
 }
 
-function adjustTextLayer(textLayer) {
+function adjustTextLayerHeight(textLayer) {
 	var dimensions = getRealTextLayerDimensions(textLayer);
-	textLayer.textItem.height = dimensions.height;
+	textLayer.textItem.height = dimensions.height + 10; // add a little to keep some leeway
 }
 
 function applyStyleToActiveLayer(style) {
@@ -117,16 +138,18 @@ function applyStyleToActiveLayer(style) {
 	textItem.antiAliasMethod = AntiAlias[style.antialias];
 	textItem.autoKerning = AutoKernType[style.kerning];
 	textItem.hyphenation = style.hyphenate;
-	if (typeof style.coords != 'undefined' && typeof style.dimensions == 'undefined') {
-		style.dimensions = getDimensionsFromCoords(style.coords);
-	}
-	if (typeof style.dimensions != 'undefined') {
-		textItem.position = dimensions.p;
-		textItem.height = dimensions.h;
-		textItem.width = dimensions.w;
-	}
-	else {
-		adjustTextLayer(layer);
+	if (!!!style.noSizeAdjustment) {
+		if (typeof style.coords != 'undefined' && typeof style.dimensions == 'undefined') {
+			style.dimensions = getDimensionsFromCoords(style.coords);
+		}
+		if (typeof style.dimensions != 'undefined') {
+			textItem.position = style.dimensions.p;
+			textItem.height = getAdjustedSize(style.dimensions.h);
+			textItem.width = getAdjustedSize(style.dimensions.w);
+		}
+		else {
+			adjustTextLayerHeight(layer);
+		}
 	}
 }
 
@@ -155,10 +178,7 @@ function sortLayerInLayerGroup(layerGroup) {
 }
 
 function typesetEX(typesetObj) {
-	var originalTypeUnits = app.preferences.typeUnits;
-	app.preferences.typeUnits = TypeUnits.PIXELS;
-	var originalRulerUnits = app.preferences.rulerUnits;
-	app.preferences.rulerUnits = Units.PIXELS;
+	setUnits();
 	try {
 		if (app.documents.length == 0) return 'No document';
 		var style = typesetObj.style;
@@ -167,17 +187,14 @@ function typesetEX(typesetObj) {
 		if (style.useLayerGroups && style.layerGroup) {
 			app.activeDocument.suspendHistory('Sort layer', 'sortLayerInLayerGroup("'+ style.layerGroup + '");');
 		}
-		app.preferences.typeUnits = originalTypeUnits;
-		app.preferences.rulerUnits = originalRulerUnits;
+		resetUnits();
 		return 'done';
 	}
 	catch (e) {
-		app.preferences.typeUnits = originalTypeUnits;
-		app.preferences.rulerUnits = originalRulerUnits;
+		resetUnits();
 		return JSON.stringify(e);
 	}
 }
-
 
 function getSelectedLayers() {
 	var idGrp = stringIDToTypeID('groupLayersEvent');
@@ -209,24 +226,68 @@ function getSelectedLayers() {
 }
 
 function applyStyleToSelectedLayers(style) {
-	var originalTypeUnits = app.preferences.typeUnits;
-	app.preferences.typeUnits = TypeUnits.PIXELS;
-	var originalRulerUnits = app.preferences.rulerUnits;
-	app.preferences.rulerUnits = Units.PIXELS;
+	setUnits();
 	try {
 		var layers = getSelectedLayers();
 		for (var i = 0; i < layers.length; i++) {
 			app.activeDocument.activeLayer = layers[i];
 			app.activeDocument.suspendHistory('Apply style', 'applyStyleToActiveLayer('+ JSON.stringify(style) + ');');
 		}
-		app.preferences.typeUnits = originalTypeUnits;
-		app.preferences.rulerUnits = originalRulerUnits;
+		resetUnits();
 		return 'done';
 	}
-	catch(e){
-		app.preferences.typeUnits = originalTypeUnits;
-		app.preferences.rulerUnits = originalRulerUnits;
-		return e;
+	catch (e) {
+		resetUnits();
+		return JSON.stringify(e);
 	}
 }
 
+function getSingleRectangleSelectionDimensions() {
+	try {
+		setUnits();
+		var doc = app.activeDocument;
+		var savedState = doc.activeHistoryState;
+		var selections = doc.selection;
+		try {
+			selections.makeWorkPath();
+		}
+		catch (e) {
+			doc.activeHistoryState = savedState;
+			resetUnits();
+			return 'no_selection';
+		}
+		var wPath = doc.pathItems['Work Path'];
+		var dimensions = {};
+		// limit to a single path only
+		if (wPath.subPathItems.length > 1) {
+			doc.activeHistoryState = savedState;
+			resetUnits();
+			return 'multiple_paths';
+		}
+		// Loop through all paths
+		for (var i = 0; i < wPath.subPathItems.length; i++) {
+			var bounds = [];
+			// we need rectangles only
+			if (wPath.subPathItems[i].pathPoints.length != 4) {
+				doc.activeHistoryState = savedState;
+				resetUnits();
+				return 'too_many_anchors';
+			}
+			// Loop through all path points and get their anchor coordinates
+			for (var j = 0; j < wPath.subPathItems[i].pathPoints.length; j++) {
+				bounds.push(wPath.subPathItems[i].pathPoints[j].anchor);
+			}
+			// calculate the corresponding dimensions
+			dimensions = getDimensionsFromCoords(bounds);
+		}
+		doc.activeHistoryState = savedState;
+		resetUnits();
+		return JSON.stringify(dimensions);
+	}
+	catch (e) {
+		doc.activeHistoryState = savedState;
+		resetUnits();
+		return JSON.stringify(e);
+	}
+
+}
