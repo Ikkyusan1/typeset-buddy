@@ -119,8 +119,10 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 				}
 			}
 			let idx = $localStorage.styleSets.findIndex(function(one) { return one.id == styleSet.id; });
+			let existingId = -1;
+			if (idx > -1) existingId = $localStorage.styleSets[idx].id;
 			for (let i = 0; i < $localStorage.styleSets.length; i++) {
-				if ($localStorage.styleSets[i].name.trim().toLowerCase() == styleSet.name.trim().toLowerCase() && $localStorage.styleSets[i].id != idx) throw 'A styleset with the same name already exists';
+				if ($localStorage.styleSets[i].name.trim().toLowerCase() == styleSet.name.trim().toLowerCase() && $localStorage.styleSets[i].id != existingId) throw 'A styleset with the same name already exists';
 			}
 			for (let i = 0; i < styleSet.styles.length; i++) {
 				if (angular.isDefined(styleSet.styles[i+1]) && styleSet.styles[i].keyword == styleSet.styles[i+1].keyword) throw 'The styleset contains duplicate style keywords';
@@ -199,9 +201,10 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 		// init
 		if (!!!$localStorage.styleSets) {
 			$localStorage.styleSets = [];
-			let def = self.getDummyStyleSet();
-			def.name = 'Default set';
-			self.saveStyleSet(def);
+			let defaultSet = self.getDummyStyleSet();
+			defaultSet.name = 'Default set';
+			defaultSet.styles[0].fontName = self.fontFallBack;
+			self.saveStyleSet(defaultSet);
 		}
 
 		return self;
