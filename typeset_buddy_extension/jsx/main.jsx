@@ -276,16 +276,19 @@ function getSingleRectangleSelectionDimensions() {
 		setUnits();
 		var doc = app.activeDocument;
 		var selections = doc.selection;
+		alert('a');
 		try {
 			selections.makeWorkPath();
 		}
 		catch (e) {
-			undo();
+			alert('fu');
 			resetUnits();
 			return 'no_selection';
 		}
+		alert('c');
 		var wPath = doc.pathItems['Work Path'];
 		var dimensions = {};
+		alert('d');
 		// limit to a single path only
 		if (wPath.subPathItems.length > 1) {
 			undo();
@@ -308,8 +311,11 @@ function getSingleRectangleSelectionDimensions() {
 			// calculate the corresponding dimensions
 			dimensions = getDimensionsFromCoords(bounds);
 		}
+		alert(1);
 		undo();
+		alert(2);
 		resetUnits();
+		alert(3);
 		return JSON.stringify(dimensions);
 	}
 	catch (e) {

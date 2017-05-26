@@ -280,7 +280,6 @@ function getSingleRectangleSelectionDimensions() {
 			selections.makeWorkPath();
 		}
 		catch (e) {
-			undo();
 			resetUnits();
 			return 'no_selection';
 		}
