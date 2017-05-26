@@ -212,7 +212,7 @@ gulp.task('zip', function(){
 	];
 	return gulp.src(files, {base: './'})
 	.pipe(plumber())
-	.pipe($.zip(packageFile.name + '.' + packageFile.version +'.zip'))
+	.pipe($.zip(packageFile.name + '_extension-' + packageFile.version +'.zip'))
 	.pipe(gulp.dest(paths.destZip));
 });
 
