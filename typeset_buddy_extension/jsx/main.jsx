@@ -191,7 +191,7 @@ function sortLayerInLayerGroup(layerGroup) {
 function typesetEX(typesetObj) {
 	setUnits();
 	try {
-		if (app.documents.length == 0) return 'No document';
+		if (app.documents.length === 0) return 'no_document';
 		var style = typesetObj.style;
 		app.activeDocument.suspendHistory('Create text layer', 'createTextLayer('+ JSON.stringify(typesetObj.text) + ');');
 		app.activeDocument.suspendHistory('Apply style', 'applyStyleToActiveLayer('+ JSON.stringify(style) + ');');
@@ -237,8 +237,8 @@ function getSelectedLayers() {
 }
 
 function applyStyleToSelectedLayers(style) {
+	if (app.documents.length === 0) return 'no_document';
 	setUnits();
-	var doc = app.activeDocument;
 	try {
 		var layers = getSelectedLayers();
 		for (var i = 0; i < layers.length; i++) {
@@ -256,6 +256,7 @@ function applyStyleToSelectedLayers(style) {
 }
 
 function setStyle(style) {
+	if (app.documents.length === 0) return 'no_document';
 	app.activeDocument.suspendHistory('Set style', '\
 		createTextLayer(""); \
 		applyStyleToActiveLayer('+ JSON.stringify(style) + '); \
@@ -272,10 +273,10 @@ function setStyleAction(style) {
 }
 
 function getSingleRectangleSelectionDimensions() {
+	if (app.documents.length === 0) return 'no_document';
 	try {
 		setUnits();
-		var doc = app.activeDocument;
-		var selections = doc.selection;
+		var selections = app.activeDocument.selection;
 		try {
 			selections.makeWorkPath();
 		}
@@ -283,7 +284,7 @@ function getSingleRectangleSelectionDimensions() {
 			resetUnits();
 			return 'no_selection';
 		}
-		var wPath = doc.pathItems['Work Path'];
+		var wPath = app.activeDocument.pathItems['Work Path'];
 		var dimensions = {};
 		// limit to a single path only
 		if (wPath.subPathItems.length > 1) {

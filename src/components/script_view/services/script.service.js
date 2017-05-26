@@ -153,7 +153,10 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 			$rootScope.log('typesetObj', tmpObj);
 			$rootScope.CSI.evalScript('getSingleRectangleSelectionDimensions();', function(res) {
 				$rootScope.log('maybeTypesetToPath return', res);
-				if (res == 'no_selection') {
+				if (res == 'no_document') {
+					def.reject('No document');
+				}
+				else if (res == 'no_selection') {
 					return self.typeset(tmpObj)
 				}
 				else if (res == 'multiple_paths') {
@@ -184,11 +187,14 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 		self.typeset = function(typesetObj) {
 			let def = $q.defer();
 			$rootScope.$root.CSI.evalScript('typesetEX(' + JSON.stringify(typesetObj) + ');', function(res) {
-				if(res === 'done') {
+				$rootScope.log('typeset return', res);
+				if (res === 'no_document') {
+					def.reject('No document');
+				}
+				else if(res === 'done') {
 					def.resolve();
 				}
 				else {
-					$rootScope.log('Typeset Error', res);
 					def.reject(res)
 				}
 			});

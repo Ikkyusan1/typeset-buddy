@@ -773,7 +773,10 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 			$rootScope.log('typesetObj', tmpObj);
 			$rootScope.CSI.evalScript('getSingleRectangleSelectionDimensions();', function(res) {
 				$rootScope.log('maybeTypesetToPath return', res);
-				if (res == 'no_selection') {
+				if (res == 'no_document') {
+					def.reject('No document');
+				}
+				else if (res == 'no_selection') {
 					return self.typeset(tmpObj)
 				}
 				else if (res == 'multiple_paths') {
@@ -804,11 +807,14 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 		self.typeset = function(typesetObj) {
 			let def = $q.defer();
 			$rootScope.$root.CSI.evalScript('typesetEX(' + JSON.stringify(typesetObj) + ');', function(res) {
-				if(res === 'done') {
+				$rootScope.log('typeset return', res);
+				if (res === 'no_document') {
+					def.reject('No document');
+				}
+				else if(res === 'done') {
 					def.resolve();
 				}
 				else {
-					$rootScope.log('Typeset Error', res);
 					def.reject(res)
 				}
 			});
@@ -1439,11 +1445,14 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 		self.applyStyleToSelectedLayers = function(style) {
 			let def = $q.defer();
 			$rootScope.$root.CSI.evalScript('applyStyleToSelectedLayers('+ JSON.stringify(style) +');', function(res) {
-				if (res === 'done') {
+				$rootScope.log('applyStyleToSelectedLayers return', res);
+				if (res === 'no_document') {
+					def.reject('No document');
+				}
+				else if (res === 'done') {
 					def.resolve();
 				}
 				else {
-					$rootScope.log('Apply style error', res);
 					def.reject(res);
 				}
 			});
@@ -1453,11 +1462,14 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 		self.setStyle = function(style) {
 			let def = $q.defer();
 			$rootScope.$root.CSI.evalScript('setStyle('+ JSON.stringify(style) +');', function(res) {
-				if (res === 'done') {
+				$rootScope.log('setStyle return', res);
+				if (res === 'no_document') {
+					def.reject('No document');
+				}
+				else if (res === 'done') {
 					def.resolve();
 				}
 				else {
-					$rootScope.log('Set style error', res);
 					def.reject(res);
 				}
 			});
