@@ -122,7 +122,7 @@ function adjustTextLayerHeight(textLayer) {
 
 function ajdustActiveLayerSize(style) {
 	var layer = app.activeDocument.activeLayer;
-	if(layer.kind !== LayerKind.TEXT) throw 'Not a text layer: ' + layer.name;
+	if(layer.kind !== LayerKind.TEXT) throw 'not_text_layer';
 	var textItem = layer.textItem;
 	if (typeof style.coords != 'undefined' && typeof style.dimensions == 'undefined') {
 		style.dimensions = getDimensionsFromCoords(style.coords);
@@ -133,7 +133,7 @@ function ajdustActiveLayerSize(style) {
 		textItem.width = getAdjustedSize(style.dimensions.w);
 	}
 	else {
-		textItem.width = getBasicTextboxWidth(style.size);
+		textItem.width = getBasicTextboxWidth(textItem.size);
 		textItem.height = activeDocument.height;
 		adjustTextLayerHeight(layer);
 	}
@@ -141,7 +141,7 @@ function ajdustActiveLayerSize(style) {
 
 function applyStyleToActiveLayer(style) {
 	var layer = app.activeDocument.activeLayer;
-	if(layer.kind !== LayerKind.TEXT) throw 'Not a text layer: ' + layer.name;
+	if(layer.kind !== LayerKind.TEXT) throw 'not_text_layer';
 	var textItem = layer.textItem;
 	if (!!!style.useCurrent) {
 		textItem.kind = TextType.PARAGRAPHTEXT;
@@ -158,6 +158,9 @@ function applyStyleToActiveLayer(style) {
 		textItem.antiAliasMethod = AntiAlias[style.antialias];
 		textItem.autoKerning = AutoKernType[style.kerning];
 		textItem.hyphenation = style.hyphenate;
+		if (!!!style.color) {
+			textItem.color = app.foregroundColor;
+		}
 	}
 	if (!!!style.noResize) {
 		ajdustActiveLayerSize(style);
@@ -203,7 +206,7 @@ function typesetEX(typesetObj) {
 	}
 	catch (e) {
 		resetUnits();
-		return JSON.stringify(e);
+		return e;
 	}
 }
 
@@ -217,7 +220,7 @@ function getSelectedLayers() {
 		executeAction(idGrp, descGrp, DialogModes.NO);
 	}
 	catch (e) {
-		throw 'No selected layers';
+		throw 'no_selected_layers';
 	}
 	var resultLayers = new Array();
 	for (var ix = 0; ix < app.activeDocument.activeLayer.layers.length; ix++){
@@ -240,7 +243,12 @@ function applyStyleToSelectedLayers(style) {
 	if (app.documents.length === 0) return 'no_document';
 	setUnits();
 	try {
-		var layers = getSelectedLayers();
+		try {
+			var layers = getSelectedLayers();
+		}
+		catch (e) {
+			return 'no_selected_layers';
+		}
 		for (var i = 0; i < layers.length; i++) {
 			app.activeDocument.activeLayer = layers[i];
 			app.activeDocument.suspendHistory('Apply style', 'applyStyleToActiveLayer('+ JSON.stringify(style) + ');');
@@ -251,7 +259,7 @@ function applyStyleToSelectedLayers(style) {
 	catch (e) {
 		undo();
 		resetUnits();
-		return JSON.stringify(e);
+		return e;
 	}
 }
 
@@ -270,6 +278,30 @@ function setStyleAction(style) {
 	applyStyleToActiveLayer(style);
 	app.activeDocument.activeLayer.remove();
 	return 'done';
+}
+
+function autoResizeSelectedLayers() {
+	if (app.documents.length === 0) return 'no_document';
+	setUnits();
+	try {
+		try {
+			var layers = getSelectedLayers();
+		}
+		catch (e) {
+			return 'no_selected_layers';
+		}
+		for (var i = 0; i < layers.length; i++) {
+			app.activeDocument.activeLayer = layers[i];
+			app.activeDocument.suspendHistory('Auto resize', 'ajdustActiveLayerSize({});');
+		}
+		resetUnits();
+		return 'done';
+	}
+	catch (e) {
+		undo();
+		resetUnits();
+		return e;
+	}
 }
 
 function getSingleRectangleSelectionDimensions() {
@@ -315,6 +347,6 @@ function getSingleRectangleSelectionDimensions() {
 	catch (e) {
 		undo();
 		resetUnits();
-		return JSON.stringify(e);
+		return e;
 	}
 }

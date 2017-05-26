@@ -57,7 +57,7 @@ var tb = angular.module('tb', [
 tb.constant('CONF', {
 	appName: 'typeset_buddy', // will be replaced by package.json name when compiled
 	debug: false,	// will be true for when compiled for dev environment, false otherwise
-	version: '0.1.4' // will be replaced when compiled
+	version: '0.1.5' // will be replaced when compiled
 });
 tb.config(['cfpLoadingBarProvider', '$localStorageProvider',
 	function(cfpLoadingBarProvider, $localStorageProvider) {
@@ -1058,7 +1058,19 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 					ngToast.create({className: 'danger', content: err});
 				}
 			);
-		}
+		};
+
+		$scope.autoResizeSelectedLayers = function() {
+			StylesService.autoResizeSelectedLayers()
+			.then(
+				function() {
+					ngToast.create({className: 'success', content: 'Done'});
+				},
+				function(err) {
+					ngToast.create({className: 'danger', content: err});
+				}
+			);
+		};
 
 		$scope.loadStyleSet = function() {
 			$scope.styleSet = StylesService.getStyleSet($scope.selectedStyleset);
@@ -1447,7 +1459,13 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 			$rootScope.$root.CSI.evalScript('applyStyleToSelectedLayers('+ JSON.stringify(style) +');', function(res) {
 				$rootScope.log('applyStyleToSelectedLayers return', res);
 				if (res === 'no_document') {
-					def.reject('No document');
+					def.reject('No document.');
+				}
+				else if (res === 'no_selected_layers') {
+					def.reject('Could not retrieve the selected layers.');
+				}
+				else if (res === 'not_text_layer') {
+					def.reject('Not a text layer.');
 				}
 				else if (res === 'done') {
 					def.resolve();
@@ -1464,7 +1482,30 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 			$rootScope.$root.CSI.evalScript('setStyle('+ JSON.stringify(style) +');', function(res) {
 				$rootScope.log('setStyle return', res);
 				if (res === 'no_document') {
-					def.reject('No document');
+					def.reject('No document.');
+				}
+				else if (res === 'done') {
+					def.resolve();
+				}
+				else {
+					def.reject(res);
+				}
+			});
+			return def.promise;
+		};
+
+		self.autoResizeSelectedLayers = function(){
+			let def = $q.defer();
+			$rootScope.$root.CSI.evalScript('autoResizeSelectedLayers();', function(res) {
+				$rootScope.log('autoResizeSelectedLayers return', res);
+				if (res === 'no_document') {
+					def.reject('No document.');
+				}
+				else if (res === 'no_selected_layers') {
+					def.reject('Could not retrieve the selected layers.');
+				}
+				else if (res === 'not_text_layer') {
+					def.reject('Not a text layer.');
 				}
 				else if (res === 'done') {
 					def.resolve();

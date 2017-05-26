@@ -28,6 +28,7 @@ var paths = {
 	destfonts: path.join(distDirectory, 'fonts'),
 	destJsx: path.join(distDirectory, 'jsx'),
 	destcsxs: path.join(distDirectory, 'CSXS'),
+	destZip: path.join(__dirname, 'packages'),
 };
 
 var packageFile = getPackageFile();
@@ -100,6 +101,8 @@ gulp.task('buildDist', function(callback){
 		'build',
 		'minJs',
 		'minCss',
+		'copyChangelog',
+		'zip',
 		callback
 	);
 });
@@ -190,6 +193,29 @@ gulp.task('copyDebugFile', function(){
 		.pipe(gulp.dest(distDirectory));
 	}
 });
+
+gulp.task('copyCommonFiles', function(){
+	var files = [
+		path.join(__dirname, 'CHANGELOG.md'),
+		path.join(__dirname, 'README.md'),
+	];
+	if(checkFilesExist(files)){
+		return gulp.src(files)
+		.pipe(plumber())
+		.pipe(gulp.dest(distDirectory));
+	}
+});
+
+gulp.task('zip', function(){
+	var files = [
+		distDirectory + '/**',
+	];
+	return gulp.src(files, {base: './'})
+	.pipe(plumber())
+	.pipe($.zip(packageFile.name + '.' + packageFile.version +'.zip'))
+	.pipe(gulp.dest(paths.destZip));
+});
+
 
 // Compile sass into a single css file
 gulp.task('sass', function (callback){

@@ -30,9 +30,13 @@
 		<!-- Delete -->
 	</button>
 	<styleset-selector selected-value="selectedStyleset"></styleset-selector>
+
 	<button class="topcoat-button pull-right" ng-click="exportConstants()" uib-tooltip="Export available fonts and constant values" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
-		<span class="glyphicon glyphicon-save"></span>
 		<span class="glyphicon glyphicon-book"></span>
+	</button>
+
+	<button class="topcoat-button pull-right" ng-click="autoResizeSelectedLayers()" uib-tooltip="Auto resize selected layers" tooltip-popup-delay="500" tooltip-placement="bottom-right">
+		<span class="glyphicon glyphicon-resize-small"></span>
 	</button>
 </div>
 

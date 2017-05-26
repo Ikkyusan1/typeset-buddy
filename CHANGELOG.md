@@ -1,3 +1,9 @@
+### 0.1.5 (2017-05-26)
+Bugfixes and error handling.
+Use foreground color when applying style.
+New: added a button to auto-resize the selected layers.
+
+
 ### 0.1.4 (2017-05-26)
 Fix: default styleset definition.
 Fix: logic error when saving a set.
