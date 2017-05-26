@@ -186,9 +186,9 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 			);
 		};
 
-		$scope.applyStyleToSelectedLayers = function(style){
+		$scope.applyStyleToSelectedLayers = function(style, resize) {
 			let tmpStyle = angular.copy(style);
-			tmpStyle.noSizeAdjustment = true;
+			tmpStyle.noResize = !!!resize;
 			StylesService.applyStyleToSelectedLayers(tmpStyle)
 			.then(
 				function() {
@@ -199,6 +199,19 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 				}
 			);
 		};
+
+		$scope.setStyle = function(style) {
+			let tmpStyle = angular.copy(style);
+			StylesService.setStyle(tmpStyle)
+			.then(
+				function() {
+
+				},
+				function(err) {
+					ngToast.create({className: 'danger', content: err});
+				}
+			);
+		}
 
 		$scope.loadStyleSet = function() {
 			$scope.styleSet = StylesService.getStyleSet($scope.selectedStyleset);

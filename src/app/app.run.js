@@ -1,10 +1,9 @@
-tb.run(['CONF', '$transitions', '$state', '$stateParams', '$templateCache', '$rootScope', '$trace', '$uiRouter', 'Utils', 'themeManager', '$timeout',
-	function(CONF, $transitions, $state, $stateParams, $templateCache, $rootScope, $trace, $uiRouter, Utils, themeManager, $timeout) {
+tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace', 'themeManager', '$localStorage',
+	function(CONF, $transitions, $state, $stateParams, $rootScope, $trace, themeManager, $localStorage) {
 
 		// convenience shortcuts
 		$rootScope.$state = $state;
 		$rootScope.$stateParams = $stateParams;
-		$rootScope.utils = Utils;
 		$rootScope.CSI = new CSInterface();
 		$rootScope.extensionID = $rootScope.CSI.getExtensionID();
 
@@ -43,6 +42,13 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$templateCache', '$ro
 				}
 			}
 		};
+
+		// save last opened tab
+		let saveTab = function(transition, state) {
+			$localStorage.lastOpenedTab = transition.to().name;
+			return transition;
+		}
+		$transitions.onFinish(true, saveTab, {priority: 10});
 
 		// trace routes if debug mode
 		if ($rootScope.debug == true) {

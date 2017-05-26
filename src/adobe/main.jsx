@@ -49,6 +49,10 @@ function resetUnits() {
 	app.preferences.rulerUnits = originalRulerUnits;
 }
 
+function undo() {
+	executeAction(charIDToTypeID('undo'), undefined, DialogModes.NO);
+}
+
 function getAppFonts() {
 	var fontNames = [];
 	for (var i=0; i < app.fonts.length; i++) {
@@ -116,40 +120,47 @@ function adjustTextLayerHeight(textLayer) {
 	textLayer.textItem.height = dimensions.height + 10; // add a little to keep some leeway
 }
 
+function ajdustActiveLayerSize(style) {
+	var layer = app.activeDocument.activeLayer;
+	if(layer.kind !== LayerKind.TEXT) throw 'Not a text layer: ' + layer.name;
+	var textItem = layer.textItem;
+	if (typeof style.coords != 'undefined' && typeof style.dimensions == 'undefined') {
+		style.dimensions = getDimensionsFromCoords(style.coords);
+	}
+	if (typeof style.dimensions != 'undefined') {
+		textItem.position = style.dimensions.p;
+		textItem.height = getAdjustedSize(style.dimensions.h);
+		textItem.width = getAdjustedSize(style.dimensions.w);
+	}
+	else {
+		textItem.width = getBasicTextboxWidth(style.size);
+		textItem.height = activeDocument.height;
+		adjustTextLayerHeight(layer);
+	}
+}
+
 function applyStyleToActiveLayer(style) {
 	var layer = app.activeDocument.activeLayer;
-	if(layer.kind !== LayerKind.TEXT) {
-		throw 'Not a text layer: ' + layer.name;
-	}
+	if(layer.kind !== LayerKind.TEXT) throw 'Not a text layer: ' + layer.name;
 	var textItem = layer.textItem;
-	textItem.kind = TextType.PARAGRAPHTEXT;
-	textItem.width = getBasicTextboxWidth(style.size);
-	textItem.height = activeDocument.height;
-	textItem.font = style.fontName;
-	textItem.size = getAdjustedSize(style.size) + 'px';
-	textItem.leading = style.leading;
-	textItem.tracking = style.tracking;
-	textItem.verticalScale = style.vScale;
-	textItem.horizontalScale = style.hScale;
-	textItem.fauxBold = style.fauxBold;
-	textItem.fauxItalic = style.fauxItalic;
-	textItem.capitalization = TextCase[style.capitalization];
-	textItem.justification = Justification[style.justification];
-	textItem.antiAliasMethod = AntiAlias[style.antialias];
-	textItem.autoKerning = AutoKernType[style.kerning];
-	textItem.hyphenation = style.hyphenate;
-	if (!!!style.noSizeAdjustment) {
-		if (typeof style.coords != 'undefined' && typeof style.dimensions == 'undefined') {
-			style.dimensions = getDimensionsFromCoords(style.coords);
-		}
-		if (typeof style.dimensions != 'undefined') {
-			textItem.position = style.dimensions.p;
-			textItem.height = getAdjustedSize(style.dimensions.h);
-			textItem.width = getAdjustedSize(style.dimensions.w);
-		}
-		else {
-			adjustTextLayerHeight(layer);
-		}
+	if (!!!style.useCurrent) {
+		textItem.kind = TextType.PARAGRAPHTEXT;
+		textItem.font = style.fontName;
+		textItem.size = getAdjustedSize(style.size) + 'px';
+		textItem.leading = style.leading;
+		textItem.tracking = style.tracking;
+		textItem.verticalScale = style.vScale;
+		textItem.horizontalScale = style.hScale;
+		textItem.fauxBold = style.fauxBold;
+		textItem.fauxItalic = style.fauxItalic;
+		textItem.capitalization = TextCase[style.capitalization];
+		textItem.justification = Justification[style.justification];
+		textItem.antiAliasMethod = AntiAlias[style.antialias];
+		textItem.autoKerning = AutoKernType[style.kerning];
+		textItem.hyphenation = style.hyphenate;
+	}
+	if (!!!style.noResize) {
+		ajdustActiveLayerSize(style);
 	}
 }
 
@@ -227,6 +238,7 @@ function getSelectedLayers() {
 
 function applyStyleToSelectedLayers(style) {
 	setUnits();
+	var doc = app.activeDocument;
 	try {
 		var layers = getSelectedLayers();
 		for (var i = 0; i < layers.length; i++) {
@@ -237,22 +249,38 @@ function applyStyleToSelectedLayers(style) {
 		return 'done';
 	}
 	catch (e) {
+		undo();
 		resetUnits();
 		return JSON.stringify(e);
 	}
+}
+
+function setStyle(style) {
+	app.activeDocument.suspendHistory('Set style', '\
+		createTextLayer(""); \
+		applyStyleToActiveLayer('+ JSON.stringify(style) + '); \
+		app.activeDocument.activeLayer.remove(); \
+	');
+	return 'done';
+}
+
+function setStyleAction(style) {
+	createTextLayer('');
+	applyStyleToActiveLayer(style);
+	app.activeDocument.activeLayer.remove();
+	return 'done';
 }
 
 function getSingleRectangleSelectionDimensions() {
 	try {
 		setUnits();
 		var doc = app.activeDocument;
-		var savedState = doc.activeHistoryState;
 		var selections = doc.selection;
 		try {
 			selections.makeWorkPath();
 		}
 		catch (e) {
-			doc.activeHistoryState = savedState;
+			undo();
 			resetUnits();
 			return 'no_selection';
 		}
@@ -260,7 +288,7 @@ function getSingleRectangleSelectionDimensions() {
 		var dimensions = {};
 		// limit to a single path only
 		if (wPath.subPathItems.length > 1) {
-			doc.activeHistoryState = savedState;
+			undo();
 			resetUnits();
 			return 'multiple_paths';
 		}
@@ -269,7 +297,7 @@ function getSingleRectangleSelectionDimensions() {
 			var bounds = [];
 			// we need rectangles only
 			if (wPath.subPathItems[i].pathPoints.length != 4) {
-				doc.activeHistoryState = savedState;
+				undo();
 				resetUnits();
 				return 'too_many_anchors';
 			}
@@ -280,14 +308,13 @@ function getSingleRectangleSelectionDimensions() {
 			// calculate the corresponding dimensions
 			dimensions = getDimensionsFromCoords(bounds);
 		}
-		doc.activeHistoryState = savedState;
+		undo();
 		resetUnits();
 		return JSON.stringify(dimensions);
 	}
 	catch (e) {
-		doc.activeHistoryState = savedState;
+		undo();
 		resetUnits();
 		return JSON.stringify(e);
 	}
-
 }

@@ -56,7 +56,7 @@ var tb = angular.module('tb', [
 ]);
 tb.constant('CONF', {
 	appName: 'typeset_buddy', // will be replaced by package.json name when compiled
-	debug: true,	// will be true for when compiled for dev environment, false otherwise
+	debug: false,	// will be true for when compiled for dev environment, false otherwise
 	version: '0.1.4' // will be replaced when compiled
 });
 tb.config(['cfpLoadingBarProvider', '$localStorageProvider',
@@ -71,13 +71,12 @@ tb.config(['cfpLoadingBarProvider', '$localStorageProvider',
 ]);
 
 
-tb.run(['CONF', '$transitions', '$state', '$stateParams', '$templateCache', '$rootScope', '$trace', '$uiRouter', 'Utils', 'themeManager', '$timeout',
-	function(CONF, $transitions, $state, $stateParams, $templateCache, $rootScope, $trace, $uiRouter, Utils, themeManager, $timeout) {
+tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace', 'themeManager', '$localStorage',
+	function(CONF, $transitions, $state, $stateParams, $rootScope, $trace, themeManager, $localStorage) {
 
 		// convenience shortcuts
 		$rootScope.$state = $state;
 		$rootScope.$stateParams = $stateParams;
-		$rootScope.utils = Utils;
 		$rootScope.CSI = new CSInterface();
 		$rootScope.extensionID = $rootScope.CSI.getExtensionID();
 
@@ -117,6 +116,13 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$templateCache', '$ro
 			}
 		};
 
+		// save last opened tab
+		let saveTab = function(transition, state) {
+			$localStorage.lastOpenedTab = transition.to().name;
+			return transition;
+		}
+		$transitions.onFinish(true, saveTab, {priority: 10});
+
 		// trace routes if debug mode
 		if ($rootScope.debug == true) {
 			$trace.enable(1);
@@ -142,10 +148,12 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$templateCache', '$ro
 
 	}
 ]);
-tb.config(['$stateProvider', '$urlRouterProvider',
-	function($stateProvider, $urlRouterProvider) {
+tb.config(['$stateProvider', '$urlRouterProvider', '$localStorageProvider',
+	function($stateProvider, $urlRouterProvider, $localStorageProvider) {
 
-		$urlRouterProvider.otherwise('/styles');
+		// load last opened tab
+		if($localStorageProvider.get('lastOpenedTab')) $urlRouterProvider.otherwise($localStorageProvider.get('lastOpenedTab'));
+		else $urlRouterProvider.otherwise('/styles');
 
 		$stateProvider
 		.state('app', {
@@ -540,7 +548,6 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 				if (!!!stylePreset) stylePreset = $scope.styleSet.styles[0];
 				stylePreset.useLayerGroups = ScriptService.useLayerGroups();
 				let typesetObj = {text: text, style: stylePreset};
-				$scope.$root.log('typesetObj', typesetObj);
 				ScriptService.maybeTypesetToPath(typesetObj)
 				.then(
 					function() {},
@@ -596,8 +603,8 @@ tb.directive('bubbleItem', [
 			},
 			replace: true,
 			templateUrl: 'bubble_item.tpl.html',
-			controller: ['$scope', 'Utils', 'ScriptService', 'StylesService',
-				function($scope, Utils, ScriptService, StylesService) {
+			controller: ['$scope',
+				function($scope) {
 					$scope.linkBubble = function() {
 						if (!!!$scope.bubble.linked) {
 							$scope.bubble.linked = true;
@@ -611,8 +618,8 @@ tb.directive('bubbleItem', [
 		};
 	}
 ]);
-tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService', 'Utils',
-	function($rootScope, $localStorage, $q, StylesService, Utils) {
+tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService',
+	function($rootScope, $localStorage, $q, StylesService) {
 		var self = this;
 
 		self.init = function() {
@@ -763,6 +770,7 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 		self.maybeTypesetToPath = function(typesetObj) {
 			let def = $q.defer();
 			let tmpObj = angular.copy(typesetObj);
+			$rootScope.log('typesetObj', tmpObj);
 			$rootScope.CSI.evalScript('getSingleRectangleSelectionDimensions();', function(res) {
 				$rootScope.log('maybeTypesetToPath return', res);
 				if (res == 'no_selection') {
@@ -799,7 +807,7 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 				if(res === 'done') {
 					def.resolve();
 				}
-				else{
+				else {
 					$rootScope.log('Typeset Error', res);
 					def.reject(res)
 				}
@@ -1019,9 +1027,9 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 			);
 		};
 
-		$scope.applyStyleToSelectedLayers = function(style){
+		$scope.applyStyleToSelectedLayers = function(style, resize) {
 			let tmpStyle = angular.copy(style);
-			tmpStyle.noSizeAdjustment = true;
+			tmpStyle.noResize = !!!resize;
 			StylesService.applyStyleToSelectedLayers(tmpStyle)
 			.then(
 				function() {
@@ -1032,6 +1040,19 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 				}
 			);
 		};
+
+		$scope.setStyle = function(style) {
+			let tmpStyle = angular.copy(style);
+			StylesService.setStyle(tmpStyle)
+			.then(
+				function() {
+
+				},
+				function(err) {
+					ngToast.create({className: 'danger', content: err});
+				}
+			);
+		}
 
 		$scope.loadStyleSet = function() {
 			$scope.styleSet = StylesService.getStyleSet($scope.selectedStyleset);
@@ -1157,7 +1178,8 @@ tb.directive('tbStylePreset', [
 				preset: '=',
 				removeAction: '&',
 				duplicateAction: '&',
-				applyAction: '&'
+				applyAction: '&',
+				setAction: '&'
 			},
 			templateUrl: 'style_preset.tpl.html',
 			controller: ['$scope', 'StylesService',
@@ -1420,8 +1442,22 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 				if (res === 'done') {
 					def.resolve();
 				}
-				else{
+				else {
 					$rootScope.log('Apply style error', res);
+					def.reject(res);
+				}
+			});
+			return def.promise;
+		};
+
+		self.setStyle = function(style) {
+			let def = $q.defer();
+			$rootScope.$root.CSI.evalScript('setStyle('+ JSON.stringify(style) +');', function(res) {
+				if (res === 'done') {
+					def.resolve();
+				}
+				else {
+					$rootScope.log('Set style error', res);
 					def.reject(res);
 				}
 			});

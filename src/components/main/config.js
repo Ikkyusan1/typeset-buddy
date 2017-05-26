@@ -1,7 +1,9 @@
-tb.config(['$stateProvider', '$urlRouterProvider',
-	function($stateProvider, $urlRouterProvider) {
+tb.config(['$stateProvider', '$urlRouterProvider', '$localStorageProvider',
+	function($stateProvider, $urlRouterProvider, $localStorageProvider) {
 
-		$urlRouterProvider.otherwise('/styles');
+		// load last opened tab
+		if($localStorageProvider.get('lastOpenedTab')) $urlRouterProvider.otherwise($localStorageProvider.get('lastOpenedTab'));
+		else $urlRouterProvider.otherwise('/styles');
 
 		$stateProvider
 		.state('app', {

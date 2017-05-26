@@ -6,7 +6,8 @@ tb.directive('tbStylePreset', [
 				preset: '=',
 				removeAction: '&',
 				duplicateAction: '&',
-				applyAction: '&'
+				applyAction: '&',
+				setAction: '&'
 			},
 			templateUrl: 'style_preset.tpl.html',
 			controller: ['$scope', 'StylesService',

@@ -9,8 +9,8 @@ tb.directive('bubbleItem', [
 			},
 			replace: true,
 			templateUrl: 'bubble_item.tpl.html',
-			controller: ['$scope', 'Utils', 'ScriptService', 'StylesService',
-				function($scope, Utils, ScriptService, StylesService) {
+			controller: ['$scope',
+				function($scope) {
 					$scope.linkBubble = function() {
 						if (!!!$scope.bubble.linked) {
 							$scope.bubble.linked = true;

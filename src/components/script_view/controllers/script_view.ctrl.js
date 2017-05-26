@@ -156,7 +156,6 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 				if (!!!stylePreset) stylePreset = $scope.styleSet.styles[0];
 				stylePreset.useLayerGroups = ScriptService.useLayerGroups();
 				let typesetObj = {text: text, style: stylePreset};
-				$scope.$root.log('typesetObj', typesetObj);
 				ScriptService.maybeTypesetToPath(typesetObj)
 				.then(
 					function() {},

@@ -84,7 +84,7 @@
 
 	<div class="list-item row bubble-item" ng-class="{'double-bubble': !!bubble.doublePart, 'panel-separator': !!bubble.panelSeparator}" ng-repeat="bubble in bubbles">
 		<div class="col-lg-2 col-md-3 col-xs-3 text-center" ng-if="!!!bubble.panelSeparator">
-			<button class="topcoat-button" ng-repeat="style in bubble.styles track by $index" ng-click="typeset(bubble.text, style)" ng-if="!!!multiMode" uib-tooltip="Create it or use the force :D" tooltip-popup-delay="1000" tooltip-placement="bottom" tooltip-enable="!!!style.inStyleSet">
+			<button class="topcoat-button" ng-repeat="style in bubble.styles track by $index" ng-click="typeset(bubble.text, style)" ng-if="!!!multiMode" uib-tooltip="Create it first or use the force :D" tooltip-popup-delay="1000" tooltip-placement="bottom-left" tooltip-enable="!!!style.inStyleSet">
 				<span>{{style.keyword}}</span>
 				<span class="glyphicon glyphicon-warning-sign" ng-if="!!!style.inStyleSet"></span>
 			</button>

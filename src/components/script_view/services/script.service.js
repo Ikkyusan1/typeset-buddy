@@ -1,5 +1,5 @@
-tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService', 'Utils',
-	function($rootScope, $localStorage, $q, StylesService, Utils) {
+tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService',
+	function($rootScope, $localStorage, $q, StylesService) {
 		var self = this;
 
 		self.init = function() {
@@ -150,6 +150,7 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 		self.maybeTypesetToPath = function(typesetObj) {
 			let def = $q.defer();
 			let tmpObj = angular.copy(typesetObj);
+			$rootScope.log('typesetObj', tmpObj);
 			$rootScope.CSI.evalScript('getSingleRectangleSelectionDimensions();', function(res) {
 				$rootScope.log('maybeTypesetToPath return', res);
 				if (res == 'no_selection') {
@@ -186,7 +187,7 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 				if(res === 'done') {
 					def.resolve();
 				}
-				else{
+				else {
 					$rootScope.log('Typeset Error', res);
 					def.reject(res)
 				}

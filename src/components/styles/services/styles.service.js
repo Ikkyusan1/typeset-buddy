@@ -190,8 +190,22 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 				if (res === 'done') {
 					def.resolve();
 				}
-				else{
+				else {
 					$rootScope.log('Apply style error', res);
+					def.reject(res);
+				}
+			});
+			return def.promise;
+		};
+
+		self.setStyle = function(style) {
+			let def = $q.defer();
+			$rootScope.$root.CSI.evalScript('setStyle('+ JSON.stringify(style) +');', function(res) {
+				if (res === 'done') {
+					def.resolve();
+				}
+				else {
+					$rootScope.log('Set style error', res);
 					def.reject(res);
 				}
 			});
