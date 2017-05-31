@@ -13,10 +13,11 @@ A typesetting extension for Adobe Photoshop CC. Tested with PS version 2015.5+.
 
 2. Start Photoshop. You'll find the extension under the menu Window > Extensions > Typeset Buddy.
 
-The disabling of the check for signed extensions is not necessary anymore for this extenions. Disabling the check was done this way :
+The disabling of the check for signed extensions is not necessary anymore for this extension. Disabling the check was done this way :
 - Win: regedit > ```HKEY_CURRENT_USER/Software/Adobe/CSXS.7```, then add a new entry ```PlayerDebugMode``` of type ```string``` with the value of ```1```.
 - Mac: In the terminal, type: ```defaults write com.adobe.CSXS.7 PlayerDebugMode 1```
 		(The plist is also located at ~/Library/Preferences/com.adobe.CSXS.7.plist)
+
 To re-enable the check, just put a value of 0 instead of 1.
 
 ## Translation script format
