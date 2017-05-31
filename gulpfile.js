@@ -28,7 +28,7 @@ var paths = {
 	destfonts: path.join(distDirectory, 'fonts'),
 	destJsx: path.join(distDirectory, 'jsx'),
 	destcsxs: path.join(distDirectory, 'CSXS'),
-	destZip: path.join(__dirname, 'packages'),
+	destZip: path.join(__dirname, 'dist'),
 };
 
 var packageFile = getPackageFile();
@@ -75,14 +75,8 @@ gulp.task('build', function(callback){
 		'copyManifest',
 		'copyJsx',
 		'copyAdobeLibs',
-		callback
-	);
-});
-
-gulp.task('buildDebug', function(callback){
-	runSequence(
-		'build',
 		'copyDebugFile',
+		'unsign',
 		callback
 	);
 });
@@ -101,7 +95,8 @@ gulp.task('buildDist', function(callback){
 		'build',
 		'minJs',
 		'minCss',
-		'copyChangelog',
+		'copyCommonFiles',
+		'sign',
 		'zip',
 		callback
 	);
@@ -109,6 +104,7 @@ gulp.task('buildDist', function(callback){
 
 gulp.task('buildAllDist', function(callback){
 	runSequence(
+		'clean',
 		'buildDeps',
 		'buildDist',
 		callback
@@ -206,6 +202,17 @@ gulp.task('copyCommonFiles', function(){
 	}
 });
 
+gulp.task('sign', function(){
+	return $.run('rm -rf ./dist/typeset_buddy_extension.zxp ./typeset_buddy_extension/META-INF ./typeset_buddy_extension/mimetype ./typeset_buddy_extension/.debug && ./ZXPSignCmd -sign typeset_buddy_extension ./dist/typeset_buddy_extension.zxp ./self_signed.p12 "$(cat ./p12password)" && unzip -qo ./dist/typeset_buddy_extension.zxp -d ./typeset_buddy_extension && defaults write com.adobe.CSXS.7 PlayerDebugMode 0')
+	.exec()
+	.pipe(plumber());
+});
+
+gulp.task('unsign', function(){
+	return $.run('rm -rf ./typeset_buddy_extension/META-INF ./typeset_buddy_extension/mimetype && defaults write com.adobe.CSXS.7 PlayerDebugMode 1')
+	.exec();
+});
+
 gulp.task('zip', function(){
 	var files = [
 		distDirectory + '/**',
@@ -215,7 +222,6 @@ gulp.task('zip', function(){
 	.pipe($.zip(packageFile.name + '_extension-' + packageFile.version +'.zip'))
 	.pipe(gulp.dest(paths.destZip));
 });
-
 
 // Compile sass into a single css file
 gulp.task('sass', function (callback){

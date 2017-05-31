@@ -2,12 +2,7 @@
 A typesetting extension for Adobe Photoshop CC. Tested with PS version 2015.5+.
 
 ## Installation:
-1. Since this extension is not signed (and I don't intend to sign it anytime soon), you'll need to disable the check for signed extensions.
-- Win: regedit > ```HKEY_CURRENT_USER/Software/Adobe/CSXS.7```, then add a new entry ```PlayerDebugMode``` of type ```string``` with the value of ```1```.
-- Mac: In the terminal, type: ```defaults write com.adobe.CSXS.7 PlayerDebugMode 1```
-		(The plist is also located at ~/Library/Preferences/com.adobe.CSXS.7.plist)
-
-2. Download the [latest release](https://github.com/Ikkyusan1/typeset-buddy/releases/latest) and extract the archive in Photoshop's extension folder. It's one of these (create the folders if they don't exist):
+1. Download the [latest release](https://github.com/Ikkyusan1/typeset-buddy/releases/latest) and extract the archive in Photoshop's extension folder. It's one of these (create the folders if they don't exist):
 - System extension folder
   - Win(x86): C:\Program Files\Common Files\Adobe\CEP\extensions
   - Win(x64): C:\Program Files (x86)\Common Files\Adobe\CEP\extensions
@@ -16,7 +11,13 @@ A typesetting extension for Adobe Photoshop CC. Tested with PS version 2015.5+.
   - Win: C:\Users\{USER}\AppData\Roaming\Adobe\CEP/extensions
   - Mac: ~/Library/Application Support/Adobe/CEP/extensions
 
-3. Start Photoshop. You'll find the extension under the menu Window > Extensions > Typeset Buddy.
+2. Start Photoshop. You'll find the extension under the menu Window > Extensions > Typeset Buddy.
+
+The disabling of the check for signed extensions is not necessary anymore for this extenions. Disabling the check was done this way :
+- Win: regedit > ```HKEY_CURRENT_USER/Software/Adobe/CSXS.7```, then add a new entry ```PlayerDebugMode``` of type ```string``` with the value of ```1```.
+- Mac: In the terminal, type: ```defaults write com.adobe.CSXS.7 PlayerDebugMode 1```
+		(The plist is also located at ~/Library/Preferences/com.adobe.CSXS.7.plist)
+To re-enable the check, just put a value of 0 instead of 1.
 
 ## Translation script format
 Follow the readme from [Typeset Helper](https://github.com/Ikkyusan1/typeset-helper/). The rules are the same.

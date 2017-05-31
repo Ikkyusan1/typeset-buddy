@@ -1,3 +1,11 @@
 # Dependency directories
 bower_components/
 node_modules/
+self_signed.p12
+p12password
+dist/**
+typeset_buddy_extension/CHANGELOG.md
+typeset_buddy_extension/README.md
+typeset_buddy_extension/META-INF/
+typeset_buddy_extension/mimetype
+typeset_buddy_extension/.debug
