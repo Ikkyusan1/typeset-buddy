@@ -147,7 +147,13 @@ function applyStyleToActiveLayer(style) {
 		textItem.kind = TextType.PARAGRAPHTEXT;
 		textItem.font = style.fontName;
 		textItem.size = getAdjustedSize(style.size) + 'px';
-		textItem.leading = style.leading;
+		if (style.leading === 0) {
+			textItem.useAutoLeading = true;
+		}
+		else {
+			textItem.useAutoLeading = false;
+			textItem.leading = style.leading;
+		}
 		textItem.tracking = style.tracking;
 		textItem.verticalScale = style.vScale;
 		textItem.horizontalScale = style.hScale;
