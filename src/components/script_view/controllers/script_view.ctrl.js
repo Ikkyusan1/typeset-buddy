@@ -34,6 +34,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 				if ($scope.pageNumbers.length > 0) {
 					if (!!!silent) {
 						ngToast.create({className: 'info', content: $scope.pageNumbers.length + ' page(s) found in file'});
+						$scope.selectedPage = $scope.pageNumbers[0];
 					}
 					if (page != null) {
 						$scope.selectedPage = page;
