@@ -93,9 +93,19 @@
 				<div class="topcoat-checkbox__checkmark"></div>
 			</label>
 		</div>
-		<div class="col-lg-10 col-md-9 col-xs-9">
-			<div class="selectable" ng-class="{'bubble-content': !!!bubble.panelSeparator}">{{bubble.text}}</div>
-			<div class="bubble-note selectable" ng-repeat="note in bubble.notes">{{note}}</div>
+		<div class="col-lg-10 col-md-9 col-xs-9" ng-if="!!!bubble.panelSeparator">
+			<div class="selectable bubble-content">
+				{{bubble.text}}
+				<button class="topcoat-button clipbutton">
+					<span class="glyphicon glyphicon-copy" ng-click="toClipboard(bubble.text)"></span>
+				</button>
+			</div>
+			<div class="bubble-note selectable" ng-repeat="note in bubble.notes">
+				{{note}}
+				<button class="topcoat-button clipbutton">
+					<span class="glyphicon glyphicon-copy" ng-click="toClipboard(bubble.bubble.notes)"></span>
+				</button>
+			</div>
 		</div>
 	</div>
 

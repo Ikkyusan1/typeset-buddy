@@ -304,6 +304,7 @@ gulp.task('buildDeps', function(){
 		path.join(paths.deps, 'angular-loading-bar/build/loading-bar.js'),
 		path.join(paths.deps, 'ngToast/dist/ngToast.js'),
 		path.join(paths.deps, 'ngstorage/ngStorage.js'),
+		path.join(paths.deps, 'angular-clipboard/angular-clipboard.js'),
 	];
 	if(checkFilesExist(files)){
 		return gulp.src(files)

@@ -14,6 +14,7 @@
     "jquery": "^2.2.3",
     "ngstorage": "^0.3.11",
     "topcoat": "^0.8.0",
-    "ngToast": "ngtoast#^2.0.0"
+    "ngToast": "ngtoast#^2.0.0",
+    "angular-clipboard": "^1.5.0"
   }
 }

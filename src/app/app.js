@@ -7,5 +7,6 @@ var tb = angular.module('tb', [
 	'ui.bootstrap',
 	'angular-loading-bar',
 	'ngStorage',
-	'ngToast'
+	'ngToast',
+	'angular-clipboard'
 ]);

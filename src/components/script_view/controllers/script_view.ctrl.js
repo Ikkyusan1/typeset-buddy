@@ -1,5 +1,5 @@
-tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Utils', 'ngToast', '$timeout',
-	function($scope, ScriptService, StylesService, Utils, ngToast, $timeout) {
+tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Utils', 'ngToast', '$timeout', 'clipboard',
+	function($scope, ScriptService, StylesService, Utils, ngToast, $timeout, clipboard) {
 
 		$scope.reset = function() {
 			$scope.filename = '';
@@ -164,6 +164,10 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 					}
 				);
 			}
+		};
+
+		$scope.toClipboard = function(text) {
+			clipboard.copyText(text);
 		};
 
 		$scope.reset();

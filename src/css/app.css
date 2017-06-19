@@ -229,7 +229,12 @@ tb-style-preset>div.row:first-child {
 }
 
 .bubble-content {
-	display: inline-block;
+	/* display: inline-block;*/
+}
+
+.clipbutton {
+	float: right;
+	margin: 3px 0 0 3px;
 }
 
 .list-item.double-bubble .bubble-content:before {

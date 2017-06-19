@@ -52,11 +52,12 @@ var tb = angular.module('tb', [
 	'ui.bootstrap',
 	'angular-loading-bar',
 	'ngStorage',
-	'ngToast'
+	'ngToast',
+	'angular-clipboard'
 ]);
 tb.constant('CONF', {
 	appName: 'typeset_buddy', // will be replaced by package.json name when compiled
-	debug: false,	// will be true for when compiled for dev environment, false otherwise
+	debug: true,	// will be true for when compiled for dev environment, false otherwise
 	version: '0.1.5' // will be replaced when compiled
 });
 tb.config(['cfpLoadingBarProvider', '$localStorageProvider',
@@ -390,8 +391,8 @@ tb.config(['$stateProvider',
 		});
 	}
 ]);
-tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Utils', 'ngToast', '$timeout',
-	function($scope, ScriptService, StylesService, Utils, ngToast, $timeout) {
+tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Utils', 'ngToast', '$timeout', 'clipboard',
+	function($scope, ScriptService, StylesService, Utils, ngToast, $timeout, clipboard) {
 
 		$scope.reset = function() {
 			$scope.filename = '';
@@ -556,6 +557,10 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 					}
 				);
 			}
+		};
+
+		$scope.toClipboard = function(text) {
+			clipboard.copyText(text);
 		};
 
 		$scope.reset();
