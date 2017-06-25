@@ -30,14 +30,19 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 			return $localStorage.lastDestinationFolder;
 		};
 
-		self.panelSeparator = function(panelSeparator) {
-			if (angular.isDefined(panelSeparator)) $localStorage.panelSeparator = panelSeparator;
+		self.panelSeparator = function(val) {
+			if (angular.isDefined(val)) $localStorage.panelSeparator = val;
 			return $localStorage.panelSeparator;
 		};
 
-		self.useLayerGroups = function(useLayerGroups) {
-			if (angular.isDefined(useLayerGroups)) $localStorage.useLayerGroups = !!useLayerGroups;
+		self.useLayerGroups = function(val) {
+			if (angular.isDefined(val)) $localStorage.useLayerGroups = !!val;
 			return $localStorage.useLayerGroups;
+		};
+
+		self.mergeBubbles = function(val) {
+			if (angular.isDefined(val)) $localStorage.mergeBubbles = !!val;
+			return $localStorage.mergeBubbles;
 		};
 
 		self.skipSfx = function(skip) {

@@ -18,7 +18,7 @@
 
 	</div>
 	<div class="col-md-1 col-xs-1 flex-input">
-		<div class="btn-group" uib-dropdown is-open="status.isopen">
+		<div class="btn-group" uib-dropdown is-open="status.isopen" auto-close="outsideClick">
 			<button class="topcoat-button" uib-dropdown-toggle>
 				<span class="glyphicon glyphicon-cog"></span>
 			</button>
@@ -31,6 +31,9 @@
 				<li class="dropdown-header">Use layer groups</li>
 				<li role="menuitem" ng-class="{'active': useLayerGroups === true}" ng-click="setUseLayerGroups(true)"><span>Yes</span></li>
 				<li role="menuitem" ng-class="{'active': useLayerGroups === false}" ng-click="setUseLayerGroups(false)" ><span>No</span></li>
+				<li class="dropdown-header">Merge bubbles</li>
+				<li role="menuitem" ng-class="{'active': mergeBubbles === true}" ng-click="setMergeBubbles(true)"><span>Yes</span></li>
+				<li role="menuitem" ng-class="{'active': mergeBubbles === false}" ng-click="setMergeBubbles(false)" ><span>No</span></li>
 			</ul>
 		</div>
 	</div>
@@ -60,18 +63,6 @@
 			Force
 		</label>
 		<tb-style-selector styleset="selectedStyleset" selected-value="selectedForcedStyle"></tb-style-selector>
-
-		<!-- <div class="input-flex">
-			<label>
-				<span>Multi mode</span>
-			</label>
-			<div>
-				<label class="topcoat-switch">
-					<input type="checkbox" ng-model="multiMode" ng-true-value="true" class="topcoat-switch__input">
-					<div class="topcoat-switch__toggle"></div>
-				</label>
-			</div>
-		</div> -->
 	</div>
 
 </div>
@@ -80,31 +71,35 @@
 </div>
 <div class="list scrollable">
 	<div class="list-item p" ng-if="!!selectedPage && !!!bubbles.length">Nothing to typeset on this page</div>
-	<!-- <bubble-item class="list-item" ng-repeat="bubble in bubbles" bubble="bubble" typeset-action="typeset(text, style)"></bubble-item> -->
-
-	<div class="list-item row bubble-item" ng-class="{'double-bubble': !!bubble.doublePart, 'panel-separator': !!bubble.panelSeparator}" ng-repeat="bubble in bubbles">
-		<div class="col-lg-2 col-md-3 col-xs-3 text-center" ng-if="!!!bubble.panelSeparator">
-			<button class="topcoat-button" ng-repeat="style in bubble.styles track by $index" ng-click="typeset(bubble.text, style)" ng-if="!!!multiMode" uib-tooltip="Create it first or use the force :D" tooltip-popup-delay="1000" tooltip-placement="bottom-left" tooltip-enable="!!!style.inStyleSet">
+	<div class="list-item row bubble-item" ng-class="{'multibubble-part': !!bubble.multibubblePart, 'panel-separator': !!bubble.panelSeparator}" ng-repeat="bubble in bubbles">
+		<div class="col-lg-2 col-md-3 col-xs-3 style-buttons" ng-if="!!!bubble.panelSeparator">
+			<button class="topcoat-button" ng-repeat="style in bubble.styles track by $index" ng-click="typeset(bubble, style)" uib-tooltip="Create it first or use the force :D" tooltip-popup-delay="1000" tooltip-placement="bottom-left" tooltip-enable="!!!style.inStyleSet">
 				<span>{{style.keyword}}</span>
 				<span class="glyphicon glyphicon-warning-sign" ng-if="!!!style.inStyleSet"></span>
 			</button>
-			<label class="topcoat-checkbox" ng-if="!!multiMode">
-			  <input type="checkbox" ng-model="bubble.selected" ng-true-value="true">
-				<div class="topcoat-checkbox__checkmark"></div>
-			</label>
 		</div>
 		<div class="col-lg-10 col-md-9 col-xs-9" ng-if="!!!bubble.panelSeparator">
-			<div class="selectable bubble-content">
-				{{bubble.text}}
-				<button class="topcoat-button clipbutton">
+			<div class="selectable bubble-content">{{bubble.text}}<button class="topcoat-button clipbutton">
 					<span class="glyphicon glyphicon-copy" ng-click="toClipboard(bubble.text)"></span>
 				</button>
 			</div>
 			<div class="bubble-note selectable" ng-repeat="note in bubble.notes">
 				{{note}}
 				<button class="topcoat-button clipbutton">
-					<span class="glyphicon glyphicon-copy" ng-click="toClipboard(bubble.bubble.notes)"></span>
+					<span class="glyphicon glyphicon-copy" ng-click="toClipboard(bubble.notes)"></span>
 				</button>
+			</div>
+			<div class="bubble-sibling" ng-repeat="sibling in bubble.siblings">
+				<div class="selectable bubble-content">{{sibling.text}}<button class="topcoat-button clipbutton">
+						<span class="glyphicon glyphicon-copy" ng-click="toClipboard(sibling.text)"></span>
+					</button>
+				</div>
+				<div class="bubble-note selectable" ng-repeat="note in sibling.notes">
+					{{note}}
+					<button class="topcoat-button clipbutton">
+						<span class="glyphicon glyphicon-copy" ng-click="toClipboard(sibling.notes)"></span>
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>

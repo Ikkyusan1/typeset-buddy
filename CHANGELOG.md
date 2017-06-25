@@ -1,3 +1,10 @@
+### 0.1.6 (2017-06-25)
+Fix: Correctly apply the leading.
+Fix: Load the first page when changing translation script.
+New: Multi-bubbles can now be merged to be typesetted as one bubble.
+New: Added a copy-to-clipboard button on every bubble content and notes.
+
+
 ### 0.1.5 (2017-05-26)
 Bugfixes and error handling.
 Use foreground color when applying style.

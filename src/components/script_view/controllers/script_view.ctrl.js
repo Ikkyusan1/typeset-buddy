@@ -13,6 +13,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 			$scope.pageStyle = '';
 			$scope.panelSeparator = ScriptService.panelSeparator();
 			$scope.useLayerGroups = ScriptService.useLayerGroups();
+			$scope.mergeBubbles = ScriptService.mergeBubbles();
 			$scope.styleSet = StylesService.getStyleSet();
 			$scope.selectedStyleset = $scope.styleSet.id;
 		};
@@ -55,12 +56,16 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 			}
 		};
 
-		$scope.setPanelSeparator = function(panelSeparator) {
-			$scope.panelSeparator = ScriptService.panelSeparator(panelSeparator);
+		$scope.setPanelSeparator = function(val) {
+			$scope.panelSeparator = ScriptService.panelSeparator(val);
 		};
 
-		$scope.setUseLayerGroups = function(use) {
-			$scope.useLayerGroups = ScriptService.useLayerGroups(use);
+		$scope.setUseLayerGroups = function(val) {
+			$scope.useLayerGroups = ScriptService.useLayerGroups(val);
+		};
+
+		$scope.setMergeBubbles = function(val) {
+			$scope.mergeBubbles = ScriptService.mergeBubbles(val);
 		};
 
 		$scope.loadPage = function(pageNumber) {
@@ -87,15 +92,13 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 								let bubble = {
 									text: ScriptService.cleanLine(line),
 									styles: [],
-									doublePart: false,
+									multibubblePart: false,
 									notes: ScriptService.getNotes(line)
 								};
 								let tmpStyles = [];
 								if (ScriptService.isDoubleBubblePart(line)) {
 									tmpStyles = ScriptService.getTextStyles(line, previousStyle);
-									bubble.doublePart = true;
-									// bubble.parent = $scope.bubbles[$scope.bubbles.length -1];
-									$scope.bubbles[$scope.bubbles.length -1].hasChild = true;
+									bubble.multibubblePart = true;
 								}
 								else {
 									tmpStyles = ScriptService.getTextStyles(line, $scope.pageStyle.keyword);
@@ -107,12 +110,24 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 									return (idx === -1 )? {keyword: one, inStyleSet: false} : {keyword: one, inStyleSet: true};
 								});
 
-								$scope.bubbles.push(bubble);
+								if ($scope.mergeBubbles && bubble.multibubblePart == true) {
+									let p = $scope.bubbles[$scope.bubbles.length -1];
+									p.merged = true;
+									if (!!!p.siblings) p.siblings = [];
+									p.siblings.push(bubble);
+									p.styles = p.styles.concat(bubble.styles.filter(function(item){
+										return !!!p.styles.find(function(existing){
+											return !!Utils.simpleComparison(existing, item);
+										});
+									}));
+								}
+								else {
+									$scope.bubbles.push(bubble);
+								}
 							}
 							else if (skipIt === null) {
 								$scope.bubbles.push({panelSeparator: true});
 							}
-
 						});
 					}
 					ScriptService.lastOpenedPage(pageNumber);
@@ -144,7 +159,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 			}
 		};
 
-		$scope.typeset = function(text, style) {
+		$scope.typeset = function(bubble, style) {
 			if (!!$scope.selectedForcedStyle) {
 				$scope.$root.log('force style', $scope.selectedForcedStyle);
 				style = {keyword: $scope.selectedForcedStyle, inStyleSet: true};
@@ -156,6 +171,12 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 				let stylePreset = $scope.styleSet.styles.find(function(one) { return one.keyword == style.keyword; });
 				if (!!!stylePreset) stylePreset = $scope.styleSet.styles[0];
 				stylePreset.useLayerGroups = ScriptService.useLayerGroups();
+				let text = bubble.text;
+				if (!!bubble.siblings) {
+					bubble.siblings.forEach(function(sibling){
+						text += '\r' + sibling.text;
+					});
+				}
 				let typesetObj = {text: text, style: stylePreset};
 				ScriptService.maybeTypesetToPath(typesetObj)
 				.then(
@@ -191,6 +212,12 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 		});
 
 		$scope.$watch('panelSeparator', function(newVal, oldVal) {
+			if (angular.isDefined(newVal)) {
+				$scope.loadPage($scope.selectedPage);
+			}
+		});
+
+		$scope.$watch('mergeBubbles', function(newVal, oldVal) {
 			if (angular.isDefined(newVal)) {
 				$scope.loadPage($scope.selectedPage);
 			}

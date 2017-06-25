@@ -152,10 +152,11 @@ input[type="select"].ng-invalid {
 }
 
 .dropdown-header {
-	padding: 3px 10px;
+	padding: 3px 5px;
 	font-weight: bold;
   text-transform: uppercase;
   color: #000;
+  font-style: italic;
 }
 
 .dropdown-menu >li > *:first-child {
@@ -169,13 +170,15 @@ input[type="select"].ng-invalid {
 	cursor: pointer;
 }
 
-.dropdown-menu > .active > *:first-child,
-.dropdown-menu > .active > *:first-child:focus,
-.dropdown-menu > .active > *:first-child:hover {
+.dropdown-menu > .active > *:first-child {
 	color: #fff;
 	text-decoration: none;
 	background-color: #337ab7;
 	outline: 0;
+}
+
+.dropdown-menu li:not(.dropdown-header):hover {
+	background: #ddd;
 }
 
 .alert {
@@ -221,6 +224,14 @@ tb-style-preset>div.row:first-child {
 .list .bubble-item {
 	padding-top: 5px;
 	padding-bottom: 5px;
+	display: flex;
+}
+
+.style-buttons {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
 }
 
 .list-item.panel-separator {
@@ -229,15 +240,16 @@ tb-style-preset>div.row:first-child {
 }
 
 .bubble-content {
-	/* display: inline-block;*/
+	white-space: pre-line;
 }
 
 .clipbutton {
 	float: right;
-	margin: 3px 0 0 3px;
+	/*margin: 3px 0 0 3px;*/
+	margin: 0;
 }
 
-.list-item.double-bubble .bubble-content:before {
+.multibubble-part .bubble-content:before {
 	content: "";
 	display: inline-block;
 	position: absolute;
@@ -249,20 +261,40 @@ tb-style-preset>div.row:first-child {
 	border-bottom: solid 2px #ddd;
 }
 
-.list-item.double-bubble .bubble-content {
+.multibubble-part .bubble-content {
 	padding-left: 15px !important;
+}
+
+.bubble-sibling {
+	margin-top: 5px;
+}
+
+.bubble-sibling:before {
+	content: "";
+	display: inline-block;
+	float: left;
+	margin-right: 10px;
+	width: 5px;
+	height: 1em;
+	border-left: solid 2px #ddd;
+	border-bottom: solid 2px #ddd;
 }
 
 .page-note,
 .bubble-note {
 	font-size: 11px;
 	font-style: italic;
-	padding: 3px;
+	padding: 5px 0 5px 3px;
+	margin: 5px 0;
 }
 
 .bubble-note {
 	border-radius: 2px;
 	background-color: #ddd;
+}
+
+.bubble-note .clipbutton {
+	margin: -3px 0;
 }
 
 .dark .bubble-note {
