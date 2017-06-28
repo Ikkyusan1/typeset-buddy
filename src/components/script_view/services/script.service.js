@@ -5,7 +5,6 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 		self.init = function() {
 			$rootScope.log('$localStorage', $localStorage);
 			self.emptyPage = ['blank', 'empty', 'no_text'];
-			self.doubleBubbleSplitter = '//';
 
 			if (!angular.isDefined($localStorage.panelSeparator)) self.panelSeparator('–');
 			if (!angular.isDefined($localStorage.useLayerGroups)) self.useLayerGroups(true);
@@ -43,11 +42,6 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 		self.mergeBubbles = function(val) {
 			if (angular.isDefined(val)) $localStorage.mergeBubbles = !!val;
 			return $localStorage.mergeBubbles;
-		};
-
-		self.skipSfx = function(skip) {
-			if (angular.isDefined(skip)) $localStorage.skipSfx = !!skip;
-			return $localStorage.skipSfx;
 		};
 
 		self.getPageNumbers = function(text) {
@@ -127,7 +121,9 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 
 		self.cleanLine = function(text) {
 			if (!!!text) return null;
-			let reg = /(\[[\s\w\d]*\]\ ?)*(\/{0,2})([^\[]*)/;
+			// there could be a double slash followed by one or more style(s)
+			// skip malformed styles, just in case
+			let reg = /(\/{0,2}\ ?)?(\[[\s\w\d]*\]\ ?)*([^\[]*)/;
 			let match = reg.exec(text);
 			return (!!match && !!match[match.length - 1])? match[match.length - 1].trim() : null;
 		};
@@ -147,6 +143,7 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 		self.isDoubleBubblePart = function(text) {
 			if (!!!text) return false;
 			text = text.trim();
+			// multi-bubble parts always start with a double-slash "//"
 			let reg = /^\/{2}.*$/;
 			let match = reg.test(text);
 			return !!match;
