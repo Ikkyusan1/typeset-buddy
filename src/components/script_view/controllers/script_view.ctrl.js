@@ -87,28 +87,30 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 						lines = $scope.rawBubbles.split('\n');
 						$scope.$root.log('lines', lines);
 						lines.forEach(function(line) {
+							let notes = ScriptService.getNotes(line);
 							let skipIt = ScriptService.skipThisLine(line, ScriptService.panelSeparator());
-							if (skipIt === false) {
+							if (skipIt === false || !!notes) {
 								let bubble = {
 									text: ScriptService.cleanLine(line),
 									styles: [],
 									multibubblePart: false,
-									notes: ScriptService.getNotes(line)
+									notes: notes
 								};
 								let tmpStyles = [];
-								if (ScriptService.isDoubleBubblePart(line)) {
-									tmpStyles = ScriptService.getTextStyles(line, previousStyle);
-									bubble.multibubblePart = true;
+								if (bubble.text) {
+									if (ScriptService.isDoubleBubblePart(line)) {
+										tmpStyles = ScriptService.getTextStyles(line, previousStyle);
+										bubble.multibubblePart = true;
+									}
+									else {
+										tmpStyles = ScriptService.getTextStyles(line, $scope.pageStyle.keyword);
+									}
+									previousStyle = tmpStyles[0];
+									bubble.styles = tmpStyles.map(function(one) {
+										let idx = $scope.styleSet.styles.findIndex(function(available) { return available.keyword == one; });
+										return (idx === -1 )? {keyword: one, inStyleSet: false} : {keyword: one, inStyleSet: true};
+									});
 								}
-								else {
-									tmpStyles = ScriptService.getTextStyles(line, $scope.pageStyle.keyword);
-								}
-								previousStyle = tmpStyles[0];
-
-								bubble.styles = tmpStyles.map(function(one) {
-									let idx = $scope.styleSet.styles.findIndex(function(available) { return available.keyword == one; });
-									return (idx === -1 )? {keyword: one, inStyleSet: false} : {keyword: one, inStyleSet: true};
-								});
 
 								if ($scope.mergeBubbles && bubble.multibubblePart == true) {
 									let p = $scope.bubbles[$scope.bubbles.length -1];

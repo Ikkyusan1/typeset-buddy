@@ -79,7 +79,7 @@
 			</button>
 		</div>
 		<div class="col-lg-10 col-md-9 col-xs-9" ng-if="!!!bubble.panelSeparator">
-			<div class="selectable bubble-content">{{bubble.text}}<button class="topcoat-button clipbutton">
+			<div class="selectable bubble-content" ng-if="!!bubble.text">{{bubble.text}}<button class="topcoat-button clipbutton">
 					<span class="glyphicon glyphicon-copy" ng-click="toClipboard(bubble.text)"></span>
 				</button>
 			</div>
