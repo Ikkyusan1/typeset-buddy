@@ -57,8 +57,8 @@ var tb = angular.module('tb', [
 ]);
 tb.constant('CONF', {
 	appName: 'typeset_buddy', // will be replaced by package.json name when compiled
-	debug: false,	// will be true for when compiled for dev environment, false otherwise
-	version: '0.1.6' // will be replaced when compiled
+	debug: false,	// will be true when compiled for dev environment, false otherwise
+	version: '0.1.7' // will be replaced when compiled
 });
 tb.config(['cfpLoadingBarProvider', '$localStorageProvider',
 	function(cfpLoadingBarProvider, $localStorageProvider) {
@@ -480,28 +480,30 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 						lines = $scope.rawBubbles.split('\n');
 						$scope.$root.log('lines', lines);
 						lines.forEach(function(line) {
+							let notes = ScriptService.getNotes(line);
 							let skipIt = ScriptService.skipThisLine(line, ScriptService.panelSeparator());
-							if (skipIt === false) {
+							if (skipIt === false || !!notes) {
 								let bubble = {
 									text: ScriptService.cleanLine(line),
 									styles: [],
 									multibubblePart: false,
-									notes: ScriptService.getNotes(line)
+									notes: notes
 								};
 								let tmpStyles = [];
-								if (ScriptService.isDoubleBubblePart(line)) {
-									tmpStyles = ScriptService.getTextStyles(line, previousStyle);
-									bubble.multibubblePart = true;
+								if (bubble.text) {
+									if (ScriptService.isDoubleBubblePart(line)) {
+										tmpStyles = ScriptService.getTextStyles(line, previousStyle);
+										bubble.multibubblePart = true;
+									}
+									else {
+										tmpStyles = ScriptService.getTextStyles(line, $scope.pageStyle.keyword);
+									}
+									previousStyle = tmpStyles[0];
+									bubble.styles = tmpStyles.map(function(one) {
+										let idx = $scope.styleSet.styles.findIndex(function(available) { return available.keyword == one; });
+										return (idx === -1 )? {keyword: one, inStyleSet: false} : {keyword: one, inStyleSet: true};
+									});
 								}
-								else {
-									tmpStyles = ScriptService.getTextStyles(line, $scope.pageStyle.keyword);
-								}
-								previousStyle = tmpStyles[0];
-
-								bubble.styles = tmpStyles.map(function(one) {
-									let idx = $scope.styleSet.styles.findIndex(function(available) { return available.keyword == one; });
-									return (idx === -1 )? {keyword: one, inStyleSet: false} : {keyword: one, inStyleSet: true};
-								});
 
 								if ($scope.mergeBubbles && bubble.multibubblePart == true) {
 									let p = $scope.bubbles[$scope.bubbles.length -1];
@@ -658,7 +660,6 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 		self.init = function() {
 			$rootScope.log('$localStorage', $localStorage);
 			self.emptyPage = ['blank', 'empty', 'no_text'];
-			self.doubleBubbleSplitter = '//';
 
 			if (!angular.isDefined($localStorage.panelSeparator)) self.panelSeparator('–');
 			if (!angular.isDefined($localStorage.useLayerGroups)) self.useLayerGroups(true);
@@ -696,11 +697,6 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 		self.mergeBubbles = function(val) {
 			if (angular.isDefined(val)) $localStorage.mergeBubbles = !!val;
 			return $localStorage.mergeBubbles;
-		};
-
-		self.skipSfx = function(skip) {
-			if (angular.isDefined(skip)) $localStorage.skipSfx = !!skip;
-			return $localStorage.skipSfx;
 		};
 
 		self.getPageNumbers = function(text) {
@@ -742,7 +738,8 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 
 		self.getTextStyles = function(text, fallback) {
 			if (!!!text) return (!!fallback)? [fallback] : null;
-			let reg = /\[(\w+)\]/g;
+			// let reg = /\[(\w+)\]/g;
+			let reg = /\[(\[?\w+)\]/g;
 			let match = reg.exec(text);
 			if (!!match && !!match[1]) {
 				reg.lastIndex = 0;
@@ -751,7 +748,9 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 					if (match.index === reg.lastIndex) {
 						reg.lastIndex++;
 					}
-					styles.push(match[1].toLowerCase());
+					if(match[1].indexOf('\[') != 0)
+						styles.push(match[1].toLowerCase());
+					else if (!!!styles.length) styles.push(fallback);
 				}
 				return styles;
 			}
@@ -780,7 +779,9 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 
 		self.cleanLine = function(text) {
 			if (!!!text) return null;
-			let reg = /(\[[\s\w\d]*\]\ ?)*(\/{0,2})([^\[]*)/;
+			// there could be a double slash followed by one or more style(s)
+			// skip malformed styles, just in case
+			let reg = /(\/{0,2}\ ?)?(\[[\s\w\d]*\]\ ?)*([^\[]*)/;
 			let match = reg.exec(text);
 			return (!!match && !!match[match.length - 1])? match[match.length - 1].trim() : null;
 		};
@@ -800,6 +801,7 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 		self.isDoubleBubblePart = function(text) {
 			if (!!!text) return false;
 			text = text.trim();
+			// multi-bubble parts always start with a double-slash "//"
 			let reg = /^\/{2}.*$/;
 			let match = reg.test(text);
 			return !!match;

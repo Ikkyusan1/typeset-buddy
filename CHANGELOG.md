@@ -1,3 +1,9 @@
+### 0.1.7 (2017-06-28)
+Edge case of styles placed right after the double-slash of a multi-part  bubble.
+Display notes even if there’s nothing else on a line.
+Dirty trick to handle single word notes.
+
+
 ### 0.1.6 (2017-06-25)
 Fix: Correctly apply the leading.
 Fix: Load the first page when changing translation script.

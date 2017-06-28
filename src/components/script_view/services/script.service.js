@@ -83,7 +83,8 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 
 		self.getTextStyles = function(text, fallback) {
 			if (!!!text) return (!!fallback)? [fallback] : null;
-			let reg = /\[(\w+)\]/g;
+			// let reg = /\[(\w+)\]/g;
+			let reg = /\[(\[?\w+)\]/g;
 			let match = reg.exec(text);
 			if (!!match && !!match[1]) {
 				reg.lastIndex = 0;
@@ -92,7 +93,9 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 					if (match.index === reg.lastIndex) {
 						reg.lastIndex++;
 					}
-					styles.push(match[1].toLowerCase());
+					if(match[1].indexOf('\[') != 0)
+						styles.push(match[1].toLowerCase());
+					else if (!!!styles.length) styles.push(fallback);
 				}
 				return styles;
 			}
