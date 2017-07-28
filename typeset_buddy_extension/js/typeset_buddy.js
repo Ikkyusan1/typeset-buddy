@@ -58,7 +58,7 @@ var tb = angular.module('tb', [
 tb.constant('CONF', {
 	appName: 'typeset_buddy', // will be replaced by package.json name when compiled
 	debug: false,	// will be true when compiled for dev environment, false otherwise
-	version: '0.1.7' // will be replaced when compiled
+	version: '0.1.8' // will be replaced when compiled
 });
 tb.config(['cfpLoadingBarProvider', '$localStorageProvider',
 	function(cfpLoadingBarProvider, $localStorageProvider) {
@@ -627,32 +627,6 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 
 	}
 ]);
-// prepared just in case, but eventually not used
-tb.directive('bubbleItem', [
-	function() {
-		return {
-			restrict: 'E',
-			scope: {
-				bubble: '=',
-				typesetAction: '&'
-			},
-			replace: true,
-			templateUrl: 'bubble_item.tpl.html',
-			controller: ['$scope',
-				function($scope) {
-					$scope.linkBubble = function() {
-						if (!!!$scope.bubble.linked) {
-							$scope.bubble.linked = true;
-						}
-						else {
-							$scope.bubble.linked = false;
-						}
-					}
-				}
-			]
-		};
-	}
-]);
 tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService',
 	function($rootScope, $localStorage, $q, StylesService) {
 		var self = this;
@@ -738,7 +712,6 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 
 		self.getTextStyles = function(text, fallback) {
 			if (!!!text) return (!!fallback)? [fallback] : null;
-			// let reg = /\[(\w+)\]/g;
 			let reg = /\[(\[?\w+)\]/g;
 			let match = reg.exec(text);
 			if (!!match && !!match[1]) {
@@ -811,7 +784,7 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 			let def = $q.defer();
 			let tmpObj = angular.copy(typesetObj);
 			$rootScope.log('typesetObj', tmpObj);
-			$rootScope.CSI.evalScript('getSingleRectangleSelectionDimensions();', function(res) {
+			$rootScope.CSI.evalScript('tryExec("getSingleRectangleSelectionDimensions");', function(res) {
 				$rootScope.log('maybeTypesetToPath return', res);
 				if (res == 'no_document') {
 					def.reject('No document');
@@ -846,7 +819,7 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 
 		self.typeset = function(typesetObj) {
 			let def = $q.defer();
-			$rootScope.$root.CSI.evalScript('typesetEX(' + JSON.stringify(typesetObj) + ');', function(res) {
+			$rootScope.$root.CSI.evalScript('tryExec("typesetEX", ' + JSON.stringify(typesetObj) + ');', function(res) {
 				$rootScope.log('typeset return', res);
 				if (res === 'no_document') {
 					def.reject('No document');
@@ -1102,6 +1075,18 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 
 		$scope.autoResizeSelectedLayers = function() {
 			StylesService.autoResizeSelectedLayers()
+			.then(
+				function() {
+					ngToast.create({className: 'success', content: 'Done'});
+				},
+				function(err) {
+					ngToast.create({className: 'danger', content: err});
+				}
+			);
+		};
+
+		$scope.adjustFontSize = function(modifier) {
+			StylesService.adjustFontSize(modifier)
 			.then(
 				function() {
 					ngToast.create({className: 'success', content: 'Done'});
@@ -1496,7 +1481,7 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 
 		self.applyStyleToSelectedLayers = function(style) {
 			let def = $q.defer();
-			$rootScope.$root.CSI.evalScript('applyStyleToSelectedLayers('+ JSON.stringify(style) +');', function(res) {
+			$rootScope.$root.CSI.evalScript('tryExec("applyStyleToSelectedLayers", '+ JSON.stringify(style) +');', function(res) {
 				$rootScope.log('applyStyleToSelectedLayers return', res);
 				if (res === 'no_document') {
 					def.reject('No document.');
@@ -1519,7 +1504,7 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 
 		self.setStyle = function(style) {
 			let def = $q.defer();
-			$rootScope.$root.CSI.evalScript('setStyle('+ JSON.stringify(style) +');', function(res) {
+				$rootScope.$root.CSI.evalScript('tryExec("setStyle", '+ JSON.stringify(style) +');', function(res) {
 				$rootScope.log('setStyle return', res);
 				if (res === 'no_document') {
 					def.reject('No document.');
@@ -1536,8 +1521,31 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 
 		self.autoResizeSelectedLayers = function(){
 			let def = $q.defer();
-			$rootScope.$root.CSI.evalScript('autoResizeSelectedLayers();', function(res) {
+				$rootScope.$root.CSI.evalScript('tryExec("autoResizeSelectedLayers");', function(res) {
 				$rootScope.log('autoResizeSelectedLayers return', res);
+				if (res === 'no_document') {
+					def.reject('No document.');
+				}
+				else if (res === 'no_selected_layers') {
+					def.reject('Could not retrieve the selected layers.');
+				}
+				else if (res === 'not_text_layer') {
+					def.reject('Not a text layer.');
+				}
+				else if (res === 'done') {
+					def.resolve();
+				}
+				else {
+					def.reject(res);
+				}
+			});
+			return def.promise;
+		};
+
+		self.adjustFontSize = function(modifier){
+			let def = $q.defer();
+			$rootScope.$root.CSI.evalScript('tryExec("adjustFontSizeSelectedLayers", '+ modifier.toString() +');', function(res) {
+				$rootScope.log('adjustFontSizeSelectedLayers return', res);
 				if (res === 'no_document') {
 					def.reject('No document.');
 				}

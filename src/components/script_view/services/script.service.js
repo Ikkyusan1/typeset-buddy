@@ -83,7 +83,6 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 
 		self.getTextStyles = function(text, fallback) {
 			if (!!!text) return (!!fallback)? [fallback] : null;
-			// let reg = /\[(\w+)\]/g;
 			let reg = /\[(\[?\w+)\]/g;
 			let match = reg.exec(text);
 			if (!!match && !!match[1]) {
@@ -156,7 +155,7 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 			let def = $q.defer();
 			let tmpObj = angular.copy(typesetObj);
 			$rootScope.log('typesetObj', tmpObj);
-			$rootScope.CSI.evalScript('getSingleRectangleSelectionDimensions();', function(res) {
+			$rootScope.CSI.evalScript('tryExec("getSingleRectangleSelectionDimensions");', function(res) {
 				$rootScope.log('maybeTypesetToPath return', res);
 				if (res == 'no_document') {
 					def.reject('No document');
@@ -191,7 +190,7 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 
 		self.typeset = function(typesetObj) {
 			let def = $q.defer();
-			$rootScope.$root.CSI.evalScript('typesetEX(' + JSON.stringify(typesetObj) + ');', function(res) {
+			$rootScope.$root.CSI.evalScript('tryExec("typesetEX", ' + JSON.stringify(typesetObj) + ');', function(res) {
 				$rootScope.log('typeset return', res);
 				if (res === 'no_document') {
 					def.reject('No document');

@@ -225,6 +225,18 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 			);
 		};
 
+		$scope.adjustFontSize = function(modifier) {
+			StylesService.adjustFontSize(modifier)
+			.then(
+				function() {
+					ngToast.create({className: 'success', content: 'Done'});
+				},
+				function(err) {
+					ngToast.create({className: 'danger', content: err});
+				}
+			);
+		};
+
 		$scope.loadStyleSet = function() {
 			$scope.styleSet = StylesService.getStyleSet($scope.selectedStyleset);
 		};

@@ -31,13 +31,17 @@
 	</button>
 	<styleset-selector selected-value="selectedStyleset"></styleset-selector>
 
-	<button class="topcoat-button pull-right" ng-click="exportConstants()" uib-tooltip="Export available fonts and constant values" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
-		<span class="glyphicon glyphicon-book"></span>
-	</button>
-
-	<button class="topcoat-button pull-right" ng-click="autoResizeSelectedLayers()" uib-tooltip="Auto resize selected layers" tooltip-popup-delay="500" tooltip-placement="bottom-right">
-		<span class="glyphicon glyphicon-resize-small"></span>
-	</button>
+	<div class="pull-right">
+		<button class="topcoat-button" ng-click="adjustFontSize(-1)" uib-tooltip="Decrease font size by 1 pixel on selected layers" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
+			<span class="">-1px</span>
+		</button>
+		<button class="topcoat-button" ng-click="adjustFontSize(1)" uib-tooltip="Increase font size by 1 pixel on selected layers" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
+			<span class="">+1px</span>
+		</button>
+		<button class="topcoat-button" ng-click="autoResizeSelectedLayers()" uib-tooltip="Auto resize selected layers" tooltip-popup-delay="500" tooltip-placement="bottom-right">
+			<span class="glyphicon glyphicon-resize-small"></span>
+		</button>
+	</div>
 </div>
 
 <div class="row no-shrink pb header">
@@ -53,8 +57,8 @@
 			<input type="text" class="topcoat-text-input" placeholder="filter..." ng-model="styleFilter">
 		</label>
 		<button class="topcoat-button" ng-click="clearStyleFilter()" ng-if="!!styleFilter">
-		<span class="glyphicon glyphicon-remove"></span>
-	</button>
+			<span class="glyphicon glyphicon-remove"></span>
+		</button>
 	</div>
 	<div class="col-md-3 col-xs-3 text-right">
 		<button class="topcoat-button" ng-click="addStyle()">Add Style</button>
@@ -63,5 +67,18 @@
 <div class="list scrollable padded">
 	<div class="list-item" ng-repeat="style in styleSet.styles |filter: {keyword: styleFilter||undefined}">
 		<tb-style-preset preset="style" remove-action="removeStyle(style)" duplicate-action="duplicateStyle(style)" apply-action="applyStyleToSelectedLayers(style, resize)" set-action="setStyle(style)" ng-class="{'default-style': style.default}"></tb-style-preset>
+	</div>
+</div>
+<div class="row no-shrink pv">
+	<div class="col-md-4 col-xs-4">
+		<button class="topcoat-button" ng-click="exportConstants()" uib-tooltip="Export available fonts and constant values" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
+			<span class="glyphicon glyphicon-book"></span>
+		</button>
+	</div>
+	<div class="col-md-5 col-xs-5">
+
+	</div>
+	<div class="col-md-3 col-xs-3 text-right">
+		<button class="topcoat-button" ng-click="addStyle()">Add Style</button>
 	</div>
 </div>

@@ -186,7 +186,7 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 
 		self.applyStyleToSelectedLayers = function(style) {
 			let def = $q.defer();
-			$rootScope.$root.CSI.evalScript('applyStyleToSelectedLayers('+ JSON.stringify(style) +');', function(res) {
+			$rootScope.$root.CSI.evalScript('tryExec("applyStyleToSelectedLayers", '+ JSON.stringify(style) +');', function(res) {
 				$rootScope.log('applyStyleToSelectedLayers return', res);
 				if (res === 'no_document') {
 					def.reject('No document.');
@@ -209,7 +209,7 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 
 		self.setStyle = function(style) {
 			let def = $q.defer();
-			$rootScope.$root.CSI.evalScript('setStyle('+ JSON.stringify(style) +');', function(res) {
+				$rootScope.$root.CSI.evalScript('tryExec("setStyle", '+ JSON.stringify(style) +');', function(res) {
 				$rootScope.log('setStyle return', res);
 				if (res === 'no_document') {
 					def.reject('No document.');
@@ -226,8 +226,31 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 
 		self.autoResizeSelectedLayers = function(){
 			let def = $q.defer();
-			$rootScope.$root.CSI.evalScript('autoResizeSelectedLayers();', function(res) {
+				$rootScope.$root.CSI.evalScript('tryExec("autoResizeSelectedLayers");', function(res) {
 				$rootScope.log('autoResizeSelectedLayers return', res);
+				if (res === 'no_document') {
+					def.reject('No document.');
+				}
+				else if (res === 'no_selected_layers') {
+					def.reject('Could not retrieve the selected layers.');
+				}
+				else if (res === 'not_text_layer') {
+					def.reject('Not a text layer.');
+				}
+				else if (res === 'done') {
+					def.resolve();
+				}
+				else {
+					def.reject(res);
+				}
+			});
+			return def.promise;
+		};
+
+		self.adjustFontSize = function(modifier){
+			let def = $q.defer();
+			$rootScope.$root.CSI.evalScript('tryExec("adjustFontSizeSelectedLayers", '+ modifier.toString() +');', function(res) {
+				$rootScope.log('adjustFontSizeSelectedLayers return', res);
 				if (res === 'no_document') {
 					def.reject('No document.');
 				}

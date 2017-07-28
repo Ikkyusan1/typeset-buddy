@@ -36,6 +36,7 @@ if (!String.prototype.trim) {
 
 var originalTypeUnits = app.preferences.typeUnits;
 var originalRulerUnits = app.preferences.rulerUnits;
+var saveState;
 
 function setUnits() {
 	originalTypeUnits = app.preferences.typeUnits;
@@ -64,6 +65,110 @@ function getAppFonts() {
 	return JSON.stringify(fontNames);
 }
 
+// Paul Riggott, you rock!
+// https://forums.adobe.com/thread/1161110
+function getSelectedLayersIdx() {
+	var selectedLayers = new Array;
+	var ref = new ActionReference();
+	ref.putEnumerated(charIDToTypeID('Dcmn'), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
+	var desc = executeActionGet(ref);
+	if (desc.hasKey(stringIDToTypeID('targetLayers'))) {
+		desc = desc.getList(stringIDToTypeID('targetLayers'));
+		var c = desc.count
+		var selectedLayers = new Array();
+		for (var i=0;i<c;i++) {
+			try {
+				activeDocument.backgroundLayer;
+				selectedLayers.push(getLayerIDfromIDX(desc.getReference(i).getIndex()));
+			}
+			catch(e) {
+				selectedLayers.push(getLayerIDfromIDX(desc.getReference(i).getIndex() + 1));
+			}
+		}
+	}
+	else {
+		var ref = new ActionReference();
+		ref.putProperty(charIDToTypeID('Prpr'), charIDToTypeID( 'ItmI'));
+		ref.putEnumerated(charIDToTypeID('Lyr '), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
+		try {
+			activeDocument.backgroundLayer;
+			selectedLayers.push(getLayerIDfromIDX( executeActionGet(ref).getInteger(charIDToTypeID('ItmI')) - 1));
+		}
+		catch(e) {
+			selectedLayers.push( getLayerIDfromIDX(executeActionGet(ref).getInteger(charIDToTypeID('ItmI'))));
+		}
+		var vis = app.activeDocument.activeLayer.visible;
+		if (vis == true) app.activeDocument.activeLayer.visible = false;
+		var desc9 = new ActionDescriptor();
+		var list9 = new ActionList();
+		var ref9 = new ActionReference();
+		ref9.putEnumerated(charIDToTypeID('Lyr '), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
+		list9.putReference(ref9);
+		desc9.putList(charIDToTypeID('null'), list9);
+		executeAction(charIDToTypeID('Shw '), desc9, DialogModes.NO);
+		if (app.activeDocument.activeLayer.visible == false) selectedLayers.shift();
+		app.activeDocument.activeLayer.visible = vis;
+	}
+	return selectedLayers;
+};
+
+function getActiveLayerID(){
+	var ref = new ActionReference();
+	ref.putEnumerated(charIDToTypeID('Lyr '), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
+	var desc = executeActionGet(ref);
+	return desc.getInteger(stringIDToTypeID('layerID'));
+};
+
+function getLayerIDfromIDX(idx) {
+	var ref = new ActionReference();
+	ref.putIndex(charIDToTypeID('Lyr '), idx);
+	return executeActionGet(ref).getInteger(stringIDToTypeID('layerID'));
+};
+
+function selectLayerById(ID, add) {
+	add = (add == undefined)? add = false : add;
+	var ref = new ActionReference();
+	ref.putIdentifier(charIDToTypeID('Lyr '), ID);
+	var desc = new ActionDescriptor();
+	desc.putReference(charIDToTypeID('null'), ref);
+	if (add) {
+		desc.putEnumerated(stringIDToTypeID('selectionModifier'), stringIDToTypeID('selectionModifierType'), stringIDToTypeID('addToSelection'));
+	}
+	desc.putBoolean(charIDToTypeID('MkVs'), false);
+	executeAction(charIDToTypeID('slct'), desc, DialogModes.NO);
+};
+
+function reselectLayers(idx) {
+	for (var i = 0; i < idx.length; i++) {
+		selectLayerById(idx[i], true);
+	}
+}
+
+function tryExec(functionName, obj) {
+	setUnits();
+	saveState();
+	try {
+		var res;
+		if(obj != undefined) {
+			res = eval(functionName + '('+ JSON.stringify(obj) +')');
+		}
+		else {
+			res = eval(functionName + '()');
+		}
+		resetUnits();
+		return res;
+	}
+	catch (e) {
+		resetUnits();
+		resetState();
+		if (e instanceof Object && e.reselect != undefined){
+			reselectLayers(e.reselect);
+			return e.message;
+		}
+		else return e;
+	}
+}
+
 // WTF, Adobe, seriously. We shouldn't even need this.
 function getTransformFactor() {
 	try {
@@ -80,7 +185,44 @@ function getTransformFactor() {
 	catch (e) {
 		throw 'Error during the retrieval of the transform factor.';
 	}
+}
 
+function getSingleRectangleSelectionDimensions() {
+	if (app.documents.length === 0) return 'no_document';
+	try {
+		var selections = app.activeDocument.selection;
+		try {
+			selections.makeWorkPath();
+		}
+		catch (e) {
+			return 'no_selection';
+		}
+		var wPath = app.activeDocument.pathItems['Work Path'];
+		var dimensions = {};
+		// limit to a single path only
+		if (wPath.subPathItems.length > 1) {
+			throw 'multiple_paths';
+		}
+		// Loop through all paths
+		for (var i = 0; i < wPath.subPathItems.length; i++) {
+			var bounds = [];
+			// we need rectangles only
+			if (wPath.subPathItems[i].pathPoints.length != 4) {
+				throw 'too_many_anchors';
+			}
+			// Loop through all path points and get their anchor coordinates
+			for (var j = 0; j < wPath.subPathItems[i].pathPoints.length; j++) {
+				bounds.push(wPath.subPathItems[i].pathPoints[j].anchor);
+			}
+			// calculate the corresponding dimensions
+			dimensions = getDimensionsFromCoords(bounds);
+		}
+		undo();
+		return JSON.stringify(dimensions);
+	}
+	catch (e) {
+		throw e;
+	}
 }
 
 function getAdjustedSize(size) {
@@ -173,6 +315,14 @@ function applyStyleToActiveLayer(style) {
 	}
 }
 
+function adjustFontSizeOfActiveLayer(modifier) {
+	var layer = app.activeDocument.activeLayer;
+	if(layer.kind !== LayerKind.TEXT) throw 'not_text_layer';
+	var textItem = layer.textItem;
+	var fontSize = textItem.size;
+	textItem.size = getAdjustedSize(parseInt(fontSize) + parseInt(modifier)) + 'px';
+}
+
 function createTextLayer(text) {
 	var textLayer = app.activeDocument.artLayers.add();
 	textLayer.kind = LayerKind.TEXT;
@@ -198,7 +348,6 @@ function sortLayerInLayerGroup(layerGroup) {
 }
 
 function typesetEX(typesetObj) {
-	setUnits();
 	try {
 		if (app.documents.length === 0) return 'no_document';
 		var style = typesetObj.style;
@@ -207,65 +356,31 @@ function typesetEX(typesetObj) {
 		if (style.useLayerGroups && style.layerGroup) {
 			app.activeDocument.suspendHistory('Sort layer', 'sortLayerInLayerGroup("'+ style.layerGroup + '");');
 		}
-		resetUnits();
 		return 'done';
 	}
 	catch (e) {
-		resetUnits();
-		return e;
+		throw e;
 	}
-}
-
-function getSelectedLayers() {
-	var idGrp = stringIDToTypeID('groupLayersEvent');
-	var descGrp = new ActionDescriptor();
-	var refGrp = new ActionReference();
-	refGrp.putEnumerated(charIDToTypeID('Lyr '), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
-	descGrp.putReference(charIDToTypeID('null'), refGrp);
-	try {
-		executeAction(idGrp, descGrp, DialogModes.NO);
-	}
-	catch (e) {
-		throw 'no_selected_layers';
-	}
-	var resultLayers = new Array();
-	for (var ix = 0; ix < app.activeDocument.activeLayer.layers.length; ix++){
-		resultLayers.push(app.activeDocument.activeLayer.layers[ix]);
-	}
-	var id8 = charIDToTypeID('slct');
-	var desc5 = new ActionDescriptor();
-	var id9 = charIDToTypeID('null');
-	var ref2 = new ActionReference();
-	var id10 = charIDToTypeID('HstS');
-	var id11 = charIDToTypeID('Ordn');
-	var id12 = charIDToTypeID('Prvs');
-	ref2.putEnumerated(id10, id11, id12);
-	desc5.putReference(id9, ref2);
-	executeAction(id8, desc5, DialogModes.NO);
-	return resultLayers;
 }
 
 function applyStyleToSelectedLayers(style) {
 	if (app.documents.length === 0) return 'no_document';
-	setUnits();
 	try {
-		try {
-			var layers = getSelectedLayers();
-		}
-		catch (e) {
-			return 'no_selected_layers';
-		}
-		for (var i = 0; i < layers.length; i++) {
-			app.activeDocument.activeLayer = layers[i];
+		var idx = getSelectedLayersIdx();
+	}
+	catch (e) {
+		throw 'no_selected_layers';
+	}
+	try {
+		for (var i = 0; i < idx.length; i++) {
+			selectLayerById(idx[i]);
 			app.activeDocument.suspendHistory('Apply style', 'applyStyleToActiveLayer('+ JSON.stringify(style) + ');');
 		}
-		resetUnits();
+		reselectLayers(idx);
 		return 'done';
 	}
 	catch (e) {
-		undo();
-		resetUnits();
-		return e;
+		throw {message: e, reselect: idx};
 	}
 }
 
@@ -288,71 +403,45 @@ function setStyleAction(style) {
 
 function autoResizeSelectedLayers() {
 	if (app.documents.length === 0) return 'no_document';
-	setUnits();
 	try {
-		try {
-			var layers = getSelectedLayers();
-		}
-		catch (e) {
-			return 'no_selected_layers';
-		}
-		for (var i = 0; i < layers.length; i++) {
-			app.activeDocument.activeLayer = layers[i];
+		var idx = getSelectedLayersIdx();
+	}
+	catch (e) {
+		throw 'no_selected_layers';
+	}
+	try {
+		for (var i = 0; i < idx.length; i++) {
+			selectLayerById(idx[i]);
 			app.activeDocument.suspendHistory('Auto resize', 'ajdustActiveLayerSize({});');
 		}
-		resetUnits();
+		reselectLayers(idx);
 		return 'done';
 	}
 	catch (e) {
-		undo();
-		resetUnits();
-		return e;
+		throw {message: e, reselect: idx};
 	}
 }
 
-function getSingleRectangleSelectionDimensions() {
-	if (app.documents.length === 0) return 'no_document';
+function adjustFontSizeSelectedLayers(modifier) {
+	if (app.documents.length === 0) throw 'no_document';
 	try {
-		setUnits();
-		var selections = app.activeDocument.selection;
-		try {
-			selections.makeWorkPath();
-		}
-		catch (e) {
-			resetUnits();
-			return 'no_selection';
-		}
-		var wPath = app.activeDocument.pathItems['Work Path'];
-		var dimensions = {};
-		// limit to a single path only
-		if (wPath.subPathItems.length > 1) {
-			undo();
-			resetUnits();
-			return 'multiple_paths';
-		}
-		// Loop through all paths
-		for (var i = 0; i < wPath.subPathItems.length; i++) {
-			var bounds = [];
-			// we need rectangles only
-			if (wPath.subPathItems[i].pathPoints.length != 4) {
-				undo();
-				resetUnits();
-				return 'too_many_anchors';
-			}
-			// Loop through all path points and get their anchor coordinates
-			for (var j = 0; j < wPath.subPathItems[i].pathPoints.length; j++) {
-				bounds.push(wPath.subPathItems[i].pathPoints[j].anchor);
-			}
-			// calculate the corresponding dimensions
-			dimensions = getDimensionsFromCoords(bounds);
-		}
-		undo();
-		resetUnits();
-		return JSON.stringify(dimensions);
+		var idx = getSelectedLayersIdx();
 	}
 	catch (e) {
-		undo();
-		resetUnits();
-		return e;
+		throw 'no_selected_layers';
+	}
+	try {
+		for (var i = 0; i < idx.length; i++) {
+			selectLayerById(idx[i]);
+			app.activeDocument.suspendHistory('Adjust font size', 'adjustFontSizeOfActiveLayer('+ modifier +');');
+		}
+		reselectLayers(idx);
+		return 'done';
+	}
+	catch (e) {
+		alert(e);
+		throw {message: e, reselect: idx};
 	}
 }
+
+
