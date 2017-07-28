@@ -1,3 +1,10 @@
+### 0.1.8 (2017-07-29)
+New: Add two buttons on style panel to increase/decrease font size of selected layers.
+Use Paul Riggott’s method to retrieve the selected layers. Refactor part of the code.
+Selected layers now stay selected when a process has failed.
+And some other tweaks.
+
+
 ### 0.1.7 (2017-06-28)
 Edge case of styles placed right after the double-slash of a multi-part  bubble.
 Display notes even if there’s nothing else on a line.
