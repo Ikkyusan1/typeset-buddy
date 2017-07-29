@@ -23,9 +23,6 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 
 		$rootScope.os = $rootScope.CSI.getOSInformation().toLowerCase().indexOf('mac') >= 0 ? 'Mac' : 'Windows';
 
-		// prevent Photoshop from reloading our extension everytime the panel is hidden or closed
-		// persist(true);
-
 		$rootScope.debug = CONF.debug;
 
 		// log utility when debug mode is on
@@ -50,8 +47,8 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 		}
 		$transitions.onFinish(true, saveTab, {priority: 10});
 
-		// trace routes if debug mode
 		if ($rootScope.debug == true) {
+			// trace routes if debug mode
 			$trace.enable(1);
 			// $trace.enable('HOOK');
 			persist(false);
