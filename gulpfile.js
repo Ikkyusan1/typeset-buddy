@@ -301,7 +301,6 @@ gulp.task('buildDeps', function(){
 		path.join(paths.deps, 'angular-sanitize/angular-sanitize.js'),
 		path.join(paths.deps, 'angular-ui-router/release/angular-ui-router.js'),
 		path.join(paths.deps, 'angular-bootstrap/ui-bootstrap-tpls.js'),
-		path.join(paths.deps, 'angular-loading-bar/build/loading-bar.js'),
 		path.join(paths.deps, 'ngToast/dist/ngToast.js'),
 		path.join(paths.deps, 'ngstorage/ngStorage.js'),
 		path.join(paths.deps, 'angular-clipboard/angular-clipboard.js'),
@@ -315,7 +314,6 @@ gulp.task('buildDeps', function(){
 			'angular-sanitize.js',
 			'angular-ui-router.js',
 			'ui-bootstrap-tpls.js',
-			'loading-bar.js',
 		]))
 		.pipe($.concat('deps.js'))
 		.pipe(gulp.dest(paths.destjs))
