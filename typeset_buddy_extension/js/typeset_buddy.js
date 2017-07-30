@@ -50,7 +50,6 @@ var tb = angular.module('tb', [
 	'ngSanitize',
 	'ui.router',
 	'ui.bootstrap',
-	'angular-loading-bar',
 	'ngStorage',
 	'ngToast',
 	'angular-clipboard'
@@ -58,19 +57,19 @@ var tb = angular.module('tb', [
 tb.constant('CONF', {
 	appName: 'typeset_buddy', // will be replaced by package.json name when compiled
 	debug: false,	// will be true when compiled for dev environment, false otherwise
-	version: '0.1.8' // will be replaced when compiled
+	version: '0.1.9' // will be replaced when compiled
 });
-tb.config(['cfpLoadingBarProvider', '$localStorageProvider',
-	function(cfpLoadingBarProvider, $localStorageProvider) {
-
-		// loading bar config
-		cfpLoadingBarProvider.includeSpinner = false;
-		// cfpLoadingBarProvider.latencyThreshold = 500;
+tb.config(['$localStorageProvider', 'ngToastProvider',
+	function($localStorageProvider, ngToastProvider) {
 
 		$localStorageProvider.setKeyPrefix('tb_');
+
+		ngToastProvider.configure({
+			verticalPosition: 'bottom',
+			maxNumber: 10
+		});
 	}
 ]);
-
 
 tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace', 'themeManager', '$localStorage',
 	function(CONF, $transitions, $state, $stateParams, $rootScope, $trace, themeManager, $localStorage) {
@@ -97,9 +96,6 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 
 		$rootScope.os = $rootScope.CSI.getOSInformation().toLowerCase().indexOf('mac') >= 0 ? 'Mac' : 'Windows';
 
-		// prevent Photoshop from reloading our extension everytime the panel is hidden or closed
-		// persist(true);
-
 		$rootScope.debug = CONF.debug;
 
 		// log utility when debug mode is on
@@ -124,8 +120,8 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 		}
 		$transitions.onFinish(true, saveTab, {priority: 10});
 
-		// trace routes if debug mode
 		if ($rootScope.debug == true) {
+			// trace routes if debug mode
 			$trace.enable(1);
 			// $trace.enable('HOOK');
 			persist(false);

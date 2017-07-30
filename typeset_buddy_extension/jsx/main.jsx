@@ -54,6 +54,14 @@ function undo() {
 	executeAction(charIDToTypeID('undo'), undefined, DialogModes.NO);
 }
 
+function saveState() {
+	savedState = app.activeDocument.activeHistoryState
+}
+
+function resetState() {
+	app.activeDocument.activeHistoryState = savedState
+}
+
 function getAppFonts() {
 	var fontNames = [];
 	for (var i=0; i < app.fonts.length; i++) {
@@ -145,6 +153,7 @@ function reselectLayers(idx) {
 }
 
 function tryExec(functionName, obj) {
+	if (app.documents.length === 0) return 'no_document';
 	setUnits();
 	saveState();
 	try {
@@ -188,7 +197,6 @@ function getTransformFactor() {
 }
 
 function getSingleRectangleSelectionDimensions() {
-	if (app.documents.length === 0) return 'no_document';
 	try {
 		var selections = app.activeDocument.selection;
 		try {
@@ -349,7 +357,6 @@ function sortLayerInLayerGroup(layerGroup) {
 
 function typesetEX(typesetObj) {
 	try {
-		if (app.documents.length === 0) return 'no_document';
 		var style = typesetObj.style;
 		app.activeDocument.suspendHistory('Create text layer', 'createTextLayer('+ JSON.stringify(typesetObj.text) + ');');
 		app.activeDocument.suspendHistory('Apply style', 'applyStyleToActiveLayer('+ JSON.stringify(style) + ');');
@@ -364,7 +371,6 @@ function typesetEX(typesetObj) {
 }
 
 function applyStyleToSelectedLayers(style) {
-	if (app.documents.length === 0) return 'no_document';
 	try {
 		var idx = getSelectedLayersIdx();
 	}
@@ -385,7 +391,6 @@ function applyStyleToSelectedLayers(style) {
 }
 
 function setStyle(style) {
-	if (app.documents.length === 0) return 'no_document';
 	app.activeDocument.suspendHistory('Set style', '\
 		createTextLayer(""); \
 		applyStyleToActiveLayer('+ JSON.stringify(style) + '); \
@@ -402,7 +407,6 @@ function setStyleAction(style) {
 }
 
 function autoResizeSelectedLayers() {
-	if (app.documents.length === 0) return 'no_document';
 	try {
 		var idx = getSelectedLayersIdx();
 	}
@@ -423,7 +427,6 @@ function autoResizeSelectedLayers() {
 }
 
 function adjustFontSizeSelectedLayers(modifier) {
-	if (app.documents.length === 0) throw 'no_document';
 	try {
 		var idx = getSelectedLayersIdx();
 	}
@@ -439,7 +442,6 @@ function adjustFontSizeSelectedLayers(modifier) {
 		return 'done';
 	}
 	catch (e) {
-		alert(e);
 		throw {message: e, reselect: idx};
 	}
 }

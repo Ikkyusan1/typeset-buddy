@@ -442,7 +442,6 @@ function adjustFontSizeSelectedLayers(modifier) {
 		return 'done';
 	}
 	catch (e) {
-		alert(e);
 		throw {message: e, reselect: idx};
 	}
 }

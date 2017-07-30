@@ -1,6 +1,20 @@
 # Typeset Buddy
 A typesetting extension for Adobe Photoshop CC. Tested with PS version 2015.5+.
 
+### What it can do :
+- hopefully help you during your typesetting sessions.
+- allow you to manage style sets. You can create presets for your projects and export/import them as json files.
+- analyze a translation script and prepare all the styles used within it (provided you followed the translation script rules).
+- display a translation script, page by page, in a comprehensive way (provided you followed the translation script rules).
+- typeset text in one click, with the style you defined. No more copy/pasta.
+- typeset text in a selection marquee.
+- apply a style to selected text layers.
+- increase/decrease font size and autoresize selected layers (via button click or standalone script execution.)
+
+### What it *can't* do :
+- automate the whole typesetting process.
+- make you more attractive than you already are.
+
 ## Installation:
 1. Download the [latest release](https://github.com/Ikkyusan1/typeset-buddy/releases/latest) and extract the archive in Photoshop's extension folder. It's one of these (create the folders if they don't exist):
 - System extension folder
@@ -19,6 +33,13 @@ The disabling of the check for signed extensions is not necessary anymore for th
 		(The plist is also located at ~/Library/Preferences/com.adobe.CSXS.7.plist)
 
 To re-enable the check, just put a value of 0 instead of 1.
+
+## Standalone scripts
+There's currently no practical way to associate keyboard shortcuts to an HTML extension (we can hijack keypress events, but only when the extension is displayed and focused). So, in order to allow the use of some basic functions without having to click on a button or even having the extension opened, for that matter, I've added some standalone scripts. You can find them in the "jsx/" folder. There's currently three scripts :
+- tb_decrease_font_size_selected_layers.jsx
+- tb_increase_font_size_selected_layers.jsx
+- tb_autoresize_selected_layers.jsx
+This way you can create a Photoshop Action to run these scripts and associate a keystroke to the action. (Running a script is done via the app menu File > Scripts > Browse...)
 
 ## Translation script format
 ### Page numbers
