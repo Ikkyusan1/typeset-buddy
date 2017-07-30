@@ -237,6 +237,42 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 			);
 		};
 
+		$scope.toggleHyphenation = function() {
+			StylesService.toggleHyphenation()
+			.then(
+				function() {
+					ngToast.create({className: 'success', content: 'Done'});
+				},
+				function(err) {
+					ngToast.create({className: 'danger', content: err});
+				}
+			);
+		};
+
+		$scope.toggleFauxBold = function() {
+			StylesService.toggleFauxBold()
+			.then(
+				function() {
+					ngToast.create({className: 'success', content: 'Done'});
+				},
+				function(err) {
+					ngToast.create({className: 'danger', content: err});
+				}
+			);
+		};
+
+		$scope.toggleFauxItalic = function() {
+			StylesService.toggleFauxItalic()
+			.then(
+				function() {
+					ngToast.create({className: 'success', content: 'Done'});
+				},
+				function(err) {
+					ngToast.create({className: 'danger', content: err});
+				}
+			);
+		};
+
 		$scope.loadStyleSet = function() {
 			$scope.styleSet = StylesService.getStyleSet($scope.selectedStyleset);
 		};

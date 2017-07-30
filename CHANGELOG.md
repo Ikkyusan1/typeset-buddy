@@ -1,3 +1,7 @@
+### 0.1.10 (2017-07-30)
+Added more standalone scripts.
+Some refactoring.
+
 ### 0.1.9 (2017-07-30)
 Added standalone scripts to allow the user to create Photoshop actions and associate shortcuts to them.
 Minor tweaks.

@@ -184,29 +184,6 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 			}
 		};
 
-		self.applyStyleToSelectedLayers = function(style) {
-			let def = $q.defer();
-			$rootScope.$root.CSI.evalScript('tryExec("applyStyleToSelectedLayers", '+ JSON.stringify(style) +');', function(res) {
-				$rootScope.log('applyStyleToSelectedLayers return', res);
-				if (res === 'no_document') {
-					def.reject('No document.');
-				}
-				else if (res === 'no_selected_layers') {
-					def.reject('Could not retrieve the selected layers.');
-				}
-				else if (res === 'not_text_layer') {
-					def.reject('Not a text layer.');
-				}
-				else if (res === 'done') {
-					def.resolve();
-				}
-				else {
-					def.reject(res);
-				}
-			});
-			return def.promise;
-		};
-
 		self.setStyle = function(style) {
 			let def = $q.defer();
 				$rootScope.$root.CSI.evalScript('tryExec("setStyle", '+ JSON.stringify(style) +');', function(res) {
@@ -224,9 +201,13 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 			return def.promise;
 		};
 
-		self.autoResizeSelectedLayers = function(){
+		self.actionSelectedLayers = function(action, obj) {
 			let def = $q.defer();
-				$rootScope.$root.CSI.evalScript('tryExec("autoResizeSelectedLayers");', function(res) {
+			let actionString = '"'+ action + '"';
+			if (angular.isDefined(obj)) {
+				actionString += ', '+ JSON.stringify(obj);
+			}
+			$rootScope.$root.CSI.evalScript('tryExec('+ actionString +');', function(res) {
 				$rootScope.log('autoResizeSelectedLayers return', res);
 				if (res === 'no_document') {
 					def.reject('No document.');
@@ -247,27 +228,28 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 			return def.promise;
 		};
 
+		self.applyStyleToSelectedLayers = function(style) {
+			return self.actionSelectedLayers('applyStyleToSelectedLayers', style);
+		};
+
+		self.autoResizeSelectedLayers = function(){
+			return self.actionSelectedLayers('autoResizeSelectedLayers');
+		};
+
 		self.adjustFontSize = function(modifier){
-			let def = $q.defer();
-			$rootScope.$root.CSI.evalScript('tryExec("adjustFontSizeSelectedLayers", '+ modifier.toString() +');', function(res) {
-				$rootScope.log('adjustFontSizeSelectedLayers return', res);
-				if (res === 'no_document') {
-					def.reject('No document.');
-				}
-				else if (res === 'no_selected_layers') {
-					def.reject('Could not retrieve the selected layers.');
-				}
-				else if (res === 'not_text_layer') {
-					def.reject('Not a text layer.');
-				}
-				else if (res === 'done') {
-					def.resolve();
-				}
-				else {
-					def.reject(res);
-				}
-			});
-			return def.promise;
+			return self.actionSelectedLayers('adjustFontSize', modifier);
+		};
+
+		self.toggleHyphenation = function(){
+			return self.actionSelectedLayers('toggleHyphenationSelectedLayers');
+		};
+
+		self.toggleFauxBold = function(){
+			return self.actionSelectedLayers('toggleFauxBoldSelectedLayers');
+		};
+
+		self.toggleFauxItalic = function(){
+			return self.actionSelectedLayers('toggleFauxItalicSelectedLayers');
 		};
 
 		// init

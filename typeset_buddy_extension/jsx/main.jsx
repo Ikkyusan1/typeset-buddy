@@ -234,7 +234,10 @@ function getSingleRectangleSelectionDimensions() {
 }
 
 function getAdjustedSize(size) {
-	return size / (getTransformFactor() * activeDocument.resolution / 72);
+	var t = getTransformFactor();
+	var ar = activeDocument.resolution;
+	// return size / (getTransformFactor() * activeDocument.resolution / 72);
+	return size / (activeDocument.resolution / 72);
 }
 
 function getBasicTextboxWidth(fontSize) {
@@ -331,6 +334,27 @@ function adjustFontSizeOfActiveLayer(modifier) {
 	textItem.size = getAdjustedSize(parseInt(fontSize) + parseInt(modifier)) + 'px';
 }
 
+function toggleHyphenationOfActiveLayer() {
+	var layer = app.activeDocument.activeLayer;
+	if(layer.kind !== LayerKind.TEXT) throw 'not_text_layer';
+	var textItem = layer.textItem;
+	textItem.hyphenation = !textItem.hyphenation;
+}
+
+function toggleFauxBoldOfActiveLayer() {
+	var layer = app.activeDocument.activeLayer;
+	if(layer.kind !== LayerKind.TEXT) throw 'not_text_layer';
+	var textItem = layer.textItem;
+	textItem.fauxBold = !textItem.fauxBold;
+}
+
+function toggleFauxItalicOfActiveLayer() {
+	var layer = app.activeDocument.activeLayer;
+	if(layer.kind !== LayerKind.TEXT) throw 'not_text_layer';
+	var textItem = layer.textItem;
+	textItem.fauxItalic = !textItem.fauxItalic;
+}
+
 function createTextLayer(text) {
 	var textLayer = app.activeDocument.artLayers.add();
 	textLayer.kind = LayerKind.TEXT;
@@ -339,6 +363,15 @@ function createTextLayer(text) {
 	textItem.position = [20, 20];
 	textLayer = null;
 	textItem = null;
+}
+
+function setStyle(style) {
+	app.activeDocument.suspendHistory('Set style', '\
+		createTextLayer(""); \
+		applyStyleToActiveLayer('+ JSON.stringify(style) + '); \
+		app.activeDocument.activeLayer.remove(); \
+	');
+	return 'done';
 }
 
 function sortLayerInLayerGroup(layerGroup) {
@@ -370,7 +403,7 @@ function typesetEX(typesetObj) {
 	}
 }
 
-function applyStyleToSelectedLayers(style) {
+function actionSelectedLayers(action, historyName, obj) {
 	try {
 		var idx = getSelectedLayersIdx();
 	}
@@ -380,7 +413,8 @@ function applyStyleToSelectedLayers(style) {
 	try {
 		for (var i = 0; i < idx.length; i++) {
 			selectLayerById(idx[i]);
-			app.activeDocument.suspendHistory('Apply style', 'applyStyleToActiveLayer('+ JSON.stringify(style) + ');');
+			var val = (obj != undefined)? obj : {};
+			app.activeDocument.suspendHistory(historyName, action + '('+ JSON.stringify(val) +');');
 		}
 		reselectLayers(idx);
 		return 'done';
@@ -390,60 +424,26 @@ function applyStyleToSelectedLayers(style) {
 	}
 }
 
-function setStyle(style) {
-	app.activeDocument.suspendHistory('Set style', '\
-		createTextLayer(""); \
-		applyStyleToActiveLayer('+ JSON.stringify(style) + '); \
-		app.activeDocument.activeLayer.remove(); \
-	');
-	return 'done';
-}
-
-function setStyleAction(style) {
-	createTextLayer('');
-	applyStyleToActiveLayer(style);
-	app.activeDocument.activeLayer.remove();
-	return 'done';
+function applyStyleToSelectedLayers(style) {
+	return actionSelectedLayers('applyStyleToActiveLayer', 'Apply style', style);
 }
 
 function autoResizeSelectedLayers() {
-	try {
-		var idx = getSelectedLayersIdx();
-	}
-	catch (e) {
-		throw 'no_selected_layers';
-	}
-	try {
-		for (var i = 0; i < idx.length; i++) {
-			selectLayerById(idx[i]);
-			app.activeDocument.suspendHistory('Auto resize', 'ajdustActiveLayerSize({});');
-		}
-		reselectLayers(idx);
-		return 'done';
-	}
-	catch (e) {
-		throw {message: e, reselect: idx};
-	}
+	return actionSelectedLayers('ajdustActiveLayerSize', 'Auto resize');
 }
 
 function adjustFontSizeSelectedLayers(modifier) {
-	try {
-		var idx = getSelectedLayersIdx();
-	}
-	catch (e) {
-		throw 'no_selected_layers';
-	}
-	try {
-		for (var i = 0; i < idx.length; i++) {
-			selectLayerById(idx[i]);
-			app.activeDocument.suspendHistory('Adjust font size', 'adjustFontSizeOfActiveLayer('+ modifier +');');
-		}
-		reselectLayers(idx);
-		return 'done';
-	}
-	catch (e) {
-		throw {message: e, reselect: idx};
-	}
+	return actionSelectedLayers('adjustFontSizeOfActiveLayer', 'Adjust font size', modifier);
 }
 
+function toggleHyphenationSelectedLayers() {
+	return actionSelectedLayers('toggleHyphenationOfActiveLayer', 'Toggle hyphenation');
+}
 
+function toggleFauxBoldSelectedLayers() {
+	return actionSelectedLayers('toggleFauxBoldOfActiveLayer', 'Toggle faux bold');
+}
+
+function toggleFauxItalicSelectedLayers() {
+	return actionSelectedLayers('toggleFauxItalicOfActiveLayer', 'Toggle faux italic');
+}
