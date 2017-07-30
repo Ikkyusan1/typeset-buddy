@@ -1,3 +1,8 @@
+### 0.1.9 (2017-07-30)
+Added standalone scripts to allow the user to create Photoshop actions and associate shortcuts to them.
+Minor tweaks.
+
+
 ### 0.1.8 (2017-07-29)
 New: Add two buttons on style panel to increase/decrease font size of selected layers.
 Use Paul Riggott’s method to retrieve the selected layers. Refactor part of the code.
