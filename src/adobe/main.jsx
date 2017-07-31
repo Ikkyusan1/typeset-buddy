@@ -275,7 +275,7 @@ function adjustTextLayerHeight(textLayer) {
 
 function ajdustActiveLayerSize(style) {
 	var layer = app.activeDocument.activeLayer;
-	if(layer.kind !== LayerKind.TEXT) throw 'not_text_layer';
+
 	var textItem = layer.textItem;
 	if (typeof style.coords != 'undefined' && typeof style.dimensions == 'undefined') {
 		style.dimensions = getDimensionsFromCoords(style.coords);
@@ -293,9 +293,7 @@ function ajdustActiveLayerSize(style) {
 }
 
 function applyStyleToActiveLayer(style) {
-	var layer = app.activeDocument.activeLayer;
-	if(layer.kind !== LayerKind.TEXT) throw 'not_text_layer';
-	var textItem = layer.textItem;
+	var textItem = app.activeDocument.activeLayer.textItem;
 	if (!!!style.useCurrent) {
 		textItem.kind = TextType.PARAGRAPHTEXT;
 		textItem.font = style.fontName;
@@ -327,31 +325,23 @@ function applyStyleToActiveLayer(style) {
 }
 
 function adjustFontSizeOfActiveLayer(modifier) {
-	var layer = app.activeDocument.activeLayer;
-	if(layer.kind !== LayerKind.TEXT) throw 'not_text_layer';
-	var textItem = layer.textItem;
+	var textItem = app.activeDocument.activeLayer.textItem;
 	var fontSize = textItem.size;
 	textItem.size = getAdjustedSize(parseInt(fontSize) + parseInt(modifier)) + 'px';
 }
 
 function toggleHyphenationOfActiveLayer() {
-	var layer = app.activeDocument.activeLayer;
-	if(layer.kind !== LayerKind.TEXT) throw 'not_text_layer';
-	var textItem = layer.textItem;
+	var textItem = app.activeDocument.activeLayer.textItem;
 	textItem.hyphenation = !textItem.hyphenation;
 }
 
 function toggleFauxBoldOfActiveLayer() {
-	var layer = app.activeDocument.activeLayer;
-	if(layer.kind !== LayerKind.TEXT) throw 'not_text_layer';
-	var textItem = layer.textItem;
+	var textItem = app.activeDocument.activeLayer.textItem;
 	textItem.fauxBold = !textItem.fauxBold;
 }
 
 function toggleFauxItalicOfActiveLayer() {
-	var layer = app.activeDocument.activeLayer;
-	if(layer.kind !== LayerKind.TEXT) throw 'not_text_layer';
-	var textItem = layer.textItem;
+	var textItem = app.activeDocument.activeLayer.textItem;
 	textItem.fauxItalic = !textItem.fauxItalic;
 }
 
@@ -413,6 +403,7 @@ function actionSelectedLayers(action, historyName, obj) {
 	try {
 		for (var i = 0; i < idx.length; i++) {
 			selectLayerById(idx[i]);
+			if(app.activeDocument.activeLayer.kind !== LayerKind.TEXT) throw 'not_text_layer';
 			var val = (obj != undefined)? obj : {};
 			app.activeDocument.suspendHistory(historyName, action + '('+ JSON.stringify(val) +');');
 		}
