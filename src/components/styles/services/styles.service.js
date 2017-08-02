@@ -201,11 +201,11 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 			return def.promise;
 		};
 
-		self.actionSelectedLayers = function(action, obj) {
+		self.actionSelectedLayers = function(action, param) {
 			let def = $q.defer();
 			let actionString = '"'+ action + '"';
-			if (angular.isDefined(obj)) {
-				actionString += ', '+ JSON.stringify(obj);
+			if (angular.isDefined(param)) {
+				actionString += ', '+ JSON.stringify(param);
 			}
 			$rootScope.$root.CSI.evalScript('tryExec('+ actionString +');', function(res) {
 				$rootScope.log('autoResizeSelectedLayers return', res);
@@ -226,30 +226,6 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 				}
 			});
 			return def.promise;
-		};
-
-		self.applyStyleToSelectedLayers = function(style) {
-			return self.actionSelectedLayers('applyStyleToSelectedLayers', style);
-		};
-
-		self.autoResizeSelectedLayers = function(){
-			return self.actionSelectedLayers('autoResizeSelectedLayers');
-		};
-
-		self.adjustFontSize = function(modifier){
-			return self.actionSelectedLayers('adjustFontSize', modifier);
-		};
-
-		self.toggleHyphenation = function(){
-			return self.actionSelectedLayers('toggleHyphenationSelectedLayers');
-		};
-
-		self.toggleFauxBold = function(){
-			return self.actionSelectedLayers('toggleFauxBoldSelectedLayers');
-		};
-
-		self.toggleFauxItalic = function(){
-			return self.actionSelectedLayers('toggleFauxItalicSelectedLayers');
 		};
 
 		// init

@@ -11,9 +11,9 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 			$scope.rawBubbles = '';
 			$scope.bubbles = [];
 			$scope.pageStyle = '';
-			$scope.panelSeparator = ScriptService.panelSeparator();
-			$scope.useLayerGroups = ScriptService.useLayerGroups();
-			$scope.mergeBubbles = ScriptService.mergeBubbles();
+			$scope.panelSeparator = ScriptService.setting('panelSeparator');
+			$scope.useLayerGroups = ScriptService.setting('useLayerGroups');
+			$scope.mergeBubbles = ScriptService.setting('mergeBubbles');
 			$scope.styleSet = StylesService.getStyleSet();
 			$scope.selectedStyleset = $scope.styleSet.id;
 		};
@@ -28,7 +28,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 		$scope.loadScript = function(filepath, page, silent) {
 			let result = window.cep.fs.readFile(filepath);
 			if (result.err === 0) {
-				ScriptService.lastOpenedScript(filepath);
+				ScriptService.setting('lastOpenedScript', filepath);
 				$scope.filename = Utils.extractFilename(filepath);
 				$scope.scriptContent = result.data;
 				$scope.pageNumbers = ScriptService.getPageNumbers($scope.scriptContent);
@@ -43,29 +43,21 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 				}
 				else {
 					ngToast.create({className: 'info', content: 'Did not find any page number in the script'});
-					ScriptService.lastOpenedScript(null);
-					ScriptService.lastOpenedPage(null);
+					ScriptService.setting('lastOpenedScript', null);
+					ScriptService.setting('lastOpenedPage', null);
 					$scope.reset();
 				}
 			}
 			else {
-				ScriptService.lastOpenedScript(null);
-				ScriptService.lastOpenedPage(null);
+				ScriptService.setting('lastOpenedScript', null);
+				ScriptService.setting('lastOpenedPage', null);
 				$scope.reset();
 				ngToast.create({className: 'danger', content: 'Could not read the file'});
 			}
 		};
 
-		$scope.setPanelSeparator = function(val) {
-			$scope.panelSeparator = ScriptService.panelSeparator(val);
-		};
-
-		$scope.setUseLayerGroups = function(val) {
-			$scope.useLayerGroups = ScriptService.useLayerGroups(val);
-		};
-
-		$scope.setMergeBubbles = function(val) {
-			$scope.mergeBubbles = ScriptService.mergeBubbles(val);
+		$scope.setting = function(setting, val) {
+			$scope[setting] = ScriptService.setting(setting, val);
 		};
 
 		$scope.loadPage = function(pageNumber) {
@@ -88,7 +80,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 						$scope.$root.log('lines', lines);
 						lines.forEach(function(line) {
 							let notes = ScriptService.getNotes(line);
-							let skipIt = ScriptService.skipThisLine(line, ScriptService.panelSeparator());
+							let skipIt = ScriptService.skipThisLine(line);
 							if (skipIt === false || !!notes) {
 								let bubble = {
 									text: ScriptService.cleanLine(line),
@@ -132,13 +124,13 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 							}
 						});
 					}
-					ScriptService.lastOpenedPage(pageNumber);
+					ScriptService.setting('lastOpenedPage', pageNumber);
 					$scope.$root.log('bubbles', $scope.bubbles);
 				}
 				else {
 					ngToast.create({className: 'info', content: 'Could not find page ' + pageNumber + ' in file'});
 					$scope.selectedPage = null;
-					ScriptService.lastOpenedPage(null);
+					ScriptService.setting('lastOpenedPage', null);
 					$scope.bubbles = [];
 				}
 			}
@@ -152,7 +144,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 					let idx = $scope.pageNumbers.findIndex(function(one) { return one == $scope.selectedPage; });
 					if (angular.isDefined($scope.pageNumbers[idx + inc])) {
 						$scope.selectedPage = $scope.pageNumbers[idx + inc];
-						ScriptService.lastOpenedPage($scope.selectedPage);
+						ScriptService.setting('lastOpenedPage', $scope.selectedPage);
 					}
 				}
 				else {
@@ -172,7 +164,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 			else {
 				let stylePreset = $scope.styleSet.styles.find(function(one) { return one.keyword == style.keyword; });
 				if (!!!stylePreset) stylePreset = $scope.styleSet.styles[0];
-				stylePreset.useLayerGroups = ScriptService.useLayerGroups();
+				stylePreset.useLayerGroups = ScriptService.setting('useLayerGroups');
 				let text = bubble.text;
 				if (!!bubble.siblings) {
 					bubble.siblings.forEach(function(sibling){
@@ -202,8 +194,8 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 
 		// autoload last openedscript
 		$timeout(function() {
-			if (!!ScriptService.lastOpenedScript()) {
-				$scope.loadScript(ScriptService.lastOpenedScript(), ScriptService.lastOpenedPage(), true);
+			if (!!ScriptService.setting('lastOpenedScript')) {
+				$scope.loadScript(ScriptService.setting('lastOpenedScript'), ScriptService.setting('lastOpenedPage'), true);
 			}
 		}, 300);
 

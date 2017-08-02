@@ -32,22 +32,22 @@
 	<styleset-selector selected-value="selectedStyleset"></styleset-selector>
 
 	<div class="pull-right">
-		<button class="topcoat-button" ng-click="toggleHyphenation()" uib-tooltip="Toggle hyphenation on selected layers" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
+		<button class="topcoat-button" ng-click="actionSelectedLayers('toggleHyphenation')" uib-tooltip="Toggle hyphenation on selected layers" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
 			<strong>H</strong><span class="glyphicon glyphicon-minus"></span>
 		</button>
-		<button class="topcoat-button" ng-click="toggleFauxBold()" uib-tooltip="Toggle faux bold on selected layers" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
+		<button class="topcoat-button" ng-click="actionSelectedLayers('toggleFauxBold')" uib-tooltip="Toggle faux bold on selected layers" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
 			<span class="glyphicon glyphicon-bold"></span>
 		</button>
-		<button class="topcoat-button" ng-click="toggleFauxItalic()" uib-tooltip="Toggle faux italic on selected layers" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
+		<button class="topcoat-button" ng-click="actionSelectedLayers('toggleFauxItalic')" uib-tooltip="Toggle faux italic on selected layers" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
 			<span class="glyphicon glyphicon-italic"></span>
 		</button>
-		<button class="topcoat-button" ng-click="adjustFontSize(-1)" uib-tooltip="Decrease font size by 1 pixel on selected layers" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
+		<button class="topcoat-button" ng-click="actionSelectedLayers('adjustFontSize', -1)" uib-tooltip="Decrease font size by 1 pixel on selected layers" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
 			<span class="glyphicon glyphicon-text-height"></span>-
 		</button>
-		<button class="topcoat-button" ng-click="adjustFontSize(1)" uib-tooltip="Increase font size by 1 pixel on selected layers" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
+		<button class="topcoat-button" ng-click="actionSelectedLayers('adjustFontSize', 1)" uib-tooltip="Increase font size by 1 pixel on selected layers" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
 			<span class="glyphicon glyphicon-text-height"></span>+
 		</button>
-		<button class="topcoat-button" ng-click="autoResizeSelectedLayers()" uib-tooltip="Auto resize selected layers" tooltip-popup-delay="500" tooltip-placement="bottom-right">
+		<button class="topcoat-button" ng-click="actionSelectedLayers('autoResizeSelectedLayers')" uib-tooltip="Auto resize selected layers" tooltip-popup-delay="500" tooltip-placement="bottom-right">
 			<span class="glyphicon glyphicon-resize-small"></span>
 		</button>
 	</div>

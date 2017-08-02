@@ -5,43 +5,16 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 		self.init = function() {
 			$rootScope.log('$localStorage', $localStorage);
 			self.emptyPage = ['blank', 'empty', 'no_text'];
-
-			if (!angular.isDefined($localStorage.panelSeparator)) self.panelSeparator('–');
-			if (!angular.isDefined($localStorage.useLayerGroups)) self.useLayerGroups(true);
-
-			if (!angular.isDefined($localStorage.lastOpenedScript)) {
-			 $localStorage.lastOpenedScript = '';
-			}
+			if (!angular.isDefined($localStorage.panelSeparator)) self.setting('panelSeparator', '–');
+			if (!angular.isDefined($localStorage.useLayerGroups)) self.setting('useLayerGroups', true);
+			if (!angular.isDefined($localStorage.mergeBubbles)) self.setting('mergeBubbles', false);
+			if (!angular.isDefined($localStorage.lastOpenedScript)) self.setting('lastOpenedScript', '');
 		};
 
-		self.lastOpenedScript = function(filepath) {
-			if (angular.isDefined(filepath)) $localStorage.lastOpenedScript = filepath;
-			return $localStorage.lastOpenedScript;
-		};
-
-		self.lastOpenedPage = function(pageNumber) {
-			if (angular.isDefined(pageNumber)) $localStorage.lastOpenedPage = pageNumber;
-			return $localStorage.lastOpenedPage;
-		};
-
-		self.lastDestinationFolder = function(folderPath) {
-			if (angular.isDefined(folderPath)) $localStorage.lastDestinationFolder = folderPath;
-			return $localStorage.lastDestinationFolder;
-		};
-
-		self.panelSeparator = function(val) {
-			if (angular.isDefined(val)) $localStorage.panelSeparator = val;
-			return $localStorage.panelSeparator;
-		};
-
-		self.useLayerGroups = function(val) {
-			if (angular.isDefined(val)) $localStorage.useLayerGroups = !!val;
-			return $localStorage.useLayerGroups;
-		};
-
-		self.mergeBubbles = function(val) {
-			if (angular.isDefined(val)) $localStorage.mergeBubbles = !!val;
-			return $localStorage.mergeBubbles;
+		self.setting = function(setting, val) {
+			if (angular.isDefined(val)) $localStorage[setting] = val;
+			console.log(setting, $localStorage[setting]);
+			return $localStorage[setting];
 		};
 
 		self.getPageNumbers = function(text) {
@@ -130,13 +103,13 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 			return (!!match && !!match[match.length - 1])? match[match.length - 1].trim() : null;
 		};
 
-		self.skipThisLine = function(text, panelSeparator) {
+		self.skipThisLine = function(text) {
 			if (!!!text) return true;
 			text = self.cleanLine(text);
 			if (!!!text || text.length == 0) {
 				return true;
 			}
-			else if (text == self.panelSeparator()) {
+			else if (text == self.setting('panelSeparator')) {
 				return null;
 			}
 			else return false;

@@ -189,7 +189,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 		$scope.applyStyleToSelectedLayers = function(style, resize) {
 			let tmpStyle = angular.copy(style);
 			tmpStyle.noResize = !!!resize;
-			StylesService.applyStyleToSelectedLayers(tmpStyle)
+			StylesService.actionSelectedLayers('applyStyleToSelectedLayers', tmpStyle)
 			.then(
 				function() {
 					ngToast.create({className: 'success', content: 'Done'});
@@ -213,56 +213,8 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 			);
 		};
 
-		$scope.autoResizeSelectedLayers = function() {
-			StylesService.autoResizeSelectedLayers()
-			.then(
-				function() {
-					ngToast.create({className: 'success', content: 'Done'});
-				},
-				function(err) {
-					ngToast.create({className: 'danger', content: err});
-				}
-			);
-		};
-
-		$scope.adjustFontSize = function(modifier) {
-			StylesService.adjustFontSize(modifier)
-			.then(
-				function() {
-					ngToast.create({className: 'success', content: 'Done'});
-				},
-				function(err) {
-					ngToast.create({className: 'danger', content: err});
-				}
-			);
-		};
-
-		$scope.toggleHyphenation = function() {
-			StylesService.toggleHyphenation()
-			.then(
-				function() {
-					ngToast.create({className: 'success', content: 'Done'});
-				},
-				function(err) {
-					ngToast.create({className: 'danger', content: err});
-				}
-			);
-		};
-
-		$scope.toggleFauxBold = function() {
-			StylesService.toggleFauxBold()
-			.then(
-				function() {
-					ngToast.create({className: 'success', content: 'Done'});
-				},
-				function(err) {
-					ngToast.create({className: 'danger', content: err});
-				}
-			);
-		};
-
-		$scope.toggleFauxItalic = function() {
-			StylesService.toggleFauxItalic()
+		$scope.actionSelectedLayers = function(action, param) {
+			StylesService.actionSelectedLayers(action, param)
 			.then(
 				function() {
 					ngToast.create({className: 'success', content: 'Done'});

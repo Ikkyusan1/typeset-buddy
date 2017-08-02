@@ -15,25 +15,27 @@
 			</label>
 			<styleset-selector selected-value="selectedStyleset"></styleset-selector>
 		</div>
-
 	</div>
+
 	<div class="col-md-1 col-xs-1 flex-input">
-		<div class="btn-group" uib-dropdown is-open="status.isopen">
+		<div class="btn-group" uib-dropdown is-open="status.isopen" auto-close="outsideClick">
 			<button class="topcoat-button" uib-dropdown-toggle>
 				<span class="glyphicon glyphicon-cog"></span>
 			</button>
 			<ul class="dropdown-menu dropdown-menu-right" uib-dropdown-menu role="menu" aria-labelledby="single-button">
 				<li class="dropdown-header">Panel separator</li>
-				<li role="menuitem" ng-class="{'active': panelSeparator == '–'}" ng-click="setPanelSeparator('–')"><span>Long dash –</span></li>
-				<li role="menuitem" ng-class="{'active': panelSeparator == '-'}" ng-click="setPanelSeparator('-')"><span>Single dash -</span></li>
-				<li role="menuitem" ng-class="{'active': panelSeparator == '--'}" ng-click="setPanelSeparator('--')"><span>Double dash --</span></li>
-				<li role="menuitem" ng-class="{'active': panelSeparator == '='}" ng-click="setPanelSeparator('=')"><span>Equal sign =</span></li>
-				<li class="dropdown-header">Use layer groups</li>
-				<li role="menuitem" ng-class="{'active': useLayerGroups === true}" ng-click="setUseLayerGroups(true)"><span>Yes</span></li>
-				<li role="menuitem" ng-class="{'active': useLayerGroups === false}" ng-click="setUseLayerGroups(false)" ><span>No</span></li>
-				<li class="dropdown-header">Merge multibubbles</li>
-				<li role="menuitem" ng-class="{'active': mergeBubbles === true}" ng-click="setMergeBubbles(true)"><span>Yes</span></li>
-				<li role="menuitem" ng-class="{'active': mergeBubbles === false}" ng-click="setMergeBubbles(false)" ><span>No</span></li>
+				<li role="menu-item" ng-class="{'active': panelSeparator == '–'}" ng-click="setting('panelSeparator', '–')"><span>Long dash –</span></li>
+				<li role="menu-item" ng-class="{'active': panelSeparator == '-'}" ng-click="setting('panelSeparator', '-')"><span>Single dash -</span></li>
+				<li role="menu-item" ng-class="{'active': panelSeparator == '--'}" ng-click="setting('panelSeparator', '--')"><span>Double dash --</span></li>
+				<li role="menu-item" ng-class="{'active': panelSeparator == '='}" ng-click="setting('panelSeparator', '=')"><span>Equal sign =</span></li>
+				<li class="divider"></li>
+				<li role="menu-item" class="dropdown-header">Use layer groups</li>
+				<li role="menu-item" ng-class="{'active': useLayerGroups === true}" ng-click="setting('useLayerGroups', true)"><span>Yes</span></li>
+				<li role="menu-item" ng-class="{'active': useLayerGroups === false}" ng-click="setting('useLayerGroups', false)" ><span>No</span></li>
+				<li class="divider"></li>
+				<li role="menu-item" class="dropdown-header">Merge multibubbles</li>
+				<li role="menu-item" ng-class="{'active': mergeBubbles === true}" ng-click="setting('mergeBubbles', true)"><span>Yes</span></li>
+				<li role="menu-item" ng-class="{'active': mergeBubbles === false}" ng-click="setting('mergeBubbles', false)" ><span>No</span></li>
 			</ul>
 		</div>
 	</div>
