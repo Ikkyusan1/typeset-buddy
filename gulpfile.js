@@ -296,7 +296,6 @@ gulp.task('minJs', function(){
 
 gulp.task('buildDeps', function(){
 	var files = [
-		path.join(paths.deps, 'jquery/dist/jquery.js'),
 		path.join(paths.deps, 'angular/angular.js'),
 		path.join(paths.deps, 'angular-sanitize/angular-sanitize.js'),
 		path.join(paths.deps, 'angular-ui-router/release/angular-ui-router.js'),

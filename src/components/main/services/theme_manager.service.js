@@ -2,37 +2,43 @@
 tb.factory('themeManager', ['$rootScope', 'Utils',
 	function($rootScope, Utils) {
 		var self = this;
+		let panelBgColor;
+		let bgColor;
+		let fontColor;
+		let isLight;
+		let stylesheet = document.getElementById('theme');
+		let body = document.getElementById('tb');
 
 		self.updateThemeWithAppSkinInfo = function(appSkinInfo) {
-			let panelBgColor = appSkinInfo.panelBackgroundColor.color;
-			let bgColor = Utils.colorToHex(panelBgColor);
-			let fontColor = 'F0F0F0';
-			let isLight = panelBgColor.red >= 122;
+			panelBgColor = appSkinInfo.panelBackgroundColor.color;
+			bgColor = Utils.colorToHex(panelBgColor);
+			fontColor = 'F0F0F0';
+			isLight = panelBgColor.red >= 122;
 			if (isLight) {
 				fontColor = '000000';
-				$('#theme').attr('href', 'css/topcoat-desktop-light.css');
-				$('body').removeClass('dark');
-				$('body').addClass('light');
+				stylesheet.href = 'css/topcoat-desktop-light.css';
+				body.classList.remove('dark');
+				body.classList.add('light');
 			}
 			else {
-				$('#theme').attr('href', 'css/topcoat-desktop-dark.css');
-				$('body').removeClass('light');
-				$('body').addClass('dark');
+				stylesheet.href = 'css/topcoat-desktop-dark.css';
+				body.classList.remove('light');
+				body.classList.add('dark');
 			}
-			$('body').css('background-color', '#' + bgColor);
-			$('body').css('color', '#' + fontColor);
-		}
+			body.style.backgroundColor = '#' + bgColor;
+			body.style.color = '#' + fontColor;
+		};
 
 		self.onAppThemeColorChanged = function(event) {
 			let skinInfo = JSON.parse(window.__adobe_cep__.getHostEnvironment()).appSkinInfo;
 			self.updateThemeWithAppSkinInfo(skinInfo);
-		}
+		};
 
 		// add event listener to change skin whenever Photoshop's skin changes
 		self.init = function() {
 			self.updateThemeWithAppSkinInfo($rootScope.CSI.hostEnvironment.appSkinInfo);
 			$rootScope.CSI.addEventListener(CSInterface.THEME_COLOR_CHANGED_EVENT, self.onAppThemeColorChanged);
-		}
+		};
 
 		return self;
 	}

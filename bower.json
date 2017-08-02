@@ -10,7 +10,6 @@
     "animate.css": "^3.5.2",
     "bootstrap": "^3.3.7",
     "font-awesome": "^4.7.0",
-    "jquery": "^2.2.3",
     "ngstorage": "^0.3.11",
     "topcoat": "^0.8.0",
     "ngToast": "ngtoast#^2.0.0",
