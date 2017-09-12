@@ -164,7 +164,6 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 			else {
 				let stylePreset = $scope.styleSet.styles.find(function(one) { return one.keyword == style.keyword; });
 				if (!!!stylePreset) stylePreset = $scope.styleSet.styles[0];
-				stylePreset.useLayerGroups = ScriptService.setting('useLayerGroups');
 				let text = bubble.text;
 				if (!!bubble.siblings) {
 					bubble.siblings.forEach(function(sibling){
@@ -205,13 +204,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 			}
 		});
 
-		$scope.$watch('panelSeparator', function(newVal, oldVal) {
-			if (angular.isDefined(newVal)) {
-				$scope.loadPage($scope.selectedPage);
-			}
-		});
-
-		$scope.$watch('mergeBubbles', function(newVal, oldVal) {
+		$scope.$watchGroup(['panelSeparator', 'mergeBubbles', 'textReplace'], function(newVal, oldVal) {
 			if (angular.isDefined(newVal)) {
 				$scope.loadPage($scope.selectedPage);
 			}

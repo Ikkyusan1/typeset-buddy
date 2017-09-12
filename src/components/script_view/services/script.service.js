@@ -13,7 +13,6 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 
 		self.setting = function(setting, val) {
 			if (angular.isDefined(val)) $localStorage[setting] = val;
-			console.log(setting, $localStorage[setting]);
 			return $localStorage[setting];
 		};
 
@@ -127,6 +126,7 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 		self.maybeTypesetToPath = function(typesetObj) {
 			let def = $q.defer();
 			let tmpObj = angular.copy(typesetObj);
+			tmpObj.style.useLayerGroups = self.setting('useLayerGroups');
 			$rootScope.log('typesetObj', tmpObj);
 			$rootScope.CSI.evalScript('tryExec("getSingleRectangleSelectionDimensions");', function(res) {
 				$rootScope.log('maybeTypesetToPath return', res);
@@ -177,7 +177,6 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 			});
 			return def.promise;
 		};
-
 
 		self.init();
 		return self;

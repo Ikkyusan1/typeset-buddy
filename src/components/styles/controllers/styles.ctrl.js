@@ -186,10 +186,10 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 			);
 		};
 
-		$scope.applyStyleToSelectedLayers = function(style, resize) {
+		$scope.applyStyleSelectedLayers = function(style, resize) {
 			let tmpStyle = angular.copy(style);
 			tmpStyle.noResize = !!!resize;
-			StylesService.actionSelectedLayers('applyStyleToSelectedLayers', tmpStyle)
+			StylesService.actionSelectedLayers('applyStyle', tmpStyle)
 			.then(
 				function() {
 					ngToast.create({className: 'success', content: 'Done'});

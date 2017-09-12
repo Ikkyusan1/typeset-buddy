@@ -18,7 +18,7 @@
 	</div>
 
 	<div class="col-md-1 col-xs-1 flex-input">
-		<div class="btn-group" uib-dropdown is-open="status.isopen" auto-close="outsideClick">
+		<div class="btn-group" uib-dropdown is-open="status.isopen">
 			<button class="topcoat-button" uib-dropdown-toggle>
 				<span class="glyphicon glyphicon-cog"></span>
 			</button>
@@ -99,7 +99,7 @@
 				<div class="bubble-note selectable" ng-repeat="note in sibling.notes">
 					{{note}}
 					<button class="topcoat-button clipbutton">
-						<span class="glyphicon glyphicon-copy" ng-click="toClipboard(sibling.notes)"></span>
+						<span class="glyphicon glyphicon-copy" ng-click="toClipboard(note)"></span>
 					</button>
 				</div>
 			</div>

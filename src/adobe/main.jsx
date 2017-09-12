@@ -34,24 +34,26 @@ if (!String.prototype.trim) {
 	};
 }
 
-var originalTypeUnits = app.preferences.typeUnits;
-var originalRulerUnits = app.preferences.rulerUnits;
+cTID = function(s) { return cTID[s] || (cTID[s] = app.charIDToTypeID(s)); };
+sTID = function(s) { return app.stringIDToTypeID(s); };
+idTS = function(id) { return app.typeIDToStringID (id); };
+
+var originalPrefs = app.preferences;
 var saveState;
 
-function setUnits() {
-	originalTypeUnits = app.preferences.typeUnits;
+function setPrefs() {
+	originalPrefs = app.preferences;
 	app.preferences.typeUnits = TypeUnits.PIXELS;
-	originalRulerUnits = app.preferences.rulerUnits;
 	app.preferences.rulerUnits = Units.PIXELS;
+	// app.preferences.smartQuotes = false;
 }
 
-function resetUnits() {
-	app.preferences.typeUnits = originalTypeUnits;
-	app.preferences.rulerUnits = originalRulerUnits;
+function resetPrefs() {
+	app.preferences = originalPrefs;
 }
 
 function undo() {
-	executeAction(charIDToTypeID('undo'), undefined, DialogModes.NO);
+	executeAction(cTID('undo'), undefined, DialogModes.NO);
 }
 
 function saveState() {
@@ -78,10 +80,10 @@ function getAppFonts() {
 function getSelectedLayersIdx() {
 	var selectedLayers = new Array;
 	var ref = new ActionReference();
-	ref.putEnumerated(charIDToTypeID('Dcmn'), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
+	ref.putEnumerated(cTID('Dcmn'), cTID('Ordn'), cTID('Trgt'));
 	var desc = executeActionGet(ref);
-	if (desc.hasKey(stringIDToTypeID('targetLayers'))) {
-		desc = desc.getList(stringIDToTypeID('targetLayers'));
+	if (desc.hasKey(sTID('targetLayers'))) {
+		desc = desc.getList(sTID('targetLayers'));
 		var c = desc.count
 		var selectedLayers = new Array();
 		for (var i=0;i<c;i++) {
@@ -96,24 +98,24 @@ function getSelectedLayersIdx() {
 	}
 	else {
 		var ref = new ActionReference();
-		ref.putProperty(charIDToTypeID('Prpr'), charIDToTypeID( 'ItmI'));
-		ref.putEnumerated(charIDToTypeID('Lyr '), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
+		ref.putProperty(cTID('Prpr'), cTID('ItmI'));
+		ref.putEnumerated(cTID('Lyr '), cTID('Ordn'), cTID('Trgt'));
 		try {
 			activeDocument.backgroundLayer;
-			selectedLayers.push(getLayerIDfromIDX( executeActionGet(ref).getInteger(charIDToTypeID('ItmI')) - 1));
+			selectedLayers.push(getLayerIDfromIDX( executeActionGet(ref).getInteger(cTID('ItmI')) - 1));
 		}
 		catch(e) {
-			selectedLayers.push( getLayerIDfromIDX(executeActionGet(ref).getInteger(charIDToTypeID('ItmI'))));
+			selectedLayers.push(getLayerIDfromIDX(executeActionGet(ref).getInteger(cTID('ItmI'))));
 		}
 		var vis = app.activeDocument.activeLayer.visible;
 		if (vis == true) app.activeDocument.activeLayer.visible = false;
 		var desc9 = new ActionDescriptor();
 		var list9 = new ActionList();
 		var ref9 = new ActionReference();
-		ref9.putEnumerated(charIDToTypeID('Lyr '), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
+		ref9.putEnumerated(cTID('Lyr '), cTID('Ordn'), cTID('Trgt'));
 		list9.putReference(ref9);
-		desc9.putList(charIDToTypeID('null'), list9);
-		executeAction(charIDToTypeID('Shw '), desc9, DialogModes.NO);
+		desc9.putList(cTID('null'), list9);
+		executeAction(cTID('Shw '), desc9, DialogModes.NO);
 		if (app.activeDocument.activeLayer.visible == false) selectedLayers.shift();
 		app.activeDocument.activeLayer.visible = vis;
 	}
@@ -122,28 +124,28 @@ function getSelectedLayersIdx() {
 
 function getActiveLayerID(){
 	var ref = new ActionReference();
-	ref.putEnumerated(charIDToTypeID('Lyr '), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
+	ref.putEnumerated(cTID('Lyr '), cTID('Ordn'), cTID('Trgt'));
 	var desc = executeActionGet(ref);
-	return desc.getInteger(stringIDToTypeID('layerID'));
+	return desc.getInteger(sTID('layerID'));
 };
 
 function getLayerIDfromIDX(idx) {
 	var ref = new ActionReference();
-	ref.putIndex(charIDToTypeID('Lyr '), idx);
-	return executeActionGet(ref).getInteger(stringIDToTypeID('layerID'));
+	ref.putIndex(cTID('Lyr '), idx);
+	return executeActionGet(ref).getInteger(sTID('layerID'));
 };
 
 function selectLayerById(ID, add) {
 	add = (add == undefined)? add = false : add;
 	var ref = new ActionReference();
-	ref.putIdentifier(charIDToTypeID('Lyr '), ID);
+	ref.putIdentifier(cTID('Lyr '), ID);
 	var desc = new ActionDescriptor();
-	desc.putReference(charIDToTypeID('null'), ref);
+	desc.putReference(cTID('null'), ref);
 	if (add) {
-		desc.putEnumerated(stringIDToTypeID('selectionModifier'), stringIDToTypeID('selectionModifierType'), stringIDToTypeID('addToSelection'));
+		desc.putEnumerated(sTID('selectionModifier'), sTID('selectionModifierType'), sTID('addToSelection'));
 	}
-	desc.putBoolean(charIDToTypeID('MkVs'), false);
-	executeAction(charIDToTypeID('slct'), desc, DialogModes.NO);
+	desc.putBoolean(cTID('MkVs'), false);
+	executeAction(cTID('slct'), desc, DialogModes.NO);
 };
 
 function reselectLayers(idx) {
@@ -154,7 +156,7 @@ function reselectLayers(idx) {
 
 function tryExec(functionName, obj) {
 	if (app.documents.length === 0) return 'no_document';
-	setUnits();
+	setPrefs();
 	saveState();
 	try {
 		var res;
@@ -164,11 +166,11 @@ function tryExec(functionName, obj) {
 		else {
 			res = eval(functionName + '()');
 		}
-		resetUnits();
+		resetPrefs;
 		return res;
 	}
 	catch (e) {
-		resetUnits();
+		resetPrefs;
 		resetState();
 		if (e instanceof Object && e.reselect != undefined){
 			reselectLayers(e.reselect);
@@ -182,11 +184,11 @@ function tryExec(functionName, obj) {
 function getTransformFactor() {
 	try {
 		var ref = new ActionReference();
-		ref.putEnumerated(charIDToTypeID('Lyr '), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
-		var desc = executeActionGet(ref).getObjectValue(stringIDToTypeID('textKey'));
-		var textSize =  desc.getList(stringIDToTypeID('textStyleRange')).getObjectValue(0).getObjectValue(stringIDToTypeID('textStyle')).getDouble(stringIDToTypeID('size'));
-		if (desc.hasKey(stringIDToTypeID('transform'))) {
-			var mFactor = desc.getObjectValue(stringIDToTypeID('transform')).getUnitDoubleValue(stringIDToTypeID('yy'));
+		ref.putEnumerated(cTID('Lyr '), cTID('Ordn'), cTID('Trgt'));
+		var desc = executeActionGet(ref).getObjectValue(sTID('textKey'));
+		var textSize =  desc.getList(sTID('textStyleRange')).getObjectValue(0).getObjectValue(sTID('textStyle')).getDouble(sTID('size'));
+		if (desc.hasKey(sTID('transform'))) {
+			var mFactor = desc.getObjectValue(sTID('transform')).getUnitDoubleValue(sTID('yy'));
 			return mFactor;
 		}
 		return 1;
@@ -234,8 +236,8 @@ function getSingleRectangleSelectionDimensions() {
 }
 
 function getAdjustedSize(size) {
-	var t = getTransformFactor();
-	var ar = activeDocument.resolution;
+	// var t = getTransformFactor();
+	// var ar = activeDocument.resolution;
 	// return size / (getTransformFactor() * activeDocument.resolution / 72);
 	return size / (activeDocument.resolution / 72);
 }
@@ -273,9 +275,8 @@ function adjustTextLayerHeight(textLayer) {
 	textLayer.textItem.height = dimensions.height + 10; // add a little to keep some leeway
 }
 
-function ajdustActiveLayerSize(style) {
+function autoResizeActiveLayer(style) {
 	var layer = app.activeDocument.activeLayer;
-
 	var textItem = layer.textItem;
 	if (typeof style.coords != 'undefined' && typeof style.dimensions == 'undefined') {
 		style.dimensions = getDimensionsFromCoords(style.coords);
@@ -292,7 +293,7 @@ function ajdustActiveLayerSize(style) {
 	}
 }
 
-function applyStyleToActiveLayer(style) {
+function applyStyleActiveLayer(style) {
 	var textItem = app.activeDocument.activeLayer.textItem;
 	if (!!!style.useCurrent) {
 		textItem.kind = TextType.PARAGRAPHTEXT;
@@ -320,27 +321,32 @@ function applyStyleToActiveLayer(style) {
 		}
 	}
 	if (!!!style.noResize) {
-		ajdustActiveLayerSize(style);
+		autoResizeActiveLayer(style);
 	}
 }
 
-function adjustFontSizeOfActiveLayer(modifier) {
+function adjustFontSizeActiveLayer(modifier) {
 	var textItem = app.activeDocument.activeLayer.textItem;
 	var fontSize = textItem.size;
 	textItem.size = getAdjustedSize(parseInt(fontSize) + parseInt(modifier)) + 'px';
 }
 
-function toggleHyphenationOfActiveLayer() {
+function roundFontSizeActiveLayer() {
+	var textItem = app.activeDocument.activeLayer.textItem;
+	textItem.size = getAdjustedSize(Math.round(parseFloat(textItem.size))) + 'px';
+}
+
+function toggleHyphenationActiveLayer() {
 	var textItem = app.activeDocument.activeLayer.textItem;
 	textItem.hyphenation = !textItem.hyphenation;
 }
 
-function toggleFauxBoldOfActiveLayer() {
+function toggleFauxBoldActiveLayer() {
 	var textItem = app.activeDocument.activeLayer.textItem;
 	textItem.fauxBold = !textItem.fauxBold;
 }
 
-function toggleFauxItalicOfActiveLayer() {
+function toggleFauxItalicActiveLayer() {
 	var textItem = app.activeDocument.activeLayer.textItem;
 	textItem.fauxItalic = !textItem.fauxItalic;
 }
@@ -358,7 +364,7 @@ function createTextLayer(text) {
 function setStyle(style) {
 	app.activeDocument.suspendHistory('Set style', '\
 		createTextLayer(""); \
-		applyStyleToActiveLayer('+ JSON.stringify(style) + '); \
+		applyStyleActiveLayer('+ JSON.stringify(style) + '); \
 		app.activeDocument.activeLayer.remove(); \
 	');
 	return 'done';
@@ -382,7 +388,7 @@ function typesetEX(typesetObj) {
 	try {
 		var style = typesetObj.style;
 		app.activeDocument.suspendHistory('Create text layer', 'createTextLayer('+ JSON.stringify(typesetObj.text) + ');');
-		app.activeDocument.suspendHistory('Apply style', 'applyStyleToActiveLayer('+ JSON.stringify(style) + ');');
+		app.activeDocument.suspendHistory('Apply style', 'applyStyleActiveLayer('+ JSON.stringify(style) + ');');
 		if (style.useLayerGroups && style.layerGroup) {
 			app.activeDocument.suspendHistory('Sort layer', 'sortLayerInLayerGroup("'+ style.layerGroup + '");');
 		}
@@ -415,26 +421,30 @@ function actionSelectedLayers(action, historyName, obj) {
 	}
 }
 
-function applyStyleToSelectedLayers(style) {
-	return actionSelectedLayers('applyStyleToActiveLayer', 'Apply style', style);
+function applyStyleSelectedLayers(style) {
+	return actionSelectedLayers('applyStyleActiveLayer', 'Apply style', style);
 }
 
 function autoResizeSelectedLayers() {
-	return actionSelectedLayers('ajdustActiveLayerSize', 'Auto resize');
+	return actionSelectedLayers('autoResizeActiveLayer', 'Auto resize');
 }
 
 function adjustFontSizeSelectedLayers(modifier) {
-	return actionSelectedLayers('adjustFontSizeOfActiveLayer', 'Adjust font size', modifier);
+	return actionSelectedLayers('adjustFontSizeActiveLayer', 'Adjust font size', modifier);
+}
+
+function roundFontSizeSelectedLayers(modifier) {
+	return actionSelectedLayers('roundFontSizeActiveLayer', 'Round font size', modifier);
 }
 
 function toggleHyphenationSelectedLayers() {
-	return actionSelectedLayers('toggleHyphenationOfActiveLayer', 'Toggle hyphenation');
+	return actionSelectedLayers('toggleHyphenationActiveLayer', 'Toggle hyphenation');
 }
 
 function toggleFauxBoldSelectedLayers() {
-	return actionSelectedLayers('toggleFauxBoldOfActiveLayer', 'Toggle faux bold');
+	return actionSelectedLayers('toggleFauxBoldActiveLayer', 'Toggle faux bold');
 }
 
 function toggleFauxItalicSelectedLayers() {
-	return actionSelectedLayers('toggleFauxItalicOfActiveLayer', 'Toggle faux italic');
+	return actionSelectedLayers('toggleFauxItalicActiveLayer', 'Toggle faux italic');
 }

@@ -47,7 +47,10 @@
 		<button class="topcoat-button" ng-click="actionSelectedLayers('adjustFontSize', 1)" uib-tooltip="Increase font size by 1 pixel on selected layers" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
 			<span class="glyphicon glyphicon-text-height"></span>+
 		</button>
-		<button class="topcoat-button" ng-click="actionSelectedLayers('autoResizeSelectedLayers')" uib-tooltip="Auto resize selected layers" tooltip-popup-delay="500" tooltip-placement="bottom-right">
+		<button class="topcoat-button" ng-click="actionSelectedLayers('roundFontSize')" uib-tooltip="Round font size on selected layers" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
+			<span class="glyphicon glyphicon-text-height"></span>o
+		</button>
+		<button class="topcoat-button" ng-click="actionSelectedLayers('autoResize')" uib-tooltip="Auto resize selected layers" tooltip-popup-delay="500" tooltip-placement="bottom-right">
 			<span class="glyphicon glyphicon-resize-small"></span>
 		</button>
 	</div>
@@ -75,7 +78,7 @@
 </div>
 <div class="list scrollable padded">
 	<div class="list-item" ng-repeat="style in styleSet.styles |filter: {keyword: styleFilter||undefined}">
-		<tb-style-preset preset="style" remove-action="removeStyle(style)" duplicate-action="duplicateStyle(style)" apply-action="applyStyleToSelectedLayers(style, resize)" set-action="setStyle(style)" ng-class="{'default-style': style.default}"></tb-style-preset>
+		<tb-style-preset preset="style" remove-action="removeStyle(style)" duplicate-action="duplicateStyle(style)" apply-action="applyStyleSelectedLayers(style, resize)" set-action="setStyle(style)" ng-class="{'default-style': style.default}"></tb-style-preset>
 	</div>
 </div>
 <div class="row no-shrink pv">

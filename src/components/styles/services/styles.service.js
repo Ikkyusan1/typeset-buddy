@@ -203,12 +203,12 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 
 		self.actionSelectedLayers = function(action, param) {
 			let def = $q.defer();
-			let actionString = '"'+ action + '"';
+			let actionString = '"'+ action + 'SelectedLayers"';
 			if (angular.isDefined(param)) {
 				actionString += ', '+ JSON.stringify(param);
 			}
 			$rootScope.$root.CSI.evalScript('tryExec('+ actionString +');', function(res) {
-				$rootScope.log('autoResizeSelectedLayers return', res);
+				$rootScope.log(actionString + ' return', res);
 				if (res === 'no_document') {
 					def.reject('No document.');
 				}
