@@ -329,7 +329,7 @@ var tb = angular.module('tb', [
 tb.constant('CONF', {
 	appName: 'typeset_buddy', // will be replaced by package.json name when compiled
 	debug: false,	// will be true when compiled for dev environment, false otherwise
-	version: '0.1.10' // will be replaced when compiled
+	version: '0.1.11' // will be replaced when compiled
 });
 tb.config(['$localStorageProvider', 'ngToastProvider',
 	function($localStorageProvider, ngToastProvider) {
