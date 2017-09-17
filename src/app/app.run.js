@@ -7,6 +7,18 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 		$rootScope.CSI = new CSInterface();
 		$rootScope.extensionID = $rootScope.CSI.getExtensionID();
 
+		// convoluted way to load the jsx files
+		let JSXs = [
+			'polyfills',
+			'tb_helper',
+		];
+		let extensionPath = $rootScope.CSI.getSystemPath(SystemPath.EXTENSION) + '/jsx/';
+		for (let i = 0; i < JSXs.length; i++){
+			let jsxFile =  extensionPath + JSXs[i] +'.jsx';
+			let script = '$.evalFile("' + jsxFile + '");';
+			$rootScope.CSI.evalScript(script, function(result) {});
+		}
+
 		themeManager.init();
 
 		function persist(on) {

@@ -90,7 +90,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 								};
 								let tmpStyles = [];
 								if (bubble.text) {
-									if (ScriptService.isDoubleBubblePart(line)) {
+									if (ScriptService.isMultiBubblePart(line)) {
 										tmpStyles = ScriptService.getTextStyles(line, previousStyle);
 										bubble.multibubblePart = true;
 									}

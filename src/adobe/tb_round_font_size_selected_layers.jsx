@@ -1,8 +1,5 @@
+#include "./polyfills.jsx"
 #include "./main.jsx"
 
-try {
-	roundFontSizeSelectedLayers(-1);
-}
-catch (e) {
-	// shush!
-}
+var res =	tryExec('roundFontSizeSelectedLayers');
+if (res != 'done') alert(res);

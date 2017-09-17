@@ -248,6 +248,7 @@ gulp.task('minCss', function(){
 
 gulp.task('buildJs', function(){
 	var files = [
+		path.join(srcDirectory, 'adobe/tb_helper.jsx'),
 		path.join(srcDirectory, 'app/*.js'),
 		path.join(srcDirectory, 'components/**/*.js'),
 	];
@@ -255,6 +256,7 @@ gulp.task('buildJs', function(){
 	.pipe(plumber())
 	.pipe($.order([
 		'polyfills.js',
+		'tb_helper.jsx',
 		'app.js',
 		'constant.js',
 		'utils.service.js',

@@ -8,9 +8,9 @@ tb.directive('justificationSelector', ['StylesService',
 			replace: true,
 			template: '<select ng-options="choice.value as choice.label for choice in choices" ng-model="selectedValue"></select>',
 			link: function($scope, $elem, $attrs) {
-				$scope.choices = StylesService.constants.justification;
+				$scope.choices = tbHelper.styleProps.justification.values;
 				if (!!!$scope.selectedValue) {
-					$scope.selectedValue = StylesService.dummyStyle.justification;
+					$scope.selectedValue = tbHelper.styleProps.justification.def;
 				}
 			}
 		};

@@ -5,61 +5,7 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 
 		var self = this;
 
-		self.constants = {
-			antialias: [
-				{value: 'CRISP', label: 'Crisp'},
-				{value: 'SHARP', label: 'Sharp'},
-				{value: 'SMOOTH', label: 'Smooth'},
-				{value: 'STRONG', label: 'Strong'},
-				{value: 'NONE', label: 'None'}
-			],
-			kerning: [
-				{value: 'METRICS', label: 'Metrics'},
-				{value: 'OPTICAL', label: 'Optical'}
-			],
-			capitalization: [
-				{value: 'ALLCAPS', label: 'All caps'},
-				{value: 'NORMAL', label: 'Normal'},
-				{value: 'SMALLCAPS', label: 'Small caps'}
-			],
-			justification: [
-				{value: 'CENTER', label: 'Center'},
-				{value: 'CENTERJUSTIFIED', label: 'Center justified'},
-				{value: 'FULLYJUSTIFIED', label: 'Fully justified'},
-				{value: 'LEFT', label: 'Left'},
-				{value: 'LEFTJUSTIFIED', label: 'Left justified'},
-				{value: 'RIGHT', label: 'Right'},
-				{value: 'RIGHTJUSTIFIED', label: 'Right justified'}
-			]
-		};
-
 		self.appFonts = [];
-		self.fontFallBack = 'ArialMT';
-
-		self.dummyStyle = {
-			keyword: null,
-			layerGroup: null,
-			fontName: null,
-			size: 20,
-			leading: 0,
-			tracking: 0,
-			vScale: 100,
-			hScale: 100,
-			capitalization: 'NORMAL',
-			justification: 'CENTER',
-			antialias: 'SMOOTH',
-			fauxBold: false,
-			fauxItalic: false,
-			hyphenate: true,
-			kerning: 'METRICS',
-		};
-
-		self.dummyStyleSet = {
-			name: null,
-			styles: [
-				angular.copy(self.dummyStyle)
-			]
-		};
 
 		self.getAppFonts = function() {
 			let def = $q.defer();
@@ -75,19 +21,6 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 			return def.promise;
 		};
 
-		self.getDummyStyle = function(keyword) {
-			let dummy = angular.copy(self.dummyStyle);
-			if (angular.isDefined(keyword) && !Utils.isEmpty(keyword)) dummy.keyword = keyword;
-			return dummy;
-		};
-
-		self.getDummyStyleSet = function() {
-			let dummy = angular.copy(self.dummyStyleSet);
-			dummy.styles[0].default = true;
-			dummy.styles[0].keyword = 'default_style';
-			return dummy;
-		};
-
 		self.getStyleSetList = function() {
 			return $localStorage.styleSets;
 		};
@@ -95,29 +28,7 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 		self.cleanAndCheckStyleSet = function(styleSet) {
 			if (!angular.isDefined(styleSet.name) || !!!styleSet.name || !!!styleSet.name.trim()) throw 'Need a name';
 			if (styleSet.name.length > 25) throw 'Name must be less than 25 characters';
-			let defaultStyleCount = 0;
-			if (!!!styleSet.styles) throw 'No styles in set';
-			for (let i = 0; i < styleSet.styles.length; i++) {
-				if (!!!styleSet.styles[i].keyword) throw 'Some style keywords are undefined';
-				styleSet.styles[i].keyword = styleSet.styles[i].keyword.trim().toLowerCase();
-				if (angular.isDefined(styleSet.styles[i].default) && styleSet.styles[i].default == true) {
-					++defaultStyleCount;
-					if (styleSet.styles[i].keyword != 'default_style') throw 'Default style must be named "default_style"';
-				}
-			}
-			if (defaultStyleCount === 0) throw 'Missing default style';
-			if (defaultStyleCount > 1) throw 'Only one default style allowed';
-			styleSet.styles.sort(function(a, b) {
-				if (a.keyword < b.keyword) return -1;
-				if (a.keyword > b.keyword) return 1;
-				return 0;
-			});
-			// force default values if undefined
-			for (let i = 0; i < styleSet.styles.length; i++) {
-				for (let prop in self.dummyStyle) {
-					if (!angular.isDefined(styleSet.styles[i][prop]) || styleSet.styles[i][prop] === null) styleSet.styles[i][prop] = self.dummyStyle[prop];
-				}
-			}
+			tbHelper.checkStyleSet(styleSet);
 			let idx = $localStorage.styleSets.findIndex(function(one) { return one.id == styleSet.id; });
 			let existingId = -1;
 			if (idx > -1) existingId = $localStorage.styleSets[idx].id;
@@ -166,7 +77,7 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 				return styleSet;
 			}
 			else {
-				return self.getDummyStyleSet();
+				return tbHelper.getDummyStyleSet();
 			}
 		};
 
@@ -231,9 +142,8 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 		// init
 		if (!!!$localStorage.styleSets) {
 			$localStorage.styleSets = [];
-			let defaultSet = self.getDummyStyleSet();
+			let defaultSet = tbHelper.getDummyStyleSet();
 			defaultSet.name = 'Default set';
-			defaultSet.styles[0].fontName = self.fontFallBack;
 			self.saveStyleSet(defaultSet);
 		}
 

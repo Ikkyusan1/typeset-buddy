@@ -1,8 +1,5 @@
+#include "./polyfills.jsx"
 #include "./main.jsx"
 
-try {
-	toggleHyphenationSelectedLayers();
-}
-catch (e) {
-	// shush!
-}
+var res =	tryExec('toggleHyphenationSelectedLayers');
+if (res != 'done') alert(res);

@@ -13,7 +13,7 @@ tb.directive('fontSelector', ['StylesService',
 					function(list) {
 						$scope.choices = list;
 						if (!!!$scope.selectedValue) {
-							$scope.selectedValue = StylesService.fontFallBack;
+							$scope.selectedValue = tbHelper.styleProps.fontName.def;
 						}
 					}
 				);

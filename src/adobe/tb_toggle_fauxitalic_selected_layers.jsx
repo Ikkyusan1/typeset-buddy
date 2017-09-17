@@ -1,8 +1,5 @@
+#include "./polyfills.jsx"
 #include "./main.jsx"
 
-try {
-	toggleFauxItalicSelectedLayers();
-}
-catch (e) {
-	// shush!
-}
+var res =	tryExec('toggleFauxItalicSelectedLayers');
+if (res != 'done') alert(res);

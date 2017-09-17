@@ -6,7 +6,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 		}
 
 		$scope.newStyleSet = function() {
-			$scope.styleSet = StylesService.getDummyStyleSet();
+			$scope.styleSet = tbHelper.getDummyStyleSet();
 			$scope.selectedStyleset = null;
 		};
 
@@ -40,7 +40,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 				return one.keyword == keyword;
 			});
 			if (idx == -1) {
-				$scope.styleSet.styles.push(StylesService.getDummyStyle(keyword));
+				$scope.styleSet.styles.push(tbHelper.getDummyStyle(keyword));
 			}
 		};
 
@@ -101,26 +101,26 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 						$scope.styleSet = angular.copy(tmp);
 					}
 					catch (e) {
-						$scope.styleSet = StylesService.getDummyStyleSet();
+						$scope.styleSet = tbHelper.getDummyStyleSet();
 						ngToast.create({className: 'danger', content: 'Import error: ' + e});
 					}
 				}
 				else {
-					$scope.styleSet = StylesService.getDummyStyleSet();
+					$scope.styleSet = tbHelper.getDummyStyleSet();
 					ngToast.create({className: 'danger', content: 'Could not read the file'});
 				}
 			}
 		};
 
-		$scope.exportConstants = function() {
-			let result = window.cep.fs.showSaveDialogEx('Export fonts and constant values', undefined, Utils.getValidFileSuffix('*.json'), 'tb_fonts_and_constants.json', undefined, 'Export', undefined);
+		$scope.exportStyleProps = function() {
+			let result = window.cep.fs.showSaveDialogEx('Export fonts and style properties', undefined, Utils.getValidFileSuffix('*.json'), 'tb_fonts_and_styleprops.json', undefined, 'Export', undefined);
 			if (!!result.data) {
 				StylesService.getAppFonts()
 				.then(
 					function(fonts) {
 						let constants = {
-							fonts: fonts,
-							styleConstants: angular.copy(StylesService.constants)
+							styleProperties: angular.copy(tbHelper.styleProps),
+							fonts: fonts
 						}
 						let writeResult = window.cep.fs.writeFile(result.data, JSON.stringify(constants, null, 2));
 						if (writeResult.err != 0) {
@@ -132,12 +132,12 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 		};
 
 		$scope.addStyle = function() {
-			$scope.styleSet.styles.push(StylesService.getDummyStyle());
+			$scope.styleSet.styles.push(tbHelper.getDummyStyle());
 		};
 
 		$scope.deleteStyleSet = function() {
 			if (angular.isDefined($scope.styleSet.id)) {
-				Utils.showConfirmDialog('Are you sure you want to delete the style set "'+ $scope.styleSet.name +'"')
+				Utils.showConfirmDialog('Are you sure you want to delete the style set "'+ $scope.styleSet.name +'" ?')
 				.then(
 					function() {
 						if (StylesService.deleteStyleSet($scope.styleSet.id) === true) {

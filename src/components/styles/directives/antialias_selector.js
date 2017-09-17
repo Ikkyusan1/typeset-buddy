@@ -8,9 +8,9 @@ tb.directive('antialiasSelector', ['StylesService',
 			replace: true,
 			template: '<select ng-options="choice.value as choice.label for choice in choices" ng-model="selectedValue"></select>',
 			link: function($scope, $elem, $attrs) {
-				$scope.choices = StylesService.constants.antialias;
+				$scope.choices = tbHelper.styleProps.antialias.values;
 				if (!!!$scope.selectedValue) {
-					$scope.selectedValue = StylesService.dummyStyle.antialias;
+					$scope.selectedValue = tbHelper.styleProps.antialias.def;
 				}
 			}
 		};
