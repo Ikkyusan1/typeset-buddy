@@ -1,48 +1,320 @@
 'use strict';
-// polyfill array.prototype.find()
-if (!Array.prototype.find) {
-	Array.prototype.find = function(predicate) {
-		if (this === null) {
-			throw new TypeError('Array.prototype.find called on null or undefined');
+
+Array.prototype.find||(Array.prototype.find=function(r){if(null===this)throw new TypeError("Array.prototype.find called on null or undefined");if("function"!=typeof r)throw new TypeError("predicate must be a function");for(var t,n=Object(this),e=n.length>>>0,o=arguments[1],i=0;i<e;i++)if(t=n[i],r.call(o,t,i,n))return t});
+
+Array.prototype.findIndex||(Array.prototype.findIndex=function(r){if(null===this)throw new TypeError("Array.prototype.findIndex called on null or undefined");if("function"!=typeof r)throw new TypeError("predicate must be a function");for(var n,e=Object(this),t=e.length>>>0,o=arguments[1],i=0;i<t;i++)if(n=e[i],r.call(o,n,i,e))return i;return-1});
+var tbHelper = {
+
+	emptyPages: ['blank', 'empty', 'no_text'],
+
+	panelSeparators: [
+		{
+			label: 'Long dash',
+			value: '–'
+		},
+		{
+			label: 'Single dash',
+			value: '-',
+		},
+		{
+			label: 'Double dash',
+			value: '--',
+		},
+		{
+			label: 'Equal sign',
+			value: '='
 		}
-		if (typeof predicate !== 'function') {
-			throw new TypeError('predicate must be a function');
+	],
+
+	styleProps: {
+		'keyword': {
+			label: 'Keyword',
+			def: null
+		},
+		'layerGroup': {
+			label: 'Layer Group',
+			def: null
+		},
+		'fontName': {
+			label: 'Font Name',
+			values: [],
+			def: 'ArialMT'
+		},
+		'size': {
+			label: 'Size',
+			def: 25,
+			min: 1,
+			max: 1000
+		},
+		'leading': {
+			label: 'Leading',
+			def: 0,
+			min: 0,
+			max: 1000
+		},
+		'tracking': {
+			label: 'Tracking',
+			def: 0,
+			min: -1000,
+			max: 10000
+		},
+		'vScale': {
+			label: 'VScale',
+			def: 100,
+			min: 1,
+			max: 1000
+		},
+		'hScale': {
+			label: 'HScale',
+			def: 100,
+			min: 1,
+			max: 1000
+		},
+		'capitalization': {
+			label: 'Capitalization',
+			values: [
+				{value: 'ALLCAPS', label: 'All caps'},
+				{value: 'NORMAL', label: 'Normal'},
+				{value: 'SMALLCAPS', label: 'Small caps'}
+			],
+			def: 'NORMAL'
+		},
+		'justification': {
+			label: 'Justification',
+			values: [
+				{value: 'CENTER', label: 'Center'},
+				{value: 'CENTERJUSTIFIED', label: 'Center justified'},
+				{value: 'FULLYJUSTIFIED', label: 'Fully justified'},
+				{value: 'LEFT', label: 'Left'},
+				{value: 'LEFTJUSTIFIED', label: 'Left justified'},
+				{value: 'RIGHT', label: 'Right'},
+				{value: 'RIGHTJUSTIFIED', label: 'Right justified'}
+			],
+			def: 'CENTER'
+		},
+		'antialias': {
+			label: 'Antialias',
+			values: [
+				{value: 'CRISP', label: 'Crisp'},
+				{value: 'SHARP', label: 'Sharp'},
+				{value: 'SMOOTH', label: 'Smooth'},
+				{value: 'STRONG', label: 'Strong'},
+				{value: 'NONE', label: 'None'}
+			],
+			def: 'SMOOTH'
+		},
+		'fauxBold': {
+			label: 'FauxBold',
+			def: false
+		},
+		'fauxItalic': {
+			label: 'FauxItalic',
+			def: false
+		},
+		'hyphenate': {
+			label: 'Hyphenate',
+			def: true
+		},
+		'kerning': {
+			label: 'Kerning',
+			values: [
+				{value: 'METRICS', label: 'Metrics'},
+				{value: 'OPTICAL', label: 'Optical'}
+			],
+			def: 'METRICS'
 		}
-		let list = Object(this);
-		let length = list.length >>> 0;
-		let thisArg = arguments[1];
-		let value;
-		for (let i = 0; i < length; i++) {
-			value = list[i];
-			if (predicate.call(thisArg, value, i, list)) {
-				return value;
+	},
+
+	getSylePropValues: function(prop) {
+		var values = [];
+		for (var i = 0; i < this.styleProps[prop].values.length; i++) {
+			values.push(styleProps[prop].values[i].value);
+		}
+		return values;
+	},
+
+	getDummyStyle: function(keyword, isDefault) {
+		var dummy = {};
+		for (var prop in tbHelper.styleProps) {
+			dummy[prop] = tbHelper.styleProps[prop].def;
+		}
+		if (!!keyword) dummy.keyword = keyword;
+		if (!!isDefault) dummy.default = true;
+		return dummy;
+	},
+
+	getDummyStyleSet: function() {
+		var dummy = {
+			name: null,
+			styles: [
+				this.getDummyStyle('default_style', true)
+			]
+		};
+		return dummy;
+	},
+
+	checkStyleSet: function(styleSet) {
+		var defaultStyleCount = 0;
+		if (!!!styleSet.styles) throw 'No styles in set';
+		for (var i = 0; i < styleSet.styles.length; i++) {
+			if (!!!styleSet.styles[i].keyword) throw 'Some style keywords are undefined';
+			styleSet.styles[i].keyword = styleSet.styles[i].keyword.trim().toLowerCase();
+			if (styleSet.styles[i].default != undefined && styleSet.styles[i].default == true) {
+				++defaultStyleCount;
+				if (styleSet.styles[i].keyword != 'default_style') throw 'Default style must be named "default_style"';
 			}
 		}
-		return undefined;
-	};
-}
-// polyfill array.prototype.findIndex()
-if (!Array.prototype.findIndex) {
-	Array.prototype.findIndex = function(predicate) {
-		if (this === null) {
-			throw new TypeError('Array.prototype.findIndex called on null or undefined');
+		if (defaultStyleCount === 0) throw 'Missing default style';
+		if (defaultStyleCount > 1) throw 'Only one default style allowed';
+		styleSet.styles.sort(function(a, b) {
+			if (a.keyword < b.keyword) return -1;
+			if (a.keyword > b.keyword) return 1;
+			return 0;
+		});
+		// force default values if undefined
+		for (var i = 0; i < styleSet.styles.length; i++) {
+			styleSet.styles[i] = this.cleanStyle(styleSet.styles[i]);
 		}
-		if (typeof predicate !== 'function') {
-			throw new TypeError('predicate must be a function');
+	},
+
+	cleanStyle: function(style) {
+		for (var prop in tbHelper.styleProps) {
+			if (style[prop] == undefined || style[prop] === null) style[prop] = tbHelper.styleProps[prop].def;
 		}
-		let list = Object(this);
-		let length = list.length >>> 0;
-		let thisArg = arguments[1];
-		let value;
-		for (let i = 0; i < length; i++) {
-			value = list[i];
-			if (predicate.call(thisArg, value, i, list)) {
-				return i;
+		return style;
+	},
+
+	getStyleFromStyleSet: function(set, keyword) {
+		if (!!!set) throw 'No style set';
+		if (!!!set.styles) throw 'No styles in set';
+		var style = set.styles.find(function(one){ return one.keyword == keyword.toLowerCase(); });
+		if (!!!style) throw 'Style not found';
+		else return this.cleanStyle(style);
+	},
+
+	getFilePageNumber: function(filename) {
+		// test for 0000-0000 format
+		var reg = /^.*[-_\ ]([\d]{3,4}-[\d]{3,4})\.psd$/;
+		var match = reg.exec(filename);
+		if (!!match && !!match[1]) {
+			return match[1];
+		}
+		else {
+			// test for 00000 format
+			reg = /^.*[-_\ ]([\d]{3,5})\.psd$/;
+			match = reg.exec(filename);
+			return (!!match && !!match[1])? match[1] : null;
+		}
+	},
+
+	getPageNumbers: function(text) {
+		var pageNumbers = [];
+		var regex = /\b([\d-]{3,9})#/g;
+		var match;
+		while((match = regex.exec(text)) !== null) {
+			// failsafe to avoid infinite loops with zero-width matches
+			if (match.index === regex.lastIndex) regex.lastIndex++;
+			pageNumbers.push(match[1]);
+		}
+		return pageNumbers;
+	},
+
+	loadPage: function(text, pageNumber) {
+		// pageNumber can be a double page, like "006-007"
+		// returns array of matches or null
+		// [0]: the whole match
+		// [1]: undefined or a page note. Mainly used to apply a style to a whole page, like [italic]
+		// [2]: the page's bubbles.
+		// [3]: start of the next page or end
+		var reg = new RegExp('\\b' + pageNumber + '#\\ ?(.*)?\\n([\\s\\S]*?)($|END|[\\d-]{3,9}#)');
+		var match = reg.exec(text);
+		return (!!match)? match : null;
+	},
+
+	pageContainsText: function(text) {
+		if (!!!text) return false;
+		text = text.trim();
+		if (text.length === 0) return false;
+		else {
+			for (var i = 0; i < this.emptyPages.length; i++) {
+				if (text.indexOf('[' + this.emptyPages[i] + ']') == 0) return false;
 			}
+			return true;
 		}
-		return -1;
-	};
-}
+	},
+
+	getTextStyles: function(text, fallback) {
+		if (!!!text) return (!!fallback)? [fallback] : null;
+		var reg = /\[(\[?\w+)\]/g;
+		var match = reg.exec(text);
+		if (!!match && !!match[1]) {
+			reg.lastIndex = 0;
+			var styles = [];
+			while ((match = reg.exec(text)) !== null) {
+				if (match.index === reg.lastIndex) {
+					reg.lastIndex++;
+				}
+				if(match[1].indexOf('\[') != 0) styles.push(match[1].toLowerCase());
+				else if (!!!styles.length) styles.push(fallback);
+			}
+			return styles;
+		}
+		else {
+			return (!!fallback)? [fallback] : null;
+		}
+	},
+
+	getNotes: function(text) {
+		// notes are everything that's enclosed in double square brackets
+		if(!!!text) return null;
+		var reg = /\[{2}([^\[]+)\]{2}/g;
+		var match = reg.exec(text);
+		if (!!match && !!match[1]) {
+			reg.lastIndex = 0;
+			var notes = [];
+			while ((match = reg.exec(text)) !== null) {
+				if (match.index === reg.lastIndex) {
+					reg.lastIndex++;
+				}
+				notes.push(match[1]);
+			}
+			return notes;
+		}
+		return null;
+	},
+
+	cleanLine: function(text) {
+		if (!!!text) return null;
+		// there could be a double slash followed by one or more style(s)
+		// skip malformed styles, just in case
+		var reg = /(\/{0,2}\ ?)?(\[[\s\w\d]*\]\ ?)*([^\[]*)/;
+		var match = reg.exec(text);
+		return (!!match && !!match[match.length - 1])? match[match.length - 1].trim() : null;
+	},
+
+	// true if skippable, null if panel separator, false if not skipped
+	skipThisLine: function(text, panelSeparator) {
+		if (!!!text) return true;
+		text = this.cleanLine(text);
+		if (!!!text || text.length == 0) {
+			return true;
+		}
+		else if (text.charCodeAt(0) == panelSeparator.charCodeAt(0)) {
+			return null;
+		}
+		else return false;
+	},
+
+	isMultiBubblePart: function(text) {
+		if (!!!text) return false;
+		text = text.trim();
+		// multi-bubble parts always start with a double-slash "//"
+		var reg = /^\/{2}.*$/;
+		var match = reg.test(text);
+		return !!match;
+	}
+};
+
 'use strict';
 
 var tb = angular.module('tb', [
@@ -79,6 +351,18 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 		$rootScope.$stateParams = $stateParams;
 		$rootScope.CSI = new CSInterface();
 		$rootScope.extensionID = $rootScope.CSI.getExtensionID();
+
+		// convoluted way to load the jsx files
+		let JSXs = [
+			'polyfills',
+			'tb_helper',
+		];
+		let extensionPath = $rootScope.CSI.getSystemPath(SystemPath.EXTENSION) + '/jsx/';
+		for (let i = 0; i < JSXs.length; i++){
+			let jsxFile =  extensionPath + JSXs[i] +'.jsx';
+			let script = '$.evalFile("' + jsxFile + '");';
+			$rootScope.CSI.evalScript(script, function(result) {});
+		}
 
 		themeManager.init();
 
@@ -214,37 +498,43 @@ tb.controller('AppCtrl', ['$scope', '$localStorage', '$uibModal', 'Utils',
 tb.factory('themeManager', ['$rootScope', 'Utils',
 	function($rootScope, Utils) {
 		var self = this;
+		let panelBgColor;
+		let bgColor;
+		let fontColor;
+		let isLight;
+		let stylesheet = document.getElementById('theme');
+		let body = document.getElementById('tb');
 
 		self.updateThemeWithAppSkinInfo = function(appSkinInfo) {
-			let panelBgColor = appSkinInfo.panelBackgroundColor.color;
-			let bgColor = Utils.colorToHex(panelBgColor);
-			let fontColor = 'F0F0F0';
-			let isLight = panelBgColor.red >= 122;
+			panelBgColor = appSkinInfo.panelBackgroundColor.color;
+			bgColor = Utils.colorToHex(panelBgColor);
+			fontColor = 'F0F0F0';
+			isLight = panelBgColor.red >= 122;
 			if (isLight) {
 				fontColor = '000000';
-				$('#theme').attr('href', 'css/topcoat-desktop-light.css');
-				$('body').removeClass('dark');
-				$('body').addClass('light');
+				stylesheet.href = 'css/topcoat-desktop-light.css';
+				body.classList.remove('dark');
+				body.classList.add('light');
 			}
 			else {
-				$('#theme').attr('href', 'css/topcoat-desktop-dark.css');
-				$('body').removeClass('light');
-				$('body').addClass('dark');
+				stylesheet.href = 'css/topcoat-desktop-dark.css';
+				body.classList.remove('light');
+				body.classList.add('dark');
 			}
-			$('body').css('background-color', '#' + bgColor);
-			$('body').css('color', '#' + fontColor);
-		}
+			body.style.backgroundColor = '#' + bgColor;
+			body.style.color = '#' + fontColor;
+		};
 
 		self.onAppThemeColorChanged = function(event) {
 			let skinInfo = JSON.parse(window.__adobe_cep__.getHostEnvironment()).appSkinInfo;
 			self.updateThemeWithAppSkinInfo(skinInfo);
-		}
+		};
 
 		// add event listener to change skin whenever Photoshop's skin changes
 		self.init = function() {
 			self.updateThemeWithAppSkinInfo($rootScope.CSI.hostEnvironment.appSkinInfo);
 			$rootScope.CSI.addEventListener(CSInterface.THEME_COLOR_CHANGED_EVENT, self.onAppThemeColorChanged);
-		}
+		};
 
 		return self;
 	}
@@ -400,9 +690,9 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 			$scope.rawBubbles = '';
 			$scope.bubbles = [];
 			$scope.pageStyle = '';
-			$scope.panelSeparator = ScriptService.panelSeparator();
-			$scope.useLayerGroups = ScriptService.useLayerGroups();
-			$scope.mergeBubbles = ScriptService.mergeBubbles();
+			$scope.panelSeparator = ScriptService.setting('panelSeparator');
+			$scope.useLayerGroups = ScriptService.setting('useLayerGroups');
+			$scope.mergeBubbles = ScriptService.setting('mergeBubbles');
 			$scope.styleSet = StylesService.getStyleSet();
 			$scope.selectedStyleset = $scope.styleSet.id;
 		};
@@ -417,7 +707,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 		$scope.loadScript = function(filepath, page, silent) {
 			let result = window.cep.fs.readFile(filepath);
 			if (result.err === 0) {
-				ScriptService.lastOpenedScript(filepath);
+				ScriptService.setting('lastOpenedScript', filepath);
 				$scope.filename = Utils.extractFilename(filepath);
 				$scope.scriptContent = result.data;
 				$scope.pageNumbers = ScriptService.getPageNumbers($scope.scriptContent);
@@ -432,29 +722,21 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 				}
 				else {
 					ngToast.create({className: 'info', content: 'Did not find any page number in the script'});
-					ScriptService.lastOpenedScript(null);
-					ScriptService.lastOpenedPage(null);
+					ScriptService.setting('lastOpenedScript', null);
+					ScriptService.setting('lastOpenedPage', null);
 					$scope.reset();
 				}
 			}
 			else {
-				ScriptService.lastOpenedScript(null);
-				ScriptService.lastOpenedPage(null);
+				ScriptService.setting('lastOpenedScript', null);
+				ScriptService.setting('lastOpenedPage', null);
 				$scope.reset();
 				ngToast.create({className: 'danger', content: 'Could not read the file'});
 			}
 		};
 
-		$scope.setPanelSeparator = function(val) {
-			$scope.panelSeparator = ScriptService.panelSeparator(val);
-		};
-
-		$scope.setUseLayerGroups = function(val) {
-			$scope.useLayerGroups = ScriptService.useLayerGroups(val);
-		};
-
-		$scope.setMergeBubbles = function(val) {
-			$scope.mergeBubbles = ScriptService.mergeBubbles(val);
+		$scope.setting = function(setting, val) {
+			$scope[setting] = ScriptService.setting(setting, val);
 		};
 
 		$scope.loadPage = function(pageNumber) {
@@ -477,7 +759,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 						$scope.$root.log('lines', lines);
 						lines.forEach(function(line) {
 							let notes = ScriptService.getNotes(line);
-							let skipIt = ScriptService.skipThisLine(line, ScriptService.panelSeparator());
+							let skipIt = ScriptService.skipThisLine(line);
 							if (skipIt === false || !!notes) {
 								let bubble = {
 									text: ScriptService.cleanLine(line),
@@ -487,7 +769,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 								};
 								let tmpStyles = [];
 								if (bubble.text) {
-									if (ScriptService.isDoubleBubblePart(line)) {
+									if (ScriptService.isMultiBubblePart(line)) {
 										tmpStyles = ScriptService.getTextStyles(line, previousStyle);
 										bubble.multibubblePart = true;
 									}
@@ -521,13 +803,13 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 							}
 						});
 					}
-					ScriptService.lastOpenedPage(pageNumber);
+					ScriptService.setting('lastOpenedPage', pageNumber);
 					$scope.$root.log('bubbles', $scope.bubbles);
 				}
 				else {
 					ngToast.create({className: 'info', content: 'Could not find page ' + pageNumber + ' in file'});
 					$scope.selectedPage = null;
-					ScriptService.lastOpenedPage(null);
+					ScriptService.setting('lastOpenedPage', null);
 					$scope.bubbles = [];
 				}
 			}
@@ -541,7 +823,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 					let idx = $scope.pageNumbers.findIndex(function(one) { return one == $scope.selectedPage; });
 					if (angular.isDefined($scope.pageNumbers[idx + inc])) {
 						$scope.selectedPage = $scope.pageNumbers[idx + inc];
-						ScriptService.lastOpenedPage($scope.selectedPage);
+						ScriptService.setting('lastOpenedPage', $scope.selectedPage);
 					}
 				}
 				else {
@@ -561,7 +843,6 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 			else {
 				let stylePreset = $scope.styleSet.styles.find(function(one) { return one.keyword == style.keyword; });
 				if (!!!stylePreset) stylePreset = $scope.styleSet.styles[0];
-				stylePreset.useLayerGroups = ScriptService.useLayerGroups();
 				let text = bubble.text;
 				if (!!bubble.siblings) {
 					bubble.siblings.forEach(function(sibling){
@@ -591,8 +872,8 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 
 		// autoload last openedscript
 		$timeout(function() {
-			if (!!ScriptService.lastOpenedScript()) {
-				$scope.loadScript(ScriptService.lastOpenedScript(), ScriptService.lastOpenedPage(), true);
+			if (!!ScriptService.setting('lastOpenedScript')) {
+				$scope.loadScript(ScriptService.setting('lastOpenedScript'), ScriptService.setting('lastOpenedPage'), true);
 			}
 		}, 300);
 
@@ -602,13 +883,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 			}
 		});
 
-		$scope.$watch('panelSeparator', function(newVal, oldVal) {
-			if (angular.isDefined(newVal)) {
-				$scope.loadPage($scope.selectedPage);
-			}
-		});
-
-		$scope.$watch('mergeBubbles', function(newVal, oldVal) {
+		$scope.$watchGroup(['panelSeparator', 'mergeBubbles', 'textReplace'], function(newVal, oldVal) {
 			if (angular.isDefined(newVal)) {
 				$scope.loadPage($scope.selectedPage);
 			}
@@ -629,56 +904,19 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 
 		self.init = function() {
 			$rootScope.log('$localStorage', $localStorage);
-			self.emptyPage = ['blank', 'empty', 'no_text'];
-
-			if (!angular.isDefined($localStorage.panelSeparator)) self.panelSeparator('–');
-			if (!angular.isDefined($localStorage.useLayerGroups)) self.useLayerGroups(true);
-
-			if (!angular.isDefined($localStorage.lastOpenedScript)) {
-			 $localStorage.lastOpenedScript = '';
-			}
+			if (!angular.isDefined($localStorage.panelSeparator)) self.setting('panelSeparator', '–');
+			if (!angular.isDefined($localStorage.useLayerGroups)) self.setting('useLayerGroups', true);
+			if (!angular.isDefined($localStorage.mergeBubbles)) self.setting('mergeBubbles', false);
+			if (!angular.isDefined($localStorage.lastOpenedScript)) self.setting('lastOpenedScript', '');
 		};
 
-		self.lastOpenedScript = function(filepath) {
-			if (angular.isDefined(filepath)) $localStorage.lastOpenedScript = filepath;
-			return $localStorage.lastOpenedScript;
-		};
-
-		self.lastOpenedPage = function(pageNumber) {
-			if (angular.isDefined(pageNumber)) $localStorage.lastOpenedPage = pageNumber;
-			return $localStorage.lastOpenedPage;
-		};
-
-		self.lastDestinationFolder = function(folderPath) {
-			if (angular.isDefined(folderPath)) $localStorage.lastDestinationFolder = folderPath;
-			return $localStorage.lastDestinationFolder;
-		};
-
-		self.panelSeparator = function(val) {
-			if (angular.isDefined(val)) $localStorage.panelSeparator = val;
-			return $localStorage.panelSeparator;
-		};
-
-		self.useLayerGroups = function(val) {
-			if (angular.isDefined(val)) $localStorage.useLayerGroups = !!val;
-			return $localStorage.useLayerGroups;
-		};
-
-		self.mergeBubbles = function(val) {
-			if (angular.isDefined(val)) $localStorage.mergeBubbles = !!val;
-			return $localStorage.mergeBubbles;
+		self.setting = function(setting, val) {
+			if (angular.isDefined(val)) $localStorage[setting] = val;
+			return $localStorage[setting];
 		};
 
 		self.getPageNumbers = function(text) {
-			let pageNumbers = [];
-			let regex = /\b([\d-]{3,9})#/g;
-			let match;
-			while((match = regex.exec(text)) !== null) {
-				// failsafe to avoid infinite loops with zero-width matches
-				if (match.index === regex.lastIndex) regex.lastIndex++;
-				pageNumbers.push(match[1]);
-			}
-			return pageNumbers;
+			return tbHelper.getPageNumbers(text);
 		};
 
 		// pageNumber can be a double page, like "006-007"
@@ -688,97 +926,39 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 		// [2]: the page's bubbles.
 		// [3]: start of the next page or end
 		self.loadPage = function(text, pageNumber) {
-			let reg = new RegExp('\\b' + pageNumber + '#\\ ?(.*)?\\n([\\s\\S]*?)($|END|[\\d-]{3,9}#)');
-			let match = reg.exec(text);
-			$rootScope.log('page Match', match);
-			return (!!match)? match : null;
+			let res = tbHelper.loadPage(text, pageNumber);
+			$rootScope.log('page Match', res);
+			return res;
 		};
 
 		self.pageContainsText = function(text) {
-			if (!!!text) return false;
-			text = text.trim();
-			if (text.length === 0) return false;
-			else {
-				for (var i = 0; i < self.emptyPage.length; i++) {
-					if (text.indexOf('[' + self.emptyPage[i] + ']') == 0) return false;
-				}
-				return true;
-			}
+			return tbHelper.pageContainsText(text);
 		};
 
 		self.getTextStyles = function(text, fallback) {
-			if (!!!text) return (!!fallback)? [fallback] : null;
-			let reg = /\[(\[?\w+)\]/g;
-			let match = reg.exec(text);
-			if (!!match && !!match[1]) {
-				reg.lastIndex = 0;
-				let styles = [];
-				while ((match = reg.exec(text)) !== null) {
-					if (match.index === reg.lastIndex) {
-						reg.lastIndex++;
-					}
-					if(match[1].indexOf('\[') != 0)
-						styles.push(match[1].toLowerCase());
-					else if (!!!styles.length) styles.push(fallback);
-				}
-				return styles;
-			}
-			else {
-				return (!!fallback)? [fallback] : null;
-			}
+			return tbHelper.getTextStyles(text, fallback);
 		};
 
 		self.getNotes = function(text) {
-			if(!!!text) return null;
-			let reg = /\[{2}([^\[]+)\]{2}/g;
-			let match = reg.exec(text);
-			if (!!match && !!match[1]) {
-				reg.lastIndex = 0;
-				let notes = [];
-				while ((match = reg.exec(text)) !== null) {
-					if (match.index === reg.lastIndex) {
-						reg.lastIndex++;
-					}
-					notes.push(match[1]);
-				}
-				return notes;
-			}
-			return null;
+			return tbHelper.getNotes(text);
 		};
 
 		self.cleanLine = function(text) {
-			if (!!!text) return null;
-			// there could be a double slash followed by one or more style(s)
-			// skip malformed styles, just in case
-			let reg = /(\/{0,2}\ ?)?(\[[\s\w\d]*\]\ ?)*([^\[]*)/;
-			let match = reg.exec(text);
-			return (!!match && !!match[match.length - 1])? match[match.length - 1].trim() : null;
+			return tbHelper.cleanLine(text);
 		};
 
-		self.skipThisLine = function(text, panelSeparator) {
-			if (!!!text) return true;
-			text = self.cleanLine(text);
-			if (!!!text || text.length == 0) {
-				return true;
-			}
-			else if (text == self.panelSeparator()) {
-				return null;
-			}
-			else return false;
+		self.skipThisLine = function(text) {
+			return tbHelper.skipThisLine(text, self.setting('panelSeparator'));
 		};
 
-		self.isDoubleBubblePart = function(text) {
-			if (!!!text) return false;
-			text = text.trim();
-			// multi-bubble parts always start with a double-slash "//"
-			let reg = /^\/{2}.*$/;
-			let match = reg.test(text);
-			return !!match;
+		self.isMultiBubblePart = function(text) {
+			return tbHelper.isMultiBubblePart(text);
 		};
 
 		self.maybeTypesetToPath = function(typesetObj) {
 			let def = $q.defer();
 			let tmpObj = angular.copy(typesetObj);
+			tmpObj.useLayerGroups = self.setting('useLayerGroups');
 			$rootScope.log('typesetObj', tmpObj);
 			$rootScope.CSI.evalScript('tryExec("getSingleRectangleSelectionDimensions");', function(res) {
 				$rootScope.log('maybeTypesetToPath return', res);
@@ -830,7 +1010,6 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 			return def.promise;
 		};
 
-
 		self.init();
 		return self;
 	}
@@ -862,7 +1041,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 		}
 
 		$scope.newStyleSet = function() {
-			$scope.styleSet = StylesService.getDummyStyleSet();
+			$scope.styleSet = tbHelper.getDummyStyleSet();
 			$scope.selectedStyleset = null;
 		};
 
@@ -896,7 +1075,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 				return one.keyword == keyword;
 			});
 			if (idx == -1) {
-				$scope.styleSet.styles.push(StylesService.getDummyStyle(keyword));
+				$scope.styleSet.styles.push(tbHelper.getDummyStyle(keyword));
 			}
 		};
 
@@ -957,26 +1136,26 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 						$scope.styleSet = angular.copy(tmp);
 					}
 					catch (e) {
-						$scope.styleSet = StylesService.getDummyStyleSet();
+						$scope.styleSet = tbHelper.getDummyStyleSet();
 						ngToast.create({className: 'danger', content: 'Import error: ' + e});
 					}
 				}
 				else {
-					$scope.styleSet = StylesService.getDummyStyleSet();
+					$scope.styleSet = tbHelper.getDummyStyleSet();
 					ngToast.create({className: 'danger', content: 'Could not read the file'});
 				}
 			}
 		};
 
-		$scope.exportConstants = function() {
-			let result = window.cep.fs.showSaveDialogEx('Export fonts and constant values', undefined, Utils.getValidFileSuffix('*.json'), 'tb_fonts_and_constants.json', undefined, 'Export', undefined);
+		$scope.exportStyleProps = function() {
+			let result = window.cep.fs.showSaveDialogEx('Export fonts and style properties', undefined, Utils.getValidFileSuffix('*.json'), 'tb_fonts_and_styleprops.json', undefined, 'Export', undefined);
 			if (!!result.data) {
 				StylesService.getAppFonts()
 				.then(
 					function(fonts) {
 						let constants = {
-							fonts: fonts,
-							styleConstants: angular.copy(StylesService.constants)
+							styleProperties: angular.copy(tbHelper.styleProps),
+							fonts: fonts
 						}
 						let writeResult = window.cep.fs.writeFile(result.data, JSON.stringify(constants, null, 2));
 						if (writeResult.err != 0) {
@@ -988,12 +1167,12 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 		};
 
 		$scope.addStyle = function() {
-			$scope.styleSet.styles.push(StylesService.getDummyStyle());
+			$scope.styleSet.styles.push(tbHelper.getDummyStyle());
 		};
 
 		$scope.deleteStyleSet = function() {
 			if (angular.isDefined($scope.styleSet.id)) {
-				Utils.showConfirmDialog('Are you sure you want to delete the style set "'+ $scope.styleSet.name +'"')
+				Utils.showConfirmDialog('Are you sure you want to delete the style set "'+ $scope.styleSet.name +'" ?')
 				.then(
 					function() {
 						if (StylesService.deleteStyleSet($scope.styleSet.id) === true) {
@@ -1042,10 +1221,10 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 			);
 		};
 
-		$scope.applyStyleToSelectedLayers = function(style, resize) {
+		$scope.applyStyleSelectedLayers = function(style, resize) {
 			let tmpStyle = angular.copy(style);
 			tmpStyle.noResize = !!!resize;
-			StylesService.applyStyleToSelectedLayers(tmpStyle)
+			StylesService.actionSelectedLayers('applyStyle', tmpStyle)
 			.then(
 				function() {
 					ngToast.create({className: 'success', content: 'Done'});
@@ -1069,56 +1248,8 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 			);
 		};
 
-		$scope.autoResizeSelectedLayers = function() {
-			StylesService.autoResizeSelectedLayers()
-			.then(
-				function() {
-					ngToast.create({className: 'success', content: 'Done'});
-				},
-				function(err) {
-					ngToast.create({className: 'danger', content: err});
-				}
-			);
-		};
-
-		$scope.adjustFontSize = function(modifier) {
-			StylesService.adjustFontSize(modifier)
-			.then(
-				function() {
-					ngToast.create({className: 'success', content: 'Done'});
-				},
-				function(err) {
-					ngToast.create({className: 'danger', content: err});
-				}
-			);
-		};
-
-		$scope.toggleHyphenation = function() {
-			StylesService.toggleHyphenation()
-			.then(
-				function() {
-					ngToast.create({className: 'success', content: 'Done'});
-				},
-				function(err) {
-					ngToast.create({className: 'danger', content: err});
-				}
-			);
-		};
-
-		$scope.toggleFauxBold = function() {
-			StylesService.toggleFauxBold()
-			.then(
-				function() {
-					ngToast.create({className: 'success', content: 'Done'});
-				},
-				function(err) {
-					ngToast.create({className: 'danger', content: err});
-				}
-			);
-		};
-
-		$scope.toggleFauxItalic = function() {
-			StylesService.toggleFauxItalic()
+		$scope.actionSelectedLayers = function(action, param) {
+			StylesService.actionSelectedLayers(action, param)
 			.then(
 				function() {
 					ngToast.create({className: 'success', content: 'Done'});
@@ -1160,9 +1291,9 @@ tb.directive('antialiasSelector', ['StylesService',
 			replace: true,
 			template: '<select ng-options="choice.value as choice.label for choice in choices" ng-model="selectedValue"></select>',
 			link: function($scope, $elem, $attrs) {
-				$scope.choices = StylesService.constants.antialias;
+				$scope.choices = tbHelper.styleProps.antialias.values;
 				if (!!!$scope.selectedValue) {
-					$scope.selectedValue = StylesService.dummyStyle.antialias;
+					$scope.selectedValue = tbHelper.styleProps.antialias.def;
 				}
 			}
 		};
@@ -1178,9 +1309,9 @@ tb.directive('capitalizationSelector', ['StylesService',
 			replace: true,
 			template: '<select ng-options="choice.value as choice.label for choice in choices" ng-model="selectedValue"></select>',
 			link: function($scope, $elem, $attrs) {
-				$scope.choices = StylesService.constants.capitalization;
+				$scope.choices = tbHelper.styleProps.capitalization.values;
 				if (!!!$scope.selectedValue) {
-					$scope.selectedValue = StylesService.dummyStyle.capitalization;
+					$scope.selectedValue = tbHelper.styleProps.capitalization.def;
 				}
 			}
 		};
@@ -1201,7 +1332,7 @@ tb.directive('fontSelector', ['StylesService',
 					function(list) {
 						$scope.choices = list;
 						if (!!!$scope.selectedValue) {
-							$scope.selectedValue = StylesService.fontFallBack;
+							$scope.selectedValue = tbHelper.styleProps.fontName.def;
 						}
 					}
 				);
@@ -1219,9 +1350,9 @@ tb.directive('justificationSelector', ['StylesService',
 			replace: true,
 			template: '<select ng-options="choice.value as choice.label for choice in choices" ng-model="selectedValue"></select>',
 			link: function($scope, $elem, $attrs) {
-				$scope.choices = StylesService.constants.justification;
+				$scope.choices = tbHelper.styleProps.justification.values;
 				if (!!!$scope.selectedValue) {
-					$scope.selectedValue = StylesService.dummyStyle.justification;
+					$scope.selectedValue = tbHelper.styleProps.justification.def;
 				}
 			}
 		};
@@ -1237,9 +1368,9 @@ tb.directive('kerningSelector', ['StylesService',
 			replace: true,
 			template: '<select ng-options="choice.value as choice.label for choice in choices" ng-model="selectedValue"></select>',
 			link: function($scope, $elem, $attrs) {
-				$scope.choices = StylesService.constants.kerning;
+				$scope.choices = tbHelper.styleProps.kerning.values;
 				if (!!!$scope.selectedValue) {
-					$scope.selectedValue = StylesService.dummyStyle.kerning;
+					$scope.selectedValue = tbHelper.styleProps.kerning.def;
 				}
 			}
 		};
@@ -1332,61 +1463,7 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 
 		var self = this;
 
-		self.constants = {
-			antialias: [
-				{value: 'CRISP', label: 'Crisp'},
-				{value: 'SHARP', label: 'Sharp'},
-				{value: 'SMOOTH', label: 'Smooth'},
-				{value: 'STRONG', label: 'Strong'},
-				{value: 'NONE', label: 'None'}
-			],
-			kerning: [
-				{value: 'METRICS', label: 'Metrics'},
-				{value: 'OPTICAL', label: 'Optical'}
-			],
-			capitalization: [
-				{value: 'ALLCAPS', label: 'All caps'},
-				{value: 'NORMAL', label: 'Normal'},
-				{value: 'SMALLCAPS', label: 'Small caps'}
-			],
-			justification: [
-				{value: 'CENTER', label: 'Center'},
-				{value: 'CENTERJUSTIFIED', label: 'Center justified'},
-				{value: 'FULLYJUSTIFIED', label: 'Fully justified'},
-				{value: 'LEFT', label: 'Left'},
-				{value: 'LEFTJUSTIFIED', label: 'Left justified'},
-				{value: 'RIGHT', label: 'Right'},
-				{value: 'RIGHTJUSTIFIED', label: 'Right justified'}
-			]
-		};
-
 		self.appFonts = [];
-		self.fontFallBack = 'ArialMT';
-
-		self.dummyStyle = {
-			keyword: null,
-			layerGroup: null,
-			fontName: null,
-			size: 20,
-			leading: 0,
-			tracking: 0,
-			vScale: 100,
-			hScale: 100,
-			capitalization: 'NORMAL',
-			justification: 'CENTER',
-			antialias: 'SMOOTH',
-			fauxBold: false,
-			fauxItalic: false,
-			hyphenate: true,
-			kerning: 'METRICS',
-		};
-
-		self.dummyStyleSet = {
-			name: null,
-			styles: [
-				angular.copy(self.dummyStyle)
-			]
-		};
 
 		self.getAppFonts = function() {
 			let def = $q.defer();
@@ -1402,19 +1479,6 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 			return def.promise;
 		};
 
-		self.getDummyStyle = function(keyword) {
-			let dummy = angular.copy(self.dummyStyle);
-			if (angular.isDefined(keyword) && !Utils.isEmpty(keyword)) dummy.keyword = keyword;
-			return dummy;
-		};
-
-		self.getDummyStyleSet = function() {
-			let dummy = angular.copy(self.dummyStyleSet);
-			dummy.styles[0].default = true;
-			dummy.styles[0].keyword = 'default_style';
-			return dummy;
-		};
-
 		self.getStyleSetList = function() {
 			return $localStorage.styleSets;
 		};
@@ -1422,29 +1486,7 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 		self.cleanAndCheckStyleSet = function(styleSet) {
 			if (!angular.isDefined(styleSet.name) || !!!styleSet.name || !!!styleSet.name.trim()) throw 'Need a name';
 			if (styleSet.name.length > 25) throw 'Name must be less than 25 characters';
-			let defaultStyleCount = 0;
-			if (!!!styleSet.styles) throw 'No styles in set';
-			for (let i = 0; i < styleSet.styles.length; i++) {
-				if (!!!styleSet.styles[i].keyword) throw 'Some style keywords are undefined';
-				styleSet.styles[i].keyword = styleSet.styles[i].keyword.trim().toLowerCase();
-				if (angular.isDefined(styleSet.styles[i].default) && styleSet.styles[i].default == true) {
-					++defaultStyleCount;
-					if (styleSet.styles[i].keyword != 'default_style') throw 'Default style must be named "default_style"';
-				}
-			}
-			if (defaultStyleCount === 0) throw 'Missing default style';
-			if (defaultStyleCount > 1) throw 'Only one default style allowed';
-			styleSet.styles.sort(function(a, b) {
-				if (a.keyword < b.keyword) return -1;
-				if (a.keyword > b.keyword) return 1;
-				return 0;
-			});
-			// force default values if undefined
-			for (let i = 0; i < styleSet.styles.length; i++) {
-				for (let prop in self.dummyStyle) {
-					if (!angular.isDefined(styleSet.styles[i][prop]) || styleSet.styles[i][prop] === null) styleSet.styles[i][prop] = self.dummyStyle[prop];
-				}
-			}
+			tbHelper.checkStyleSet(styleSet);
 			let idx = $localStorage.styleSets.findIndex(function(one) { return one.id == styleSet.id; });
 			let existingId = -1;
 			if (idx > -1) existingId = $localStorage.styleSets[idx].id;
@@ -1493,7 +1535,7 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 				return styleSet;
 			}
 			else {
-				return self.getDummyStyleSet();
+				return tbHelper.getDummyStyleSet();
 			}
 		};
 
@@ -1528,14 +1570,14 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 			return def.promise;
 		};
 
-		self.actionSelectedLayers = function(action, obj) {
+		self.actionSelectedLayers = function(action, param) {
 			let def = $q.defer();
-			let actionString = '"'+ action + '"';
-			if (angular.isDefined(obj)) {
-				actionString += ', '+ JSON.stringify(obj);
+			let actionString = '"'+ action + 'SelectedLayers"';
+			if (angular.isDefined(param)) {
+				actionString += ', '+ JSON.stringify(param);
 			}
 			$rootScope.$root.CSI.evalScript('tryExec('+ actionString +');', function(res) {
-				$rootScope.log('autoResizeSelectedLayers return', res);
+				$rootScope.log(actionString + ' return', res);
 				if (res === 'no_document') {
 					def.reject('No document.');
 				}
@@ -1555,36 +1597,11 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 			return def.promise;
 		};
 
-		self.applyStyleToSelectedLayers = function(style) {
-			return self.actionSelectedLayers('applyStyleToSelectedLayers', style);
-		};
-
-		self.autoResizeSelectedLayers = function(){
-			return self.actionSelectedLayers('autoResizeSelectedLayers');
-		};
-
-		self.adjustFontSize = function(modifier){
-			return self.actionSelectedLayers('adjustFontSize', modifier);
-		};
-
-		self.toggleHyphenation = function(){
-			return self.actionSelectedLayers('toggleHyphenationSelectedLayers');
-		};
-
-		self.toggleFauxBold = function(){
-			return self.actionSelectedLayers('toggleFauxBoldSelectedLayers');
-		};
-
-		self.toggleFauxItalic = function(){
-			return self.actionSelectedLayers('toggleFauxItalicSelectedLayers');
-		};
-
 		// init
 		if (!!!$localStorage.styleSets) {
 			$localStorage.styleSets = [];
-			let defaultSet = self.getDummyStyleSet();
+			let defaultSet = tbHelper.getDummyStyleSet();
 			defaultSet.name = 'Default set';
-			defaultSet.styles[0].fontName = self.fontFallBack;
 			self.saveStyleSet(defaultSet);
 		}
 

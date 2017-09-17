@@ -1,6 +1,12 @@
+### 0.1.11 (2017-09-18)
+Reworked code structure.
+New: typeset-helper is back as a standalone script named tb_robot.
+
+
 ### 0.1.10 (2017-07-30)
 Added more standalone scripts.
 Some refactoring.
+
 
 ### 0.1.9 (2017-07-30)
 Added standalone scripts to allow the user to create Photoshop actions and associate shortcuts to them.

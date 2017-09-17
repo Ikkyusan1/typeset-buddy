@@ -1,5 +1,7 @@
 # Typeset Buddy
-A typesetting extension for Adobe Photoshop CC. Tested with PS version 2015.5+.
+A typesetting tool for Adobe Photoshop.
+The extension will work on PS version 2015.5+. The standalone scripts should work on PS CS5+.
+
 
 ### What it can do :
 - hopefully help you during your typesetting sessions.
@@ -10,10 +12,13 @@ A typesetting extension for Adobe Photoshop CC. Tested with PS version 2015.5+.
 - typeset text in a selection marquee.
 - apply a style to selected text layers.
 - increase/decrease font size and autoresize selected layers (via button click or standalone script execution).
+- automatically typeset psd files (via a standalone script).
+
 
 ### What it *can't* do :
 - automate the whole typesetting process.
 - make you more attractive than you already are.
+
 
 ## Installation:
 1. Download the [latest release](https://github.com/Ikkyusan1/typeset-buddy/releases/latest) and extract the archive in Photoshop's extension folder. It's one of these (create the folders if they don't exist):
@@ -27,25 +32,30 @@ A typesetting extension for Adobe Photoshop CC. Tested with PS version 2015.5+.
 
 2. Start Photoshop. You'll find the extension under the menu Window > Extensions > Typeset Buddy.
 
-The disabling of the check for signed extensions is not necessary anymore for this extension. Disabling the check was done this way :
-- Win: regedit > ```HKEY_CURRENT_USER/Software/Adobe/CSXS.7```, then add a new entry ```PlayerDebugMode``` of type ```string``` with the value of ```1```.
-- Mac: In the terminal, type: ```defaults write com.adobe.CSXS.7 PlayerDebugMode 1```
-		(The plist is also located at ~/Library/Preferences/com.adobe.CSXS.7.plist)
+If you just want to use the standalone scripts (for instance, if you don't have PS CC), only the "jsx" folder is necessary. You can copy (and rename) it wherever you want.
 
-To re-enable the check, just put a value of 0 instead of 1.
 
 ## Standalone scripts
-There's currently no practical way to associate keyboard shortcuts to an HTML extension (we can hijack keypress events, but only when the extension is displayed and focused). So, in order to allow the use of some basic functions without having to click on a button or even having the extension opened, for that matter, I've added some standalone scripts. You can find them in the "jsx/" folder. The available scripts are :
+There's currently no practical way to associate keyboard shortcuts to an HTML extension (we can hijack keypress events, but only when the extension is displayed and focused). So, in order to allow the use of some basic functions without having to click on a button (or even having the extension opened, for that matter) I've added some standalone scripts. You can find them in the "jsx/" folder. The available scripts are :
 - tb_autoresize_selected_layers.jsx
 - tb_decrease_font_size_selected_layers.jsx
 - tb_increase_font_size_selected_layers.jsx
+- tb_round_font_size_selected_layers.jsx
 - tb_toggle_fauxbold_selected_layers.jsx
 - tb_toggle_fauxitalic_selected_layers.jsx
 - tb_toggle_hyphenation_selected_layers.jsx
+- tb_robot.jsx
 
 This way you can create a Photoshop Action to run these scripts and associate a keystroke to the action. (Running a script is done via the app menu File > Scripts > Browse...)
 
+
+## TB Robot
+The tb_robot.jsx standalone script is designed to automatically typeset psd files. It won't put the text inside the bubbles, but it will create all the text layers and apply the relevant styles on them. If you don't have PS CC, look at the provided examples to create your stylesets. The robot has a button to export the expected style properties and the list of available fonts.
+Quick note : keep in mind that if several styles are defined for a bubble, the robot will use only the last one for the typesetting.
+
+
 ## Translation script format
+
 ### Page numbers
 - They must be written on three or four digits.
 - They must be followed by a # character.
@@ -53,6 +63,7 @@ This way you can create a Photoshop Action to run these scripts and associate a 
 - The end of the script is marked by the anchor ```END#```
 - The working script is what's between the first page number anchor ```XXX#``` and ```END#```
 - Text before and after these anchors will not be taken into account, so it's a good place to add translation notes and whatnot.
+
 
 ### Bubbles
 - The rule is one bubble per line. In other words, bubbles are separated by a carriage return.
@@ -95,7 +106,6 @@ This first part is a shout bubble. [shout]
 // Second part will inherit the previous style.
 // But we want the third part to be written in italic. [italic]
 ```
-
 
 ### Notes
 Basically, notes are everything that doesn't correspond to the styles' keywords.

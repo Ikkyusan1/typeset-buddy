@@ -1,8 +1,5 @@
+#include "./polyfills.jsx"
 #include "./main.jsx"
 
-try {
-	autoResizeSelectedLayers();
-}
-catch (e) {
-	// shush!
-}
+var res =	tryExec('autoResizeSelectedLayers');
+if (res != 'done') alert(res);

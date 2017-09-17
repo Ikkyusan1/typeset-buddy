@@ -1,8 +1,5 @@
+#include "./polyfills.jsx"
 #include "./main.jsx"
 
-try {
-	adjustFontSizeSelectedLayers(1);
-}
-catch (e) {
-	// shush!
-}
+var res =	tryExec('adjustFontSizeSelectedLayers', 1);
+if (res != 'done') alert(res);

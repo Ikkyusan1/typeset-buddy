@@ -1,0 +1,84 @@
+Title : A book in a foreign language
+Translator : Yours truly
+Base language : a language I barely understand
+
+These notes won't be taken into account by the typesetter script.
+
+
+001#
+First Bubble.
+–
+Second Bubble. This one is not supposed to be on the same panel as the previous bubble.
+–
+[nib] Not that it really matters : it's just to show that some special characters can be ignored. In this case, a long dash was on the previous line to signify a change of panel.
+[sfxib] Another bubble, this one is a double-bubble. First part is sfxib styled.
+// Second part, will be a "sfxib" too, because no style has been defined on this line.
+Another double-bubble. First part is "yelling" style. [yelling]
+// The second part, on the other hand, will be "handwritten". [handwritten]
+
+
+002# [italic] [[all the bubbles on this page will be written in "italic", unless the style is overriden on a line]]
+[nib] A text not in bubble.
+A big bubble...
+// All the part of this multi-bubble will be written in "italic".
+// Because no override style has been defined, and the page style is "italic".
+Giga pudding! [yelling] [[this bubble will be written in "yelling" style, even if the page was set to "italic"]]
+[nib] New note definition [handwritten][[a simple note]][[and another]]
+
+
+003#
+[blank] [[this page has no text, it won't be typesetted, and this note won't be taken into account]]
+
+
+004# [[not a style, just a note]]
+[sfx] Some sfx
+[newspaper] Tonight at eleven.
+[sfxib] Sfx in balloon.
+
+
+005#
+[nib] "nib", yes, but we want to override this one with "handwritten". [handwritten]
+–
+[[There's nothing to typeset here, but we should still display the note]][[or notes]]
+–
+[[glop]]
+
+
+006# [italic]
+[nib] More vicious : an "italic" page style, with a "nib" that should be "handwritten". [handwritten]
+–
+A multipart bubble. Of which the first part is "yelling". [yelling]
+// The second should then be "yelling" too.
+–
+[nib] And the ultimate combo. First "nib". [[vicious I said]]
+// Then second "yelling". [yelling] [[believe it]]
+// Then third. Should be "yelling" too, because it inherits from the previous part. [[yes it does]]
+// And last. "Handwritten". [handwritten] [[push it]]
+–
+And this one should be "italic", since the page is "italic".
+–
+Dirty trick.
+// [handwritten] The style was placed right after the double-slash. It works too.
+[sfxib] // The style was defined BEFORE the double-slash. This is invalid and the line will be considered a bubble on its own.
+
+
+007# [[Although there's nothing to typeset on this page, this note will be displayed nonetheless]]
+[blank]
+
+
+008-009#
+This one is supposed to be a double page.
+[nib] This bubble has a note and a style set after the note. Does it work? [[yes it does]] [other_style]
+
+
+010# [[we have single word notes in this page]]
+Screw this [[censored]]
+[nib] Screw that [[censored_too]]
+
+
+
+END#
+
+Everything that appears after the END anchor won't be taken into account either.
+
+

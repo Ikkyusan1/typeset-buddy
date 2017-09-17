@@ -194,9 +194,10 @@ gulp.task('copyCommonFiles', function(){
 	var files = [
 		path.join(__dirname, 'CHANGELOG.md'),
 		path.join(__dirname, 'README.md'),
+		path.join(__dirname, 'example/**/*')
 	];
 	if(checkFilesExist(files)){
-		return gulp.src(files)
+		return gulp.src(files, {base: '.'})
 		.pipe(plumber())
 		.pipe(gulp.dest(distDirectory));
 	}

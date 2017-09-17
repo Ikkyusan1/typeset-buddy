@@ -1,8 +1,5 @@
+#include "./polyfills.jsx"
 #include "./main.jsx"
 
-try {
-	toggleFauxBoldSelectedLayers();
-}
-catch (e) {
-	// shush!
-}
+var res =	tryExec('toggleFauxBoldSelectedLayers');
+if (res != 'done') alert(res);
