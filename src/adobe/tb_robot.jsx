@@ -47,6 +47,7 @@ function exportStyleProps() {
 			styleProperties: tbHelper.styleProps,
 			fonts: fontNames
 		}
+		file.encoding = 'UTF8';
 		file.writeln(JSON.stringify(constants, null, 2));
 		file.close();
 	}
@@ -233,6 +234,7 @@ btnStyleSetPath.onClick = function() {
 		try {
 			var fileOK = file.open('r');
 			if(fileOK){
+				fileOK.encoding = 'UTF8';
 				var content;
 				content = file.read();
 				styleSet = JSON.parse(content);

@@ -27,17 +27,14 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 
 		self.cleanAndCheckStyleSet = function(styleSet) {
 			if (!angular.isDefined(styleSet.name) || !!!styleSet.name || !!!styleSet.name.trim()) throw 'Need a name';
-			if (styleSet.name.length > 25) throw 'Name must be less than 25 characters';
-			tbHelper.checkStyleSet(styleSet);
 			let idx = $localStorage.styleSets.findIndex(function(one) { return one.id == styleSet.id; });
 			let existingId = -1;
 			if (idx > -1) existingId = $localStorage.styleSets[idx].id;
 			for (let i = 0; i < $localStorage.styleSets.length; i++) {
 				if ($localStorage.styleSets[i].name.trim().toLowerCase() == styleSet.name.trim().toLowerCase() && $localStorage.styleSets[i].id != existingId) throw 'A styleset with the same name already exists';
 			}
-			for (let i = 0; i < styleSet.styles.length; i++) {
-				if (angular.isDefined(styleSet.styles[i+1]) && styleSet.styles[i].keyword == styleSet.styles[i+1].keyword) throw 'The styleset contains duplicate style keywords';
-			}
+			if (styleSet.name.length > 25) throw 'Name must be less than 25 characters';
+			tbHelper.checkStyleSet(styleSet);
 		};
 
 		self.saveStyleSet = function(styleSet) {

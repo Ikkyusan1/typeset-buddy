@@ -128,13 +128,12 @@ var tbHelper = {
 		return values;
 	},
 
-	getDummyStyle: function(keyword, isDefault) {
+	getDummyStyle: function(keyword) {
 		var dummy = {};
 		for (var prop in tbHelper.styleProps) {
 			dummy[prop] = tbHelper.styleProps[prop].def;
 		}
 		if (!!keyword) dummy.keyword = keyword;
-		if (!!isDefault) dummy.default = true;
 		return dummy;
 	},
 
@@ -154,18 +153,18 @@ var tbHelper = {
 		for (var i = 0; i < styleSet.styles.length; i++) {
 			if (!!!styleSet.styles[i].keyword) throw 'Some style keywords are undefined';
 			styleSet.styles[i].keyword = styleSet.styles[i].keyword.trim().toLowerCase();
-			if (styleSet.styles[i].default != undefined && styleSet.styles[i].default == true) {
-				++defaultStyleCount;
-				if (styleSet.styles[i].keyword != 'default_style') throw 'Default style must be named "default_style"';
-			}
+			if (styleSet.styles[i].keyword == 'default_style') defaultStyleCount++;
 		}
-		if (defaultStyleCount === 0) throw 'Missing default style';
-		if (defaultStyleCount > 1) throw 'Only one default style allowed';
+		if (defaultStyleCount === 0) throw 'Missing default_style';
+		if (defaultStyleCount > 1) throw 'Only one default_style allowed';
 		styleSet.styles.sort(function(a, b) {
 			if (a.keyword < b.keyword) return -1;
 			if (a.keyword > b.keyword) return 1;
 			return 0;
 		});
+		for (var i = 0; i < styleSet.styles.length; i++) {
+			if (styleSet.styles[i+1] != undefined && styleSet.styles[i].keyword == styleSet.styles[i+1].keyword) throw 'The styleset contains duplicate style keywords';
+		}
 		// force default values if undefined
 		for (var i = 0; i < styleSet.styles.length; i++) {
 			styleSet.styles[i] = this.cleanStyle(styleSet.styles[i]);

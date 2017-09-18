@@ -27,7 +27,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 				delete styleSet.id;
 				let result = window.cep.fs.showSaveDialogEx('Export styleset', undefined, Utils.getValidFileSuffix('*.json'), styleSet.name + '_styleset.json', undefined, 'Export style set', undefined);
 				if (!!result.data) {
-					let writeResult = window.cep.fs.writeFile(result.data, JSON.stringify(styleSet, null, 2));
+					let writeResult = window.cep.fs.writeFile(result.data, JSON.stringify(styleSet, null, 2), cep.encoding.UTF8);
 					if (writeResult.err != 0) {
 						ngToast.create({className: 'danger', content: 'Failed to write a file at the destination:' + result.data + ', error code:' + writeResult.err});
 					}

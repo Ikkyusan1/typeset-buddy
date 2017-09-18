@@ -15,7 +15,7 @@
 		<button class="topcoat-button" ng-click="duplicateAction()" uib-tooltip="Duplicate style" tooltip-popup-delay="500" tooltip-placement="bottom-right">
 			<span class="glyphicon glyphicon-duplicate"></span>
 		</button>
-		<button class="topcoat-button" ng-click="removeAction()" ng-if="!!!preset.default" uib-tooltip="Remove style" tooltip-popup-delay="500" tooltip-placement="bottom-right">
+		<button class="topcoat-button" ng-click="removeAction()" ng-if="preset.keyword != 'default_style'" uib-tooltip="Remove style" tooltip-popup-delay="500" tooltip-placement="bottom-right">
 			<span class="glyphicon glyphicon-trash"></span>
 		</button>
 	</div>

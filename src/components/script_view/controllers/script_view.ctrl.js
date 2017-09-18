@@ -26,7 +26,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 		};
 
 		$scope.loadScript = function(filepath, page, silent) {
-			let result = window.cep.fs.readFile(filepath);
+			let result = window.cep.fs.readFile(filepath, cep.encoding.UTF8);
 			if (result.err === 0) {
 				ScriptService.setting('lastOpenedScript', filepath);
 				$scope.filename = Utils.extractFilename(filepath);
