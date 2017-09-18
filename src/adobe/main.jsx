@@ -366,6 +366,104 @@ function typesetEX(typesetObj) {
 	}
 }
 
+function typesetFiles(fileList, scriptPath, targetFolder, styleSet, options) {
+	try {
+		if (!!!fileList.length) throw 'Need files';
+		if (!!!scriptPath) throw 'Need translation script';
+		if (!!!targetFolder) throw 'Need target folder';
+		if (!!!styleSet) throw 'Need style set';
+		var scriptFile = new File(scriptPath);
+		var fileOK = scriptFile.open('r');
+		if (fileOK) {
+			var text = scriptFile.read();
+			setPrefs();
+			for (var i = 0; i < fileList.length; i++) {
+				var pageNumber = tbHelper.getFilePageNumber(fileList[i].toString());
+				if (!!!pageNumber) {
+					if (!options.noPrompt) alert('No page number found in filename ' + fileList[i].toString());
+				}
+				else {
+					var psdFile;
+					try {
+						// try to open the file anyway so that it can be saved afterwards in the target folder
+						psdFile = new File(fileList[i]);
+						open(psdFile);
+					}
+					catch (e) {
+						if (!options.noPrompt) throw 'Could not open '+ fileList[i];
+						continue;
+					}
+					var pageScript = tbHelper.loadPage(text, pageNumber);
+					if (!pageScript) {
+						if (!options.noPrompt) alert(fileList[i].toString() + ' has no corresponding page in the translation script');
+					}
+					else {
+						var bubbles = pageScript[2];
+						if (tbHelper.pageContainsText(bubbles)) {
+							// page's global style, forced to defaults_style if none is set.
+							var pageStyle = tbHelper.getTextStyles(pageScript[1], 'default_style')[0];
+							var previousStyle = pageStyle;
+							var lines = bubbles.split('\n');
+							var n = 0;
+							for (var j = 0; j < lines.length; j++) {
+								var line = lines[j];
+								if (tbHelper.skipThisLine(line, options.panelSeparator) === false) {
+									// line style will be the last thing that's between single brackets
+									// but if we're dealing with a double-bubble part, fallback on previous style if no style is defined for this bubble
+									var lineStyle = (tbHelper.isMultiBubblePart(line))? tbHelper.getTextStyles(line, previousStyle).pop() : tbHelper.getTextStyles(line, pageStyle).pop();
+									var cleanedText = tbHelper.cleanLine(line);
+									if (options.skipSfxs && lineStyle == 'sfx') continue;
+									else {
+										n++;
+										var style;
+										try {
+											style = tbHelper.getStyleFromStyleSet(styleSet, lineStyle);
+										}
+										catch (e) {
+											try {
+												style = tbHelper.getStyleFromStyleSet(styleSet, 'default_style');
+											}
+											catch (e) {
+												throw 'Style '+ lineStyle +'not found and default_style not found either... (page '+ pageNumber +')';
+											}
+										}
+										var typesetObj = {
+											text: cleanedText,
+											style: style,
+											position: [20*n, 20*n],
+											useLayerGroups: options.useLayerGroups
+										};
+										typesetEX(typesetObj);
+									}
+									previousStyle = lineStyle;
+								}
+							}
+						}
+					}
+					var saveFile = new File(editTargetFolderPath.text + '/' + app.activeDocument.name);
+					app.activeDocument.saveAs(saveFile);
+					app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
+					psdFile = null;
+					saveFile = null;
+				}
+				if (!options.noPrompt && ((i+1) % options.promptEvery == 0)) {
+					if (confirm(i+1 + '/' + fileList.length + 'pages done. Continue?', false) == false) break;
+				}
+			}
+			resetPrefs();
+			scriptFile.close();
+			return 'done';
+		}
+		else {
+			throw 'Failed to open translation script';
+		}
+	}
+	catch (e) {
+		resetPrefs();
+		throw (e);
+	}
+}
+
 function actionSelectedLayers(action, historyName, obj) {
 	try {
 		var idx = getSelectedLayersIdx();

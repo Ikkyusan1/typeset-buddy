@@ -75,10 +75,6 @@ function comboValue(combo) {
 	return (combo.selection.value != undefined)? combo.selection.value : combo.selection.text;
 }
 
-function promptContinue(nb, nbTotal) {
-	return confirm(nb + '/' + nbTotal + 'pages done. Continue?', false);
-}
-
 function failsafe() {
 	if (!!!selectedPSDs.items.length) {
 		alert('Please select some files first.');
@@ -101,104 +97,24 @@ function failsafe() {
 	return confirm('This will overwrite the files in target folder. Do you still wish to continue ?', true);
 }
 
-
 function run() {
 	try {
-		if (!failsafe()) return false;
-		var scriptFile = new File(editScriptPath.text);
-		var fileOK = scriptFile.open('r');
-		if(fileOK){
-			var text = scriptFile.read();
-			// set app prefs to pixels.
-			setPrefs();
-			var fileList = selectedPSDs.items;
-			for (var i = 0; i < fileList.length; i++) {
-				var pageNumber = tbHelper.getFilePageNumber(fileList[i].toString());
-				if (!!!pageNumber) {
-					if (!noPrompt.value) alert('No page number found in filename ' + fileList[i].toString());
-				}
-				else {
-					var psdFile;
-					try {
-						// try to open the file anyway so that it can be saved afterwards in the target folder
-						psdFile = new File(fileList[i].toString());
-						open(psdFile);
-					}
-					catch (e) {
-						if (!noPrompt.value) alert('Could not open '+ fileList[i].toString());
-						continue;
-					}
-					var pageScript = tbHelper.loadPage(text, pageNumber);
-					if (!pageScript) {
-						if (!noPrompt.value) alert(fileList[i].toString() + ' has no corresponding page in the translation script');
-					}
-					else {
-						var bubbles = pageScript[2];
-						if (tbHelper.pageContainsText(bubbles)) {
-							// we've got some text to typeset for this page, so let's get started
-							// page's global style, forced to defaults_style if none is set.
-							var pageStyle = tbHelper.getTextStyles(pageScript[1], 'default_style')[0];
-							var previousStyle = pageStyle;
-							var lines = bubbles.split('\n');
-							var n = 0;
-							for (var j = 0; j < lines.length; j++) {
-								var line = lines[j];
-								if (tbHelper.skipThisLine(line, comboValue(panelSeparator)) === false) {
-									// line style will be the first thing that's between brackets
-									// but if we're dealing with a double-bubble part, maybe there's a previous style set for it
-									var lineStyle = (tbHelper.isMultiBubblePart(line))? tbHelper.getTextStyles(line, previousStyle).pop() : tbHelper.getTextStyles(line, pageStyle).pop();
-									var cleanedText = tbHelper.cleanLine(line);
-									// alert('style ' + lineStyle + ' == ' + cleanedText);
-									if (skipSfxs.value && lineStyle == 'sfx') continue;
-									else {
-										n++;
-										var style;
-										try {
-											style = tbHelper.getStyleFromStyleSet(styleSet, lineStyle);
-										}
-										catch (e) {
-											try {
-												style = tbHelper.getStyleFromStyleSet(styleSet, 'default_style');
-											}
-											catch (e) {
-												throw 'Style '+ lineStyle +'not found and default_style not found either... (page '+ pageNumber +')';
-											}
-										}
-										// alert('style ' + lineStyle + ' == ' + cleanedText);
-										var typesetObj = {
-											text: cleanedText,
-											style: style,
-											position: [20*n, 20*n],
-											useLayerGroups: useLayerGroups.value
-										};
-										typesetEX(typesetObj);
-									}
-									previousStyle = lineStyle;
-								}
-							}
-						}
-					}
-
-					var saveFile = new File(editTargetFolderPath.text + '/' + app.activeDocument.name);
-					app.activeDocument.saveAs(saveFile);
-					app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
-					psdFile = null;
-					saveFile = null;
-				}
-				if (!noPrompt.value && ((i+1)%promptEvery == 0)) {
-					if (promptContinue(i+1, fileList.length) == false) break;
-				}
+		if (failsafe()) {
+			var fileList = [];
+			for (var i = 0; i < selectedPSDs.items.length; i++) {
+				fileList.push(selectedPSDs.items[i].toString());
 			}
-			resetPrefs();
-			scriptFile.close();
-			alert('Done');
-		}
-		else {
-			alert('Failed to open script');
+			var options = {
+				panelSeparator: comboValue(panelSeparator),
+				useLayerGroups: useLayerGroups.value,
+				skipSfxs: skipSfxs.value,
+				promptEvery: promptEvery,
+				noPrompt: noPrompt.value
+			};
+			if (typesetFiles(fileList, editScriptPath.text, editTargetFolderPath.text, styleSet, options) == 'done') alert('Done');
 		}
 	}
 	catch (e) {
-		resetPrefs();
 		alert(e);
 	}
 }
