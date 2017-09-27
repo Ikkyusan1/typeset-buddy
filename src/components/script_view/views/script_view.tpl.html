@@ -1,12 +1,16 @@
 <div class="row no-shrink">
-	<div class="col-md-6 col-xs-6 flex-input">
+	<div class="col-md-5 col-xs-5 flex-input">
 		<div class="input-wrapper">
 			<label class="">
 				<span>Script</span>
 			</label>
-			<input type="text" class="topcoat-text-input" readonly="true" ng-model="filename" ng-click="browseScript()">
+			<input type="text" class="topcoat-text-input" readonly="true" ng-model="filename" ng-click="browseScript()" uib-tooltip="{{filename}}" tooltip-popup-delay="500" tooltip-placement="bottom">
 		</div>
-		<!-- <button class="topcoat-button" ng-click="browseScript()">Browse...</button> -->
+	</div>
+	<div class="col-md-1 col-xs-1 flex-input">
+		<button class="topcoat-button" ng-click="reloadScript()" ng-if="!!filename" uib-tooltip="Reload script" tooltip-popup-delay="1000" tooltip-placement="bottom">
+			<span class="glyphicon glyphicon-repeat"></span>
+		</button>
 	</div>
 	<div class="col-md-5 col-xs-5 flex-input">
 		<div class="input-wrapper">
@@ -47,8 +51,8 @@
 			<span class="glyphicon glyphicon-minus" ng-click="incPageNumber(false)"></span>
 		</button>
 
-			<select ng-options="pageNumber as pageNumber for pageNumber in pageNumbers" ng-model="selectedPage">
-				<option value="">-</option>
+			<select ng-options="pageNumber as pageNumber for pageNumber in pageNumbers" ng-model="selectedPage" ng-disabled="!!!pageNumbers.length">
+
 			</select>
 
 		<button class="topcoat-icon-button--quiet" ng-disabled="!!!pageNumbers.length">

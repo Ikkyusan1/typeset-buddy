@@ -25,34 +25,44 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 			}
 		};
 
-		$scope.loadScript = function(filepath, page, silent) {
-			let result = window.cep.fs.readFile(filepath, cep.encoding.UTF8);
-			if (result.err === 0) {
-				ScriptService.setting('lastOpenedScript', filepath);
-				$scope.filename = Utils.extractFilename(filepath);
-				$scope.scriptContent = result.data;
-				$scope.pageNumbers = ScriptService.getPageNumbers($scope.scriptContent);
-				if ($scope.pageNumbers.length > 0) {
-					if (!!!silent) {
-						ngToast.create({className: 'info', content: $scope.pageNumbers.length + ' page(s) found in file'});
-						$scope.selectedPage = $scope.pageNumbers[0];
+		$scope.loadScript = function(filepath, page, autoloadPage) {
+			try {
+				let result = window.cep.fs.readFile(filepath, cep.encoding.UTF8);
+				if (result.err === 0) {
+					ScriptService.setting('lastOpenedScript', filepath);
+					$scope.filename = Utils.extractFilename(filepath);
+					$scope.scriptContent = result.data;
+					$scope.pageNumbers = ScriptService.getPageNumbers($scope.scriptContent);
+					if ($scope.pageNumbers.length > 0) {
+						if (!!!autoloadPage || page == null) {
+							ngToast.create({className: 'info', content: $scope.pageNumbers.length + ' page(s) found in file'});
+							$scope.selectedPage = $scope.pageNumbers[0];
+						}
+						else {
+							$scope.selectedPage = page;
+							$scope.loadPage($scope.selectedPage);
+						}
+
 					}
-					if (page != null) {
-						$scope.selectedPage = page;
+					else {
+						throw 'Did not find any page number in the translation script';
 					}
 				}
 				else {
-					ngToast.create({className: 'info', content: 'Did not find any page number in the script'});
-					ScriptService.setting('lastOpenedScript', null);
-					ScriptService.setting('lastOpenedPage', null);
-					$scope.reset();
+					throw 'Could not open translation script';
 				}
 			}
-			else {
+			catch (e) {
 				ScriptService.setting('lastOpenedScript', null);
 				ScriptService.setting('lastOpenedPage', null);
 				$scope.reset();
-				ngToast.create({className: 'danger', content: 'Could not read the file'});
+				ngToast.create({className: 'danger', content: e});
+			}
+		};
+
+		$scope.reloadScript = function() {
+			if (!!ScriptService.setting('lastOpenedScript')) {
+				$scope.loadScript(ScriptService.setting('lastOpenedScript'), ScriptService.setting('lastOpenedPage'), true);
 			}
 		};
 

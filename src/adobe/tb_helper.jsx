@@ -149,6 +149,8 @@ var tbHelper = {
 
 	checkStyleSet: function(styleSet) {
 		var defaultStyleCount = 0;
+		if (styleSet.name == undefined || !!!styleSet.name || !!!styleSet.name.trim()) throw 'Styleset must have a name';
+		if (styleSet.name.length > 25) throw 'Styleset name must be less than 25 characters';
 		if (!!!styleSet.styles) throw 'No styles in set';
 		for (var i = 0; i < styleSet.styles.length; i++) {
 			if (!!!styleSet.styles[i].keyword) throw 'Some style keywords are undefined';
@@ -205,10 +207,16 @@ var tbHelper = {
 		var pageNumbers = [];
 		var regex = /\b([\d-]{3,9})#/g;
 		var match;
-		while((match = regex.exec(text)) !== null) {
+		while ((match = regex.exec(text)) !== null) {
 			// failsafe to avoid infinite loops with zero-width matches
 			if (match.index === regex.lastIndex) regex.lastIndex++;
 			pageNumbers.push(match[1]);
+		}
+		pageNumbers.sort();
+		for (var i = 0; i < pageNumbers.length -1; i++) {
+			if (pageNumbers[i] == pageNumbers[i+1]) {
+				throw 'Duplicate page number: ' + pageNumbers[i];
+			}
 		}
 		return pageNumbers;
 	},
