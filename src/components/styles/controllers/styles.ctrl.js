@@ -243,5 +243,3 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 		});
 	}
 ]);
-
-

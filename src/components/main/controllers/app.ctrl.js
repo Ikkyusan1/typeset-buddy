@@ -29,5 +29,3 @@ tb.controller('AppCtrl', ['$scope', '$localStorage', '$uibModal', 'Utils',
 		});
 	}
 ]);
-
-

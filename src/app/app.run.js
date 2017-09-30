@@ -12,6 +12,7 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 			'polyfills',
 			'tb_helper',
 		];
+
 		let extensionPath = $rootScope.CSI.getSystemPath(SystemPath.EXTENSION) + '/jsx/';
 		for (let i = 0; i < JSXs.length; i++){
 			let jsxFile =  extensionPath + JSXs[i] +'.jsx';

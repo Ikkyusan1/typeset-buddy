@@ -104,6 +104,10 @@ input[type="select"].ng-invalid {
 	border: solid 1px red !important;
 }
 
+.full-width {
+	width: 100%;
+}
+
 .m0  { margin:           0 !important; }
 .mt0 { margin-top:       0 !important; }
 .mr0 { margin-right:     0 !important; }
@@ -134,7 +138,6 @@ input[type="select"].ng-invalid {
 .pr { padding-right: 5px; }
 .pl { padding-left: 5px; }
 .ph { padding-right: 5px; padding-left: 5px; }
-
 
 .nav > li > a {
 	position: relative;
@@ -215,7 +218,7 @@ tb-style-preset>div.row:first-child {
 }
 
 .list > .list-item:not(last-child) {
-	border-bottom: 1px solid #ddd;
+	border-bottom: 1px dotted #ddd;
 }
 
 .list.padded {
@@ -238,6 +241,7 @@ tb-style-preset>div.row:first-child {
 .list-item.panel-separator {
 	background: #ddd;
 	padding: 2px !important;
+	margin-top: -1px;
 }
 
 .bubble-content {
@@ -302,11 +306,9 @@ tb-style-preset>div.row:first-child {
 	background-color: #666;
 }
 
-
 .topcoat-switch {
 	z-index: 1;
 }
-
 
 .flex-input {
 	padding: 5px;
@@ -358,6 +360,19 @@ tb-style-preset>div.row:first-child {
 	flex: 1 1 0;
 }
 
+.flex {
+	display: flex;
+	align-items: center;
+}
+
+.flex.between {
+	justify-content: space-between;
+}
+
+.flex.around {
+	justify-content: space-around;
+}
+
 .no-shrink {
 	flex-shrink: 0;
 }
@@ -387,6 +402,10 @@ button .glyphicon {
 	position: absolute;
 	top: 0px;
 	left: 0;
+}
+
+.topcoat-checkbox {
+	padding: 2px 0;
 }
 
 .modal-dialog.modal-xs {

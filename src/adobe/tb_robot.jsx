@@ -3,8 +3,8 @@
  * Version: 0.1.0
  * Description: A typesetting script for Photoshop CS6+. It's meant to lay the groundwork for your typesetting. It will copy/paste the text from a script onto the relevant pages, and apply the relevant styles onto the text layers.
  * Author: Ikkyusan
+*/
 /*
-
 <javascriptresource>
 <name>Typeset Robot Buddy...</name>
 <menu>automate</menu>
@@ -13,7 +13,7 @@
 
 // enable double clicking from the
 // Macintosh Finder or the Windows Explorer
-// #target photoshop
+#target photoshop
 
 // Make Photoshop the frontmost application
 app.bringToFront();

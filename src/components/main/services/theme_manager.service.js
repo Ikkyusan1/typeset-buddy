@@ -43,5 +43,3 @@ tb.factory('themeManager', ['$rootScope', 'Utils',
 		return self;
 	}
 ]);
-
-
