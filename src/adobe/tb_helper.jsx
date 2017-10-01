@@ -120,6 +120,56 @@ var tbHelper = {
 		}
 	},
 
+	getDefaultTextReplaceRules: function(){
+		return [
+			{
+				id: this.uniqueId(),
+				pattern: '(‘|’)',
+				to: '\'',
+				regex: true,
+				regexG: true,
+				regexI: false,
+				active: true
+			},
+			{
+				id: this.uniqueId(),
+				pattern: '“|”',
+				to: '"',
+				regex: true,
+				regexG: true,
+				regexI: false,
+				active: true
+			},
+			{
+				id: this.uniqueId(),
+				pattern: '?!',
+				to: '!?',
+				regex: false,
+				regexG: true,
+				regexI: false,
+				active: true
+			},
+			{
+				id: this.uniqueId(),
+				pattern: '\\.{3,}',
+				to: '...',
+				regex: true,
+				regexG: true,
+				regexI: false,
+				active: true
+			},
+			{
+				id: this.uniqueId(),
+				pattern: '…',
+				to: '...',
+				regex: true,
+				regexG: true,
+				regexI: false,
+				active: true
+			}
+		];
+	},
+
 	getSylePropValues: function(prop) {
 		var values = [];
 		for (var i = 0; i < this.styleProps[prop].values.length; i++) {
@@ -159,6 +209,18 @@ var tbHelper = {
 		return dummy;
 	},
 
+	getDummyTextReplaceRule: function() {
+		return {
+			id: this.uniqueId(),
+			pattern: '',
+			to: '',
+			regex: false,
+			regexG: false,
+			regexI: false,
+			active: true
+		};
+	},
+
 	checkStyleSet: function(styleSet) {
 		var defaultStyleCount = 0;
 		if (styleSet.name == undefined || !!!styleSet.name || !!!styleSet.name.trim()) throw 'Styleset must have a name';
@@ -190,6 +252,24 @@ var tbHelper = {
 			if (style[prop] == undefined || style[prop] === null) style[prop] = this.styleProps[prop].def;
 		}
 		return style;
+	},
+
+	cleanTextReplaceRules: function(rules) {
+		var tmpRules = [];
+		for (var i = 0; i < rules.length; i++) {
+			var tmpRule = this.getDummyTextReplaceRule();
+			for (var prop in tmpRule) {
+				if (prop != 'id') {
+					if ((prop == 'pattern' || prop == 'to') && rules[i][prop] == undefined) throw prop + ' is missing';
+					if (prop == 'active' && rules[i][prop] == undefined) tmpRule[prop] = true;
+					else {
+						tmpRule[prop] = (rules[i][prop] == undefined)? false : rules[i][prop];
+					}
+				}
+			}
+			tmpRules.push(tmpRule);
+		}
+		return tmpRules;
 	},
 
 	getStyleFromStyleSet: function(set, keyword) {
@@ -304,6 +384,24 @@ var tbHelper = {
 		var reg = /(\/{0,2}\ ?)?(\[[\s\w\d]*\]\ ?)*([^\[]*)/;
 		var match = reg.exec(text);
 		return (!!match && !!match[match.length - 1])? match[match.length - 1].trim() : null;
+	},
+
+	replaceText: function(text, rules) {
+		for (var i = 0; i < rules.length; i++) {
+			var rule = rules[i];
+			var pattern;
+			if (!!rule.regex) {
+				var opt = '';
+				if (!!rule.regexG) opt += 'g';
+				if (!!rule.regexI) opt += 'i';
+				pattern = new RegExp(rule.pattern, opt);
+			}
+			else {
+				pattern = rule.pattern;
+			}
+			if (rule.active) text = text.replace(pattern, rule.to);
+		};
+		return text;
 	},
 
 	// true if skippable, null if panel separator, false if not skipped

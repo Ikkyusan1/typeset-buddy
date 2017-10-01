@@ -1,0 +1,78 @@
+<div class="row no-shrink p header">
+	<div class="col-lg-4 col-md-4 col-xs-4 text-center">
+		Pattern
+	</div>
+	<div class="col-lg-1 col-md-1 col-xs-1 text-center">
+		RegExp
+	</div>
+	<div class="col-lg-4 col-md-4 col-xs-4 text-center">
+		Replace with
+	</div>
+	<div class="col-lg-3 col-md-3 col-xs-3 flex between">
+		<button class="topcoat-button" ng-click="addRule()">
+			<span class="glyphicon glyphicon-plus"></span>
+		</button>
+		<span>Order</span>
+		<span>Active</span>
+	</div>
+</div>
+<div class="list scrollable pt">
+	<div class="row pb" ng-repeat="rule in textReplaceRules">
+		<div class="col-lg-4 col-md-4 col-xs-4 flex between">
+			<span ng-if="rule.regex">/</span>
+			<input type="text" class="topcoat-text-input" ng-model="rule.pattern" ng-class="{'full-width': !rule.regex}">
+			<span ng-if="rule.regex">/</span>
+			<label class="topcoat-checkbox" ng-if="rule.regex" uib-tooltip="Global (replace all matches)" tooltip-popup-delay="500" tooltip-placement="bottom">
+				<input type="checkbox" class="topcoat-checkbox" ng-model="rule.regexG">
+				<div class="topcoat-checkbox__checkmark"></div>
+				g
+			</label>
+			<label class="topcoat-checkbox" ng-if="rule.regex" uib-tooltip="Case insensitive" tooltip-popup-delay="500" tooltip-placement="bottom">
+				<input type="checkbox" class="topcoat-checkbox" ng-model="rule.regexI">
+				<div class="topcoat-checkbox__checkmark"></div>
+				i
+			</label>
+		</div>
+		<div class="col-lg-1 col-md-1 col-xs-1 flex around">
+			<label class="topcoat-checkbox" uib-tooltip="Pattern is a regular expression" tooltip-popup-delay="500" tooltip-placement="bottom">
+				<input type="checkbox" class="topcoat-checkbox" ng-model="rule.regex">
+				<div class="topcoat-checkbox__checkmark"></div>
+			</label>
+		</div>
+		<div class="col-lg-4 col-md-4 col-xs-4">
+			<input type="text" class="topcoat-text-input full-width" ng-model="rule.to">
+		</div>
+		<div class="col-lg-3 col-md-3 col-xs-3 flex between">
+			<button class="topcoat-button" ng-click="removeRule(rule)">
+				<span class="glyphicon glyphicon-trash"></span>
+			</button>
+			<button class="topcoat-button" ng-click="moveRule(rule, true)">
+				<span class="glyphicon glyphicon-arrow-up"></span>
+			</button>
+			<button class="topcoat-button" ng-click="moveRule(rule)">
+				<span class="glyphicon glyphicon-arrow-down"></span>
+			</button>
+			<label class="topcoat-switch">
+				<input type="checkbox" ng-model="rule.active" ng-true-value="true" class="topcoat-switch__input">
+				<div class="topcoat-switch__toggle"></div>
+			</label>
+		</div>
+	</div>
+</div>
+
+<div class="row no-shrink pv">
+	<div class="col-md-9 col-xs-9">
+		<button class="topcoat-button" ng-click="appendDefaults()">
+			Append default rules
+		</button>
+		<button class="topcoat-button" ng-click="importRules()" uib-tooltip="Import rules from a json file" tooltip-popup-delay="1000" tooltip-placement="top">
+			<span class="glyphicon glyphicon-import"></span>
+		</button>
+		<button class="topcoat-button" ng-click="exportRules()" ng-disabled="!!!textReplaceRules" uib-tooltip="Export rules as a json file" tooltip-popup-delay="1000" tooltip-placement="top">
+			<span class="glyphicon glyphicon-export"></span>
+		</button>
+	</div>
+	<div class="col-md-3 col-xs-3 text-right">
+		<button class="topcoat-button" ng-click="addRule()">Add Rule</button>
+	</div>
+</div>

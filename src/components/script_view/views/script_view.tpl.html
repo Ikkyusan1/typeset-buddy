@@ -40,6 +40,10 @@
 				<li role="menu-item" class="dropdown-header">Merge multibubbles</li>
 				<li role="menu-item" ng-class="{'active': mergeBubbles === true}" ng-click="setting('mergeBubbles', true)"><span>Yes</span></li>
 				<li role="menu-item" ng-class="{'active': mergeBubbles === false}" ng-click="setting('mergeBubbles', false)" ><span>No</span></li>
+				<li class="divider"></li>
+				<li role="menu-item" class="dropdown-header">Text replacement</li>
+				<li role="menu-item" ng-class="{'active': textReplace === true}" ng-click="setting('textReplace', true)"><span>Enabled</span></li>
+				<li role="menu-item" ng-class="{'active': textReplace === false}" ng-click="setting('textReplace', false)" ><span>Disabled</span></li>
 			</ul>
 		</div>
 	</div>

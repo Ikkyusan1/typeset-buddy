@@ -14,6 +14,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			$scope.panelSeparator = SettingsService.setting('panelSeparator');
 			$scope.useLayerGroups = SettingsService.setting('useLayerGroups');
 			$scope.mergeBubbles = SettingsService.setting('mergeBubbles');
+			$scope.textReplace = SettingsService.setting('textReplace');
 			$scope.styleSet = StylesService.getStyleSet();
 			$scope.selectedStyleset = $scope.styleSet.id;
 		};
@@ -100,6 +101,9 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 								};
 								let tmpStyles = [];
 								if (bubble.text) {
+									if ($scope.textReplace) {
+										bubble.text = tbHelper.replaceText(bubble.text, SettingsService.setting('textReplaceRules'));
+									}
 									if (tbHelper.isMultiBubblePart(line)) {
 										tmpStyles = tbHelper.getTextStyles(line, previousStyle);
 										bubble.multibubblePart = true;
