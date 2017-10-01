@@ -1,3 +1,7 @@
+### 0.2.0 (2017-10-01)
+New: text replacement functionality
+
+
 ### 0.1.11 (2017-09-18)
 Reworked code structure.
 New: typeset-helper is back as a standalone script named tb_robot.

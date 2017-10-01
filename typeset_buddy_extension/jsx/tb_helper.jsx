@@ -120,6 +120,56 @@ var tbHelper = {
 		}
 	},
 
+	getDefaultTextReplaceRules: function(){
+		return [
+			{
+				id: this.uniqueId(),
+				pattern: '(‘|’)',
+				to: '\'',
+				regex: true,
+				regexG: true,
+				regexI: false,
+				active: true
+			},
+			{
+				id: this.uniqueId(),
+				pattern: '“|”',
+				to: '"',
+				regex: true,
+				regexG: true,
+				regexI: false,
+				active: true
+			},
+			{
+				id: this.uniqueId(),
+				pattern: '?!',
+				to: '!?',
+				regex: false,
+				regexG: true,
+				regexI: false,
+				active: true
+			},
+			{
+				id: this.uniqueId(),
+				pattern: '\\.{3,}',
+				to: '...',
+				regex: true,
+				regexG: true,
+				regexI: false,
+				active: true
+			},
+			{
+				id: this.uniqueId(),
+				pattern: '…',
+				to: '...',
+				regex: true,
+				regexG: true,
+				regexI: false,
+				active: true
+			}
+		];
+	},
+
 	getSylePropValues: function(prop) {
 		var values = [];
 		for (var i = 0; i < this.styleProps[prop].values.length; i++) {
@@ -128,44 +178,69 @@ var tbHelper = {
 		return values;
 	},
 
-	getDummyStyle: function(keyword, isDefault) {
+	uniqueId: function() {
+		var idStrLen = 16;
+		var idStr= '';
+		idStr += (new Date()).getTime().toString(36) + '_';
+		do {
+			idStr += (Math.floor((Math.random() * 35))).toString(36);
+		} while (idStr.length < idStrLen);
+		return (idStr);
+	},
+
+	getDummyStyle: function(keyword) {
 		var dummy = {};
-		for (var prop in tbHelper.styleProps) {
-			dummy[prop] = tbHelper.styleProps[prop].def;
+		for (var prop in this.styleProps) {
+			dummy[prop] = this.styleProps[prop].def;
 		}
 		if (!!keyword) dummy.keyword = keyword;
-		if (!!isDefault) dummy.default = true;
 		return dummy;
 	},
 
-	getDummyStyleSet: function() {
+	getDummyStyleSet: function(name) {
 		var dummy = {
+			id: this.uniqueId(),
 			name: null,
 			styles: [
-				this.getDummyStyle('default_style', true)
+				this.getDummyStyle('default_style')
 			]
 		};
+		if (!!name) dummy.name = name;
 		return dummy;
+	},
+
+	getDummyTextReplaceRule: function() {
+		return {
+			id: this.uniqueId(),
+			pattern: '',
+			to: '',
+			regex: false,
+			regexG: false,
+			regexI: false,
+			active: true
+		};
 	},
 
 	checkStyleSet: function(styleSet) {
 		var defaultStyleCount = 0;
+		if (styleSet.name == undefined || !!!styleSet.name || !!!styleSet.name.trim()) throw 'Styleset must have a name';
+		if (styleSet.name.length > 25) throw 'Styleset name must be less than 25 characters';
 		if (!!!styleSet.styles) throw 'No styles in set';
 		for (var i = 0; i < styleSet.styles.length; i++) {
 			if (!!!styleSet.styles[i].keyword) throw 'Some style keywords are undefined';
 			styleSet.styles[i].keyword = styleSet.styles[i].keyword.trim().toLowerCase();
-			if (styleSet.styles[i].default != undefined && styleSet.styles[i].default == true) {
-				++defaultStyleCount;
-				if (styleSet.styles[i].keyword != 'default_style') throw 'Default style must be named "default_style"';
-			}
+			if (styleSet.styles[i].keyword == 'default_style') defaultStyleCount++;
 		}
-		if (defaultStyleCount === 0) throw 'Missing default style';
-		if (defaultStyleCount > 1) throw 'Only one default style allowed';
+		if (defaultStyleCount === 0) throw 'Missing default_style';
+		if (defaultStyleCount > 1) throw 'Only one default_style allowed';
 		styleSet.styles.sort(function(a, b) {
 			if (a.keyword < b.keyword) return -1;
 			if (a.keyword > b.keyword) return 1;
 			return 0;
 		});
+		for (var i = 0; i < styleSet.styles.length; i++) {
+			if (styleSet.styles[i+1] != undefined && styleSet.styles[i].keyword == styleSet.styles[i+1].keyword) throw 'The styleset contains duplicate style keywords';
+		}
 		// force default values if undefined
 		for (var i = 0; i < styleSet.styles.length; i++) {
 			styleSet.styles[i] = this.cleanStyle(styleSet.styles[i]);
@@ -173,10 +248,28 @@ var tbHelper = {
 	},
 
 	cleanStyle: function(style) {
-		for (var prop in tbHelper.styleProps) {
-			if (style[prop] == undefined || style[prop] === null) style[prop] = tbHelper.styleProps[prop].def;
+		for (var prop in this.styleProps) {
+			if (style[prop] == undefined || style[prop] === null) style[prop] = this.styleProps[prop].def;
 		}
 		return style;
+	},
+
+	cleanTextReplaceRules: function(rules) {
+		var tmpRules = [];
+		for (var i = 0; i < rules.length; i++) {
+			var tmpRule = this.getDummyTextReplaceRule();
+			for (var prop in tmpRule) {
+				if (prop != 'id') {
+					if ((prop == 'pattern' || prop == 'to') && rules[i][prop] == undefined) throw prop + ' is missing';
+					if (prop == 'active' && rules[i][prop] == undefined) tmpRule[prop] = true;
+					else {
+						tmpRule[prop] = (rules[i][prop] == undefined)? false : rules[i][prop];
+					}
+				}
+			}
+			tmpRules.push(tmpRule);
+		}
+		return tmpRules;
 	},
 
 	getStyleFromStyleSet: function(set, keyword) {
@@ -206,10 +299,16 @@ var tbHelper = {
 		var pageNumbers = [];
 		var regex = /\b([\d-]{3,9})#/g;
 		var match;
-		while((match = regex.exec(text)) !== null) {
+		while ((match = regex.exec(text)) !== null) {
 			// failsafe to avoid infinite loops with zero-width matches
 			if (match.index === regex.lastIndex) regex.lastIndex++;
 			pageNumbers.push(match[1]);
+		}
+		pageNumbers.sort();
+		for (var i = 0; i < pageNumbers.length -1; i++) {
+			if (pageNumbers[i] == pageNumbers[i+1]) {
+				throw 'Duplicate page number: ' + pageNumbers[i];
+			}
 		}
 		return pageNumbers;
 	},
@@ -285,6 +384,24 @@ var tbHelper = {
 		var reg = /(\/{0,2}\ ?)?(\[[\s\w\d]*\]\ ?)*([^\[]*)/;
 		var match = reg.exec(text);
 		return (!!match && !!match[match.length - 1])? match[match.length - 1].trim() : null;
+	},
+
+	replaceText: function(text, rules) {
+		for (var i = 0; i < rules.length; i++) {
+			var rule = rules[i];
+			var pattern;
+			if (!!rule.regex) {
+				var opt = '';
+				if (!!rule.regexG) opt += 'g';
+				if (!!rule.regexI) opt += 'i';
+				pattern = new RegExp(rule.pattern, opt);
+			}
+			else {
+				pattern = rule.pattern;
+			}
+			if (rule.active) text = text.replace(pattern, rule.to);
+		};
+		return text;
 	},
 
 	// true if skippable, null if panel separator, false if not skipped

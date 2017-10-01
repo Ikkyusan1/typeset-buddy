@@ -3,6 +3,7 @@
 Array.prototype.find||(Array.prototype.find=function(r){if(null===this)throw new TypeError("Array.prototype.find called on null or undefined");if("function"!=typeof r)throw new TypeError("predicate must be a function");for(var t,n=Object(this),e=n.length>>>0,o=arguments[1],i=0;i<e;i++)if(t=n[i],r.call(o,t,i,n))return t});
 
 Array.prototype.findIndex||(Array.prototype.findIndex=function(r){if(null===this)throw new TypeError("Array.prototype.findIndex called on null or undefined");if("function"!=typeof r)throw new TypeError("predicate must be a function");for(var n,e=Object(this),t=e.length>>>0,o=arguments[1],i=0;i<t;i++)if(n=e[i],r.call(o,n,i,e))return i;return-1});
+
 var tbHelper = {
 
 	emptyPages: ['blank', 'empty', 'no_text'],
@@ -125,6 +126,56 @@ var tbHelper = {
 		}
 	},
 
+	getDefaultTextReplaceRules: function(){
+		return [
+			{
+				id: this.uniqueId(),
+				pattern: '(‘|’)',
+				to: '\'',
+				regex: true,
+				regexG: true,
+				regexI: false,
+				active: true
+			},
+			{
+				id: this.uniqueId(),
+				pattern: '“|”',
+				to: '"',
+				regex: true,
+				regexG: true,
+				regexI: false,
+				active: true
+			},
+			{
+				id: this.uniqueId(),
+				pattern: '?!',
+				to: '!?',
+				regex: false,
+				regexG: true,
+				regexI: false,
+				active: true
+			},
+			{
+				id: this.uniqueId(),
+				pattern: '\\.{3,}',
+				to: '...',
+				regex: true,
+				regexG: true,
+				regexI: false,
+				active: true
+			},
+			{
+				id: this.uniqueId(),
+				pattern: '…',
+				to: '...',
+				regex: true,
+				regexG: true,
+				regexI: false,
+				active: true
+			}
+		];
+	},
+
 	getSylePropValues: function(prop) {
 		var values = [];
 		for (var i = 0; i < this.styleProps[prop].values.length; i++) {
@@ -133,44 +184,69 @@ var tbHelper = {
 		return values;
 	},
 
-	getDummyStyle: function(keyword, isDefault) {
+	uniqueId: function() {
+		var idStrLen = 16;
+		var idStr= '';
+		idStr += (new Date()).getTime().toString(36) + '_';
+		do {
+			idStr += (Math.floor((Math.random() * 35))).toString(36);
+		} while (idStr.length < idStrLen);
+		return (idStr);
+	},
+
+	getDummyStyle: function(keyword) {
 		var dummy = {};
-		for (var prop in tbHelper.styleProps) {
-			dummy[prop] = tbHelper.styleProps[prop].def;
+		for (var prop in this.styleProps) {
+			dummy[prop] = this.styleProps[prop].def;
 		}
 		if (!!keyword) dummy.keyword = keyword;
-		if (!!isDefault) dummy.default = true;
 		return dummy;
 	},
 
-	getDummyStyleSet: function() {
+	getDummyStyleSet: function(name) {
 		var dummy = {
+			id: this.uniqueId(),
 			name: null,
 			styles: [
-				this.getDummyStyle('default_style', true)
+				this.getDummyStyle('default_style')
 			]
 		};
+		if (!!name) dummy.name = name;
 		return dummy;
+	},
+
+	getDummyTextReplaceRule: function() {
+		return {
+			id: this.uniqueId(),
+			pattern: '',
+			to: '',
+			regex: false,
+			regexG: false,
+			regexI: false,
+			active: true
+		};
 	},
 
 	checkStyleSet: function(styleSet) {
 		var defaultStyleCount = 0;
+		if (styleSet.name == undefined || !!!styleSet.name || !!!styleSet.name.trim()) throw 'Styleset must have a name';
+		if (styleSet.name.length > 25) throw 'Styleset name must be less than 25 characters';
 		if (!!!styleSet.styles) throw 'No styles in set';
 		for (var i = 0; i < styleSet.styles.length; i++) {
 			if (!!!styleSet.styles[i].keyword) throw 'Some style keywords are undefined';
 			styleSet.styles[i].keyword = styleSet.styles[i].keyword.trim().toLowerCase();
-			if (styleSet.styles[i].default != undefined && styleSet.styles[i].default == true) {
-				++defaultStyleCount;
-				if (styleSet.styles[i].keyword != 'default_style') throw 'Default style must be named "default_style"';
-			}
+			if (styleSet.styles[i].keyword == 'default_style') defaultStyleCount++;
 		}
-		if (defaultStyleCount === 0) throw 'Missing default style';
-		if (defaultStyleCount > 1) throw 'Only one default style allowed';
+		if (defaultStyleCount === 0) throw 'Missing default_style';
+		if (defaultStyleCount > 1) throw 'Only one default_style allowed';
 		styleSet.styles.sort(function(a, b) {
 			if (a.keyword < b.keyword) return -1;
 			if (a.keyword > b.keyword) return 1;
 			return 0;
 		});
+		for (var i = 0; i < styleSet.styles.length; i++) {
+			if (styleSet.styles[i+1] != undefined && styleSet.styles[i].keyword == styleSet.styles[i+1].keyword) throw 'The styleset contains duplicate style keywords';
+		}
 		// force default values if undefined
 		for (var i = 0; i < styleSet.styles.length; i++) {
 			styleSet.styles[i] = this.cleanStyle(styleSet.styles[i]);
@@ -178,10 +254,28 @@ var tbHelper = {
 	},
 
 	cleanStyle: function(style) {
-		for (var prop in tbHelper.styleProps) {
-			if (style[prop] == undefined || style[prop] === null) style[prop] = tbHelper.styleProps[prop].def;
+		for (var prop in this.styleProps) {
+			if (style[prop] == undefined || style[prop] === null) style[prop] = this.styleProps[prop].def;
 		}
 		return style;
+	},
+
+	cleanTextReplaceRules: function(rules) {
+		var tmpRules = [];
+		for (var i = 0; i < rules.length; i++) {
+			var tmpRule = this.getDummyTextReplaceRule();
+			for (var prop in tmpRule) {
+				if (prop != 'id') {
+					if ((prop == 'pattern' || prop == 'to') && rules[i][prop] == undefined) throw prop + ' is missing';
+					if (prop == 'active' && rules[i][prop] == undefined) tmpRule[prop] = true;
+					else {
+						tmpRule[prop] = (rules[i][prop] == undefined)? false : rules[i][prop];
+					}
+				}
+			}
+			tmpRules.push(tmpRule);
+		}
+		return tmpRules;
 	},
 
 	getStyleFromStyleSet: function(set, keyword) {
@@ -211,10 +305,16 @@ var tbHelper = {
 		var pageNumbers = [];
 		var regex = /\b([\d-]{3,9})#/g;
 		var match;
-		while((match = regex.exec(text)) !== null) {
+		while ((match = regex.exec(text)) !== null) {
 			// failsafe to avoid infinite loops with zero-width matches
 			if (match.index === regex.lastIndex) regex.lastIndex++;
 			pageNumbers.push(match[1]);
+		}
+		pageNumbers.sort();
+		for (var i = 0; i < pageNumbers.length -1; i++) {
+			if (pageNumbers[i] == pageNumbers[i+1]) {
+				throw 'Duplicate page number: ' + pageNumbers[i];
+			}
 		}
 		return pageNumbers;
 	},
@@ -292,6 +392,24 @@ var tbHelper = {
 		return (!!match && !!match[match.length - 1])? match[match.length - 1].trim() : null;
 	},
 
+	replaceText: function(text, rules) {
+		for (var i = 0; i < rules.length; i++) {
+			var rule = rules[i];
+			var pattern;
+			if (!!rule.regex) {
+				var opt = '';
+				if (!!rule.regexG) opt += 'g';
+				if (!!rule.regexI) opt += 'i';
+				pattern = new RegExp(rule.pattern, opt);
+			}
+			else {
+				pattern = rule.pattern;
+			}
+			if (rule.active) text = text.replace(pattern, rule.to);
+		};
+		return text;
+	},
+
 	// true if skippable, null if panel separator, false if not skipped
 	skipThisLine: function(text, panelSeparator) {
 		if (!!!text) return true;
@@ -326,13 +444,17 @@ var tb = angular.module('tb', [
 	'ngToast',
 	'angular-clipboard'
 ]);
+
 tb.constant('CONF', {
 	appName: 'typeset_buddy', // will be replaced by package.json name when compiled
 	debug: false,	// will be true when compiled for dev environment, false otherwise
-	version: '0.1.11' // will be replaced when compiled
+	version: '0.2.0' // will be replaced when compiled
 });
-tb.config(['$localStorageProvider', 'ngToastProvider',
-	function($localStorageProvider, ngToastProvider) {
+
+tb.config(['$compileProvider', '$localStorageProvider', 'ngToastProvider', 'CONF',
+	function($compileProvider, $localStorageProvider, ngToastProvider, CONF) {
+
+		$compileProvider.debugInfoEnabled(CONF.debug);
 
 		$localStorageProvider.setKeyPrefix('tb_');
 
@@ -357,6 +479,7 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 			'polyfills',
 			'tb_helper',
 		];
+
 		let extensionPath = $rootScope.CSI.getSystemPath(SystemPath.EXTENSION) + '/jsx/';
 		for (let i = 0; i < JSXs.length; i++){
 			let jsxFile =  extensionPath + JSXs[i] +'.jsx';
@@ -429,6 +552,7 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 
 	}
 ]);
+
 tb.config(['$stateProvider', '$urlRouterProvider', '$localStorageProvider',
 	function($stateProvider, $urlRouterProvider, $localStorageProvider) {
 
@@ -460,14 +584,14 @@ tb.config(['$stateProvider', '$urlRouterProvider', '$localStorageProvider',
 	}
 ]);
 
-tb.controller('AppCtrl', ['$scope', '$localStorage', '$uibModal', 'Utils',
-	function($scope, $localStorage, $uibModal, Utils) {
+tb.controller('AppCtrl', ['$scope', 'SettingsService', 'Utils',
+	function($scope, SettingsService, Utils) {
 
 		$scope.resetLocalStorage = function() {
 			Utils.showConfirmDialog('Are you sure you reset the localstorage? Every style set will be deleted.')
 			.then(
 				function() {
-					$localStorage.$reset();
+					SettingsService.reset();
 				},
 				function() {}
 			);
@@ -492,7 +616,41 @@ tb.controller('AppCtrl', ['$scope', '$localStorage', '$uibModal', 'Utils',
 	}
 ]);
 
+tb.factory('SettingsService', ['$rootScope', '$localStorage', '$q',
+	function($rootScope, $localStorage, $q) {
+		var self = this;
 
+		self.init = function() {
+			$rootScope.log('$localStorage', $localStorage);
+			if (!!!$localStorage.styleSets) {
+				$localStorage.styleSets = [tbHelper.getDummyStyleSet('Default set')];
+				$localStorage.lastOpenedStyleSet = $localStorage.styleSets[0].id;
+			}
+			if (!angular.isDefined($localStorage.panelSeparator)) self.setting('panelSeparator', '–');
+			if (!angular.isDefined($localStorage.useLayerGroups)) self.setting('useLayerGroups', true);
+			if (!angular.isDefined($localStorage.mergeBubbles)) self.setting('mergeBubbles', false);
+			if (!angular.isDefined($localStorage.lastOpenedScript)) self.setting('lastOpenedScript', '');
+			if (!angular.isDefined($localStorage.textReplace)) self.setting('textReplace', false);
+			if (!angular.isDefined($localStorage.textReplaceRules))
+				self.setting('textReplaceRules', tbHelper.getDefaultTextReplaceRules());
+		};
+
+		self.setting = function(setting, val) {
+			if (angular.isDefined(val)) $localStorage[setting] = val;
+			return $localStorage[setting];
+		};
+
+		self.reset = function(){
+			$localStorage.$reset();
+			self.init();
+			location.reload();
+		};
+
+		self.init();
+
+		return self;
+	}
+]);
 
 
 tb.factory('themeManager', ['$rootScope', 'Utils',
@@ -539,8 +697,6 @@ tb.factory('themeManager', ['$rootScope', 'Utils',
 		return self;
 	}
 ]);
-
-
 
 tb.factory('Utils', ['$uibModal',
 	function($uibModal) {
@@ -658,6 +814,7 @@ tb.factory('Utils', ['$uibModal',
 		return self;
 	}
 ]);
+
 tb.config(['$stateProvider',
 	function($stateProvider) {
 		$stateProvider
@@ -677,8 +834,9 @@ tb.config(['$stateProvider',
 		});
 	}
 ]);
-tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Utils', 'ngToast', '$timeout', 'clipboard',
-	function($scope, ScriptService, StylesService, Utils, ngToast, $timeout, clipboard) {
+
+tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', 'StylesService', 'Utils', 'ngToast', '$timeout', 'clipboard',
+	function($scope, SettingsService, ScriptService, StylesService, Utils, ngToast, $timeout, clipboard) {
 
 		$scope.reset = function() {
 			$scope.filename = '';
@@ -690,9 +848,10 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 			$scope.rawBubbles = '';
 			$scope.bubbles = [];
 			$scope.pageStyle = '';
-			$scope.panelSeparator = ScriptService.setting('panelSeparator');
-			$scope.useLayerGroups = ScriptService.setting('useLayerGroups');
-			$scope.mergeBubbles = ScriptService.setting('mergeBubbles');
+			$scope.panelSeparator = SettingsService.setting('panelSeparator');
+			$scope.useLayerGroups = SettingsService.setting('useLayerGroups');
+			$scope.mergeBubbles = SettingsService.setting('mergeBubbles');
+			$scope.textReplace = SettingsService.setting('textReplace');
 			$scope.styleSet = StylesService.getStyleSet();
 			$scope.selectedStyleset = $scope.styleSet.id;
 		};
@@ -704,77 +863,90 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 			}
 		};
 
-		$scope.loadScript = function(filepath, page, silent) {
-			let result = window.cep.fs.readFile(filepath);
-			if (result.err === 0) {
-				ScriptService.setting('lastOpenedScript', filepath);
-				$scope.filename = Utils.extractFilename(filepath);
-				$scope.scriptContent = result.data;
-				$scope.pageNumbers = ScriptService.getPageNumbers($scope.scriptContent);
-				if ($scope.pageNumbers.length > 0) {
-					if (!!!silent) {
-						ngToast.create({className: 'info', content: $scope.pageNumbers.length + ' page(s) found in file'});
-						$scope.selectedPage = $scope.pageNumbers[0];
+		$scope.loadScript = function(filepath, page, autoloadPage) {
+			try {
+				let result = window.cep.fs.readFile(filepath, cep.encoding.UTF8);
+				if (result.err === 0) {
+					SettingsService.setting('lastOpenedScript', filepath);
+					$scope.filename = Utils.extractFilename(filepath);
+					$scope.scriptContent = result.data;
+					$scope.pageNumbers = tbHelper.getPageNumbers($scope.scriptContent);
+					if ($scope.pageNumbers.length > 0) {
+						if (!!!autoloadPage || page == null) {
+							ngToast.create({className: 'info', content: $scope.pageNumbers.length + ' page(s) found in file'});
+							$scope.selectedPage = $scope.pageNumbers[0];
+						}
+						else {
+							$scope.selectedPage = page;
+							$scope.loadPage($scope.selectedPage);
+						}
+
 					}
-					if (page != null) {
-						$scope.selectedPage = page;
+					else {
+						throw 'Did not find any page number in the translation script';
 					}
 				}
 				else {
-					ngToast.create({className: 'info', content: 'Did not find any page number in the script'});
-					ScriptService.setting('lastOpenedScript', null);
-					ScriptService.setting('lastOpenedPage', null);
-					$scope.reset();
+					throw 'Could not open translation script';
 				}
 			}
-			else {
-				ScriptService.setting('lastOpenedScript', null);
-				ScriptService.setting('lastOpenedPage', null);
+			catch (e) {
+				SettingsService.setting('lastOpenedScript', null);
+				SettingsService.setting('lastOpenedPage', null);
 				$scope.reset();
-				ngToast.create({className: 'danger', content: 'Could not read the file'});
+				ngToast.create({className: 'danger', content: e});
+			}
+		};
+
+		$scope.reloadScript = function() {
+			if (!!SettingsService.setting('lastOpenedScript')) {
+				$scope.loadScript(SettingsService.setting('lastOpenedScript'), SettingsService.setting('lastOpenedPage'), true);
 			}
 		};
 
 		$scope.setting = function(setting, val) {
-			$scope[setting] = ScriptService.setting(setting, val);
+			$scope[setting] = SettingsService.setting(setting, val);
 		};
 
 		$scope.loadPage = function(pageNumber) {
 			if (angular.isDefined(pageNumber) && pageNumber != null && !Utils.isEmpty($scope.scriptContent)) {
-				$scope.pageScript = ScriptService.loadPage($scope.scriptContent, pageNumber);
+				$scope.pageScript = tbHelper.loadPage($scope.scriptContent, pageNumber);
 				if ($scope.pageScript != null) {
-					let tmpPageStyle = ScriptService.getTextStyles($scope.pageScript[1], 'default_style')[0];
+					let tmpPageStyle = tbHelper.getTextStyles($scope.pageScript[1], 'default_style')[0];
 					$scope.pageStyle = ($scope.styleSet.styles.findIndex(function(one) { return one.keyword == tmpPageStyle; }) === -1)? {keyword: tmpPageStyle, inStyleSet: false} : {keyword: tmpPageStyle, inStyleSet: true};
 					$scope.$root.log('pageStyle', $scope.pageStyle);
-					$scope.pageNotes = ScriptService.getNotes($scope.pageScript[1]);
+					$scope.pageNotes = tbHelper.getNotes($scope.pageScript[1]);
 					$scope.$root.log('pageNotes', $scope.pageNotes);
 					$scope.rawBubbles = $scope.pageScript[2];
 					$scope.bubbles = [];
 					$scope.$root.log('rawBubbles', $scope.rawBubbles);
-					if (ScriptService.pageContainsText($scope.rawBubbles)) {
+					if (tbHelper.pageContainsText($scope.rawBubbles)) {
 						$scope.$root.log('contains text');
 						let lines = [];
 						let previousStyle = $scope.pageStyle.keyword;
 						lines = $scope.rawBubbles.split('\n');
 						$scope.$root.log('lines', lines);
 						lines.forEach(function(line) {
-							let notes = ScriptService.getNotes(line);
-							let skipIt = ScriptService.skipThisLine(line);
+							let notes = tbHelper.getNotes(line);
+							let skipIt = tbHelper.skipThisLine(line, $scope.panelSeparator);
 							if (skipIt === false || !!notes) {
 								let bubble = {
-									text: ScriptService.cleanLine(line),
+									text: tbHelper.cleanLine(line),
 									styles: [],
 									multibubblePart: false,
 									notes: notes
 								};
 								let tmpStyles = [];
 								if (bubble.text) {
-									if (ScriptService.isMultiBubblePart(line)) {
-										tmpStyles = ScriptService.getTextStyles(line, previousStyle);
+									if ($scope.textReplace) {
+										bubble.text = tbHelper.replaceText(bubble.text, SettingsService.setting('textReplaceRules'));
+									}
+									if (tbHelper.isMultiBubblePart(line)) {
+										tmpStyles = tbHelper.getTextStyles(line, previousStyle);
 										bubble.multibubblePart = true;
 									}
 									else {
-										tmpStyles = ScriptService.getTextStyles(line, $scope.pageStyle.keyword);
+										tmpStyles = tbHelper.getTextStyles(line, $scope.pageStyle.keyword);
 									}
 									previousStyle = tmpStyles[0];
 									bubble.styles = tmpStyles.map(function(one) {
@@ -803,13 +975,13 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 							}
 						});
 					}
-					ScriptService.setting('lastOpenedPage', pageNumber);
+					SettingsService.setting('lastOpenedPage', pageNumber);
 					$scope.$root.log('bubbles', $scope.bubbles);
 				}
 				else {
 					ngToast.create({className: 'info', content: 'Could not find page ' + pageNumber + ' in file'});
 					$scope.selectedPage = null;
-					ScriptService.setting('lastOpenedPage', null);
+					SettingsService.setting('lastOpenedPage', null);
 					$scope.bubbles = [];
 				}
 			}
@@ -823,7 +995,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 					let idx = $scope.pageNumbers.findIndex(function(one) { return one == $scope.selectedPage; });
 					if (angular.isDefined($scope.pageNumbers[idx + inc])) {
 						$scope.selectedPage = $scope.pageNumbers[idx + inc];
-						ScriptService.setting('lastOpenedPage', $scope.selectedPage);
+						SettingsService.setting('lastOpenedPage', $scope.selectedPage);
 					}
 				}
 				else {
@@ -872,8 +1044,8 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 
 		// autoload last openedscript
 		$timeout(function() {
-			if (!!ScriptService.setting('lastOpenedScript')) {
-				$scope.loadScript(ScriptService.setting('lastOpenedScript'), ScriptService.setting('lastOpenedPage'), true);
+			if (!!SettingsService.setting('lastOpenedScript')) {
+				$scope.loadScript(SettingsService.setting('lastOpenedScript'), SettingsService.setting('lastOpenedPage'), true);
 			}
 		}, 300);
 
@@ -898,67 +1070,15 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 
 	}
 ]);
-tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService',
-	function($rootScope, $localStorage, $q, StylesService) {
+
+tb.factory('ScriptService', ['$rootScope', 'SettingsService', '$q',
+	function($rootScope, SettingsService, $q) {
 		var self = this;
-
-		self.init = function() {
-			$rootScope.log('$localStorage', $localStorage);
-			if (!angular.isDefined($localStorage.panelSeparator)) self.setting('panelSeparator', '–');
-			if (!angular.isDefined($localStorage.useLayerGroups)) self.setting('useLayerGroups', true);
-			if (!angular.isDefined($localStorage.mergeBubbles)) self.setting('mergeBubbles', false);
-			if (!angular.isDefined($localStorage.lastOpenedScript)) self.setting('lastOpenedScript', '');
-		};
-
-		self.setting = function(setting, val) {
-			if (angular.isDefined(val)) $localStorage[setting] = val;
-			return $localStorage[setting];
-		};
-
-		self.getPageNumbers = function(text) {
-			return tbHelper.getPageNumbers(text);
-		};
-
-		// pageNumber can be a double page, like "006-007"
-		// returns array of matches or null
-		// [0]: the whole match
-		// [1]: undefined or a page note. Mainly used to apply a style to a whole page, like [italic]
-		// [2]: the page's bubbles.
-		// [3]: start of the next page or end
-		self.loadPage = function(text, pageNumber) {
-			let res = tbHelper.loadPage(text, pageNumber);
-			$rootScope.log('page Match', res);
-			return res;
-		};
-
-		self.pageContainsText = function(text) {
-			return tbHelper.pageContainsText(text);
-		};
-
-		self.getTextStyles = function(text, fallback) {
-			return tbHelper.getTextStyles(text, fallback);
-		};
-
-		self.getNotes = function(text) {
-			return tbHelper.getNotes(text);
-		};
-
-		self.cleanLine = function(text) {
-			return tbHelper.cleanLine(text);
-		};
-
-		self.skipThisLine = function(text) {
-			return tbHelper.skipThisLine(text, self.setting('panelSeparator'));
-		};
-
-		self.isMultiBubblePart = function(text) {
-			return tbHelper.isMultiBubblePart(text);
-		};
 
 		self.maybeTypesetToPath = function(typesetObj) {
 			let def = $q.defer();
 			let tmpObj = angular.copy(typesetObj);
-			tmpObj.useLayerGroups = self.setting('useLayerGroups');
+			tmpObj.useLayerGroups = SettingsService.setting('useLayerGroups');
 			$rootScope.log('typesetObj', tmpObj);
 			$rootScope.CSI.evalScript('tryExec("getSingleRectangleSelectionDimensions");', function(res) {
 				$rootScope.log('maybeTypesetToPath return', res);
@@ -1010,10 +1130,10 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 			return def.promise;
 		};
 
-		self.init();
 		return self;
 	}
 ]);
+
 tb.config(['$stateProvider',
 	function($stateProvider) {
 		$stateProvider
@@ -1033,6 +1153,7 @@ tb.config(['$stateProvider',
 		});
 	}
 ]);
+
 tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToast', 'Utils', '$uibModal',
 	function($scope, StylesService, ScriptService, ngToast, Utils, $uibModal) {
 
@@ -1062,7 +1183,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 				delete styleSet.id;
 				let result = window.cep.fs.showSaveDialogEx('Export styleset', undefined, Utils.getValidFileSuffix('*.json'), styleSet.name + '_styleset.json', undefined, 'Export style set', undefined);
 				if (!!result.data) {
-					let writeResult = window.cep.fs.writeFile(result.data, JSON.stringify(styleSet, null, 2));
+					let writeResult = window.cep.fs.writeFile(result.data, JSON.stringify(styleSet, null, 2), cep.encoding.UTF8);
 					if (writeResult.err != 0) {
 						ngToast.create({className: 'danger', content: 'Failed to write a file at the destination:' + result.data + ', error code:' + writeResult.err});
 					}
@@ -1279,8 +1400,6 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 	}
 ]);
 
-
-
 tb.directive('antialiasSelector', ['StylesService',
 	function(StylesService) {
 		return {
@@ -1299,6 +1418,7 @@ tb.directive('antialiasSelector', ['StylesService',
 		};
 	}
 ]);
+
 tb.directive('capitalizationSelector', ['StylesService',
 	function(StylesService) {
 		return {
@@ -1317,6 +1437,7 @@ tb.directive('capitalizationSelector', ['StylesService',
 		};
 	}
 ]);
+
 tb.directive('fontSelector', ['StylesService',
 	function(StylesService) {
 		return {
@@ -1340,6 +1461,7 @@ tb.directive('fontSelector', ['StylesService',
 		};
 	}
 ]);
+
 tb.directive('justificationSelector', ['StylesService',
 	function(StylesService) {
 		return {
@@ -1358,6 +1480,7 @@ tb.directive('justificationSelector', ['StylesService',
 		};
 	}
 ]);
+
 tb.directive('kerningSelector', ['StylesService',
 	function(StylesService) {
 		return {
@@ -1376,6 +1499,7 @@ tb.directive('kerningSelector', ['StylesService',
 		};
 	}
 ]);
+
 tb.directive('tbStylePreset', [
 	function() {
 		return {
@@ -1396,6 +1520,7 @@ tb.directive('tbStylePreset', [
 		};
 	}
 ]);
+
 tb.directive('tbStyleSelector', ['StylesService',
 	function(StylesService) {
 		return {
@@ -1431,6 +1556,7 @@ tb.directive('tbStyleSelector', ['StylesService',
 		};
 	}
 ]);
+
 tb.directive('stylesetSelector', ['StylesService',
 	function(StylesService) {
 		return {
@@ -1439,7 +1565,7 @@ tb.directive('stylesetSelector', ['StylesService',
 				selectedValue: '='
 			},
 			replace: true,
-			template: '<select ng-options="choice.id as choice.name for choice in choices" ng-model="selectedValue"></select>',
+			template: '<select ng-options="choice.id as choice.name for choice in choices | orderBy: \'name\'" ng-model="selectedValue"></select>',
 			link: function($scope, $elem, $attrs) {
 				$scope.choices = [];
 
@@ -1456,10 +1582,9 @@ tb.directive('stylesetSelector', ['StylesService',
 		};
 	}
 ]);
+
 tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngToast',
 	function($rootScope, $localStorage, $q, Utils, ngToast) {
-		// localStorage location
-		// mac : ~/Library/Caches/CSXS/cep_cache/
 
 		var self = this;
 
@@ -1484,32 +1609,23 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 		};
 
 		self.cleanAndCheckStyleSet = function(styleSet) {
-			if (!angular.isDefined(styleSet.name) || !!!styleSet.name || !!!styleSet.name.trim()) throw 'Need a name';
-			if (styleSet.name.length > 25) throw 'Name must be less than 25 characters';
 			tbHelper.checkStyleSet(styleSet);
-			let idx = $localStorage.styleSets.findIndex(function(one) { return one.id == styleSet.id; });
+			let idx = (!angular.isDefined(styleSet.id))? -1 : $localStorage.styleSets.findIndex(function(one) { return one.id == styleSet.id; });
 			let existingId = -1;
 			if (idx > -1) existingId = $localStorage.styleSets[idx].id;
 			for (let i = 0; i < $localStorage.styleSets.length; i++) {
 				if ($localStorage.styleSets[i].name.trim().toLowerCase() == styleSet.name.trim().toLowerCase() && $localStorage.styleSets[i].id != existingId) throw 'A styleset with the same name already exists';
 			}
-			for (let i = 0; i < styleSet.styles.length; i++) {
-				if (angular.isDefined(styleSet.styles[i+1]) && styleSet.styles[i].keyword == styleSet.styles[i+1].keyword) throw 'The styleset contains duplicate style keywords';
-			}
 		};
 
 		self.saveStyleSet = function(styleSet) {
 			self.cleanAndCheckStyleSet(styleSet);
+			if (!angular.isDefined(styleSet.id)) styleSet.id = tbHelper.uniqueId();
 			let idx = $localStorage.styleSets.findIndex(function(one) { return one.id == styleSet.id; });
 			if (idx > -1) {
 				$localStorage.styleSets[idx] = angular.copy(styleSet);
 			}
 			else {
-				let maxId = -1;
-				$localStorage.styleSets.forEach(function(one) {
-					if (one.id > maxId) maxId = one.id;
-				});
-				styleSet.id = ++maxId;
 				$localStorage.styleSets.push(angular.copy(styleSet));
 			}
 			$localStorage.lastOpenedStyleSet = styleSet.id;
@@ -1519,7 +1635,6 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 		self.getStyleSet = function(id) {
 			let styleSet = undefined;
 			if (!angular.isDefined(id)) {
-				// attempt to load last styleset
 				if (angular.isDefined($localStorage.lastOpenedStyleSet)) {
 					styleSet = self.getStyleSet($localStorage.lastOpenedStyleSet);
 				}
@@ -1541,7 +1656,7 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 
 		self.deleteStyleSet = function(id) {
 			let idx = $localStorage.styleSets.findIndex(function(one) { return one.id == id; });
-			if ($localStorage.styleSets[idx].id === 0) {
+			if ($localStorage.styleSets[idx].name == 'Default set') {
 				ngToast.create({className: 'danger', content: 'Cannot delete default style set'});
 				return false;
 			}
@@ -1597,14 +1712,100 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 			return def.promise;
 		};
 
-		// init
-		if (!!!$localStorage.styleSets) {
-			$localStorage.styleSets = [];
-			let defaultSet = tbHelper.getDummyStyleSet();
-			defaultSet.name = 'Default set';
-			self.saveStyleSet(defaultSet);
-		}
-
 		return self;
+	}
+]);
+
+tb.config(['$stateProvider',
+	function($stateProvider) {
+		$stateProvider
+		.state('text_replacer', {
+			url: 'text_replacer',
+			parent: 'app',
+			nav: true,
+			label: 'Text Replace',
+			order: 3,
+			views: {
+				app: {
+					controller: 'TextReplacerCtrl',
+					templateUrl: 'text_replacer.tpl.html',
+				}
+			}
+		});
+	}
+]);
+
+tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'ngToast', '$timeout', 'clipboard',
+	function($scope, SettingsService, Utils, ngToast, $timeout, clipboard) {
+
+		$scope.textReplaceRules = SettingsService.setting('textReplaceRules');
+
+		$scope.moveRule = function(rule, up) {
+			let mod = (!!up)? -1 : 1;
+			let idx = $scope.textReplaceRules.findIndex(function(one) { return one.id == rule.id; });
+			if (angular.isDefined($scope.textReplaceRules[idx + mod])) {
+				$scope.textReplaceRules.splice(idx, 1);
+				$scope.textReplaceRules.splice(idx + mod, 0, rule);
+			}
+		};
+
+		$scope.addRule = function() {
+			$scope.textReplaceRules.push(angular.copy(tbHelper.getDummyTextReplaceRule()));
+		};
+
+		$scope.removeRule = function(rule) {
+			let idx = $scope.textReplaceRules.findIndex(function(one) { return one.id == rule.id; });
+			$scope.textReplaceRules.splice(idx, 1);
+		};
+
+		$scope.exportRules = function() {
+			let result = window.cep.fs.showSaveDialogEx('Export text replace rules', undefined, Utils.getValidFileSuffix('*.json'), 'text_replace_rules.json', undefined, 'Export text replace rules', undefined);
+			if (!!result.data) {
+				let tmpRules = angular.copy($scope.textReplaceRules);
+				tmpRules.forEach(function(one) { delete one.id; });
+				let obj = {textReplaceRules: tmpRules};
+				let writeResult = window.cep.fs.writeFile(result.data, JSON.stringify(obj, null, 2), cep.encoding.UTF8);
+				if (writeResult.err != 0) {
+					ngToast.create({className: 'danger', content: 'Failed to write a file at the destination:' + result.data + ', error code:' + writeResult.err});
+				}
+			}
+		};
+
+		$scope.importRules = function() {
+			let file = window.cep.fs.showOpenDialogEx(false, false, 'Select rules file', '', Utils.getValidFileSuffix('*.json'), undefined, false);
+			if (angular.isDefined(file.data[0])) {
+				let result = window.cep.fs.readFile(file.data[0]);
+				if (result.err === 0) {
+					try{
+						let tmp = JSON.parse(result.data);
+						$scope.log('parsed', tmp);
+						let tmpRules;
+						if (angular.isDefined(tmp.textReplaceRules)) {
+							tmpRules = tmp.textReplaceRules;
+						}
+						else if (Array.isArray(tmp)) {
+							tmpRules = tmp;
+						}
+						if (!angular.isDefined(tmp)) throw 'The file does not seem to contain any rule';
+						$scope.textReplaceRules = $scope.textReplaceRules.concat(tbHelper.cleanTextReplaceRules(tmpRules));
+					}
+					catch (e) {
+						ngToast.create({className: 'danger', content: 'Import error: ' + e});
+					}
+				}
+				else {
+					ngToast.create({className: 'danger', content: 'Could not read the file'});
+				}
+			}
+		};
+
+		$scope.appendDefaults = function() {
+			$scope.textReplaceRules = $scope.textReplaceRules.concat(tbHelper.getDefaultTextReplaceRules());
+		};
+
+		$scope.$watch('textReplaceRules', function(newVal, oldVal) {
+			SettingsService.setting('textReplaceRules', $scope.textReplaceRules);
+		}, true);
+
 	}
 ]);

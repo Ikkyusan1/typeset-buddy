@@ -76,6 +76,12 @@ Screw this [[censored]]
 [nib] Screw that [[censored_too]]
 
 
+011# [[text replacement test]]
+This line contains smart quotes: ‘ ’ “ ”.
+Here is a question and exclamation mark: ?!
+Ellipsis: …
+Too many dots: .......
+
 
 END#
 
