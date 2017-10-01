@@ -6,7 +6,7 @@ tb.directive('stylesetSelector', ['StylesService',
 				selectedValue: '='
 			},
 			replace: true,
-			template: '<select ng-options="choice.id as choice.name for choice in choices" ng-model="selectedValue"></select>',
+			template: '<select ng-options="choice.id as choice.name for choice in choices | orderBy: \'name\'" ng-model="selectedValue"></select>',
 			link: function($scope, $elem, $attrs) {
 				$scope.choices = [];
 
