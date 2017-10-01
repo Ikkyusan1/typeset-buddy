@@ -1,0 +1,40 @@
+{
+  "textReplaceRules": [
+    {
+      "pattern": "(‘|’)",
+      "to": "'",
+      "regex": true,
+      "regexG": true,
+      "regexI": false,
+      "active": true
+    },
+    {
+      "pattern": "“|”",
+      "to": "\"",
+      "regex": true,
+      "regexG": true,
+      "regexI": false,
+      "active": true
+    },
+    {
+      "pattern": "?!",
+      "to": "!?"
+    },
+    {
+      "pattern": "\\.{3,}",
+      "to": "...",
+      "regex": true,
+      "regexG": true,
+      "regexI": false,
+      "active": true
+    },
+    {
+      "pattern": "…",
+      "to": "...",
+      "regex": true,
+      "regexG": true,
+      "regexI": false,
+      "active": true
+    }
+  ]
+}
