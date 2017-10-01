@@ -1,5 +1,7 @@
-tb.config(['$localStorageProvider', 'ngToastProvider',
-	function($localStorageProvider, ngToastProvider) {
+tb.config(['$compileProvider', '$localStorageProvider', 'ngToastProvider', 'CONF',
+	function($compileProvider, $localStorageProvider, ngToastProvider, CONF) {
+
+		$compileProvider.debugInfoEnabled(CONF.debug);
 
 		$localStorageProvider.setKeyPrefix('tb_');
 
