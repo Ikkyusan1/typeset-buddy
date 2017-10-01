@@ -12,6 +12,7 @@ The extension will work on PS version 2015.5+. The standalone scripts should wor
 - typeset text in a selection marquee.
 - apply a style to selected text layers.
 - increase/decrease font size and autoresize selected layers (via button click or standalone script execution).
+- perform customizable text replacement.
 - automatically typeset psd files (via a standalone script).
 
 
@@ -35,6 +36,15 @@ The extension will work on PS version 2015.5+. The standalone scripts should wor
 If you just want to use the standalone scripts (for instance, if you don't have PS CC), only the "jsx" folder is necessary. You can copy (and rename) it wherever you want.
 
 
+## Potential issues :
+- Text encoding : the extension expects files encoded in UTF8. So to avoid encoding problems (accented characters, etc, ...), please encode your translation scripts and style set files in UTF8.
+- Beware of smart quotes and other exotic characters : some fonts don't have smart quotes (or tilde, ellipsis, etc...), resulting in missing glyphs or poor subsitutions when the text is inserted. If needed, use text replacement rules to change these characters to more regular ones. If you still have problems with smart quotes after that, you can disable them entirely in Photoshop's Preferences > Type.
+
+
+## Known limitations :
+- Font size adjustment using the extension's functions won't work correctly on text layers that have been "transformed". By "transformed", I mean text layers on which the textbox size has been changed using the transform controls (texbox size and text size is changed at the same time when doing so).
+
+
 ## Standalone scripts
 There's currently no practical way to associate keyboard shortcuts to an HTML extension (we can hijack keypress events, but only when the extension is displayed and focused). So, in order to allow the use of some basic functions without having to click on a button (or even having the extension opened, for that matter) I've added some standalone scripts. You can find them in the "jsx/" folder. The available scripts are :
 - tb_autoresize_selected_layers.jsx
@@ -50,8 +60,30 @@ This way you can create a Photoshop Action to run these scripts and associate a 
 
 
 ## TB Robot
-The tb_robot.jsx standalone script is designed to automatically typeset psd files. It won't put the text inside the bubbles, but it will create all the text layers and apply the relevant styles on them. If you don't have PS CC, look at the provided examples to create your stylesets. The robot has a button to export the expected style properties and the list of available fonts.
+The tb_robot.jsx standalone script is designed to automatically typeset psd files. It won't put the text inside the bubbles, but it will create all the text layers and apply the relevant styles on them. If you don't have PS CC, look at the provided example to create your stylesets. The robot has a button to export the expected style properties and their values, as well as the list of the fonts that are available on your system.
 Quick note : keep in mind that if several styles are defined for a bubble, the robot will use only the last one for the typesetting.
+
+
+## Style set format
+If you don't (or can't) use the TB Extension and have to create your style set files manually, the basic rules are :
+- it's a JSON file.
+- it must be encoded in UTF8.
+- the style set must have a name.
+- the style set must have an array of styles.
+- the style set must contain one (and only one) style with the keyword "default_style".
+- a style set can't have duplicate styles (in other words : can't have two styles with the same keyword).
+- the fontName property of each style actually corresponds to the font's postScriptName in Photoshop.
+
+
+## PSD file naming convention
+The files (aka the pages) must be numbered to be processed with TB Robot. The page number is the last part of the filename (before the extension, of course). It must be preceded with a space, or an hyphen, or an underscore. Double pages are allowed, their number is separated by an hyphen. Each page number is three or four digits long. e.g. :
+```
+your-awesome-book_009.psd
+your-awesome-book-010.psd
+your-awesome-book 011.psd
+your-awesome-book_012-013.psd
+your-super-long-book_2048-2049.psd
+```
 
 
 ## Translation script format
@@ -73,7 +105,7 @@ Quick note : keep in mind that if several styles are defined for a bubble, the r
 This is the first part of the multi-bubble.
 // This line corresponds to the second part of the multi-bubble.
 ```
-- When a page doesn't contain any text, or at least, nothing to be typesetted, you can make the script skip it using one of the empty page keywords (one of these: blank, empty, no_text). Between brackets, as usual. It must the first text of the page. Meaning, you can add a whole essay after that, it won't be typesetted.
+- When a page doesn't contain any text, or at least, nothing to be typesetted, you can make the script skip it using one of the empty page keywords (one of these: blank, empty, no_text). Between brackets, as usual. It must the first text of the page. Meaning, you can add a whole essay after that, it won't be taken into account.
 
 
 ### Styles and text type/placement
@@ -96,7 +128,7 @@ This bubble should be in italic. [italic]
 ```
 - A style can be defined for a whole page. In which case, add the style right after the page number :
 ```
-035# [shout]
+035# [bolditalic]
 All the bubbles will be written in "bolditalic style"
 ```
 - It is possible to override this "page style" by adding the style at the beginning or the end of the line.
