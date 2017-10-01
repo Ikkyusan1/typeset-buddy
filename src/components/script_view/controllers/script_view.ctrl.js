@@ -1,5 +1,5 @@
-tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Utils', 'ngToast', '$timeout', 'clipboard',
-	function($scope, ScriptService, StylesService, Utils, ngToast, $timeout, clipboard) {
+tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', 'StylesService', 'Utils', 'ngToast', '$timeout', 'clipboard',
+	function($scope, SettingsService, ScriptService, StylesService, Utils, ngToast, $timeout, clipboard) {
 
 		$scope.reset = function() {
 			$scope.filename = '';
@@ -11,9 +11,9 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 			$scope.rawBubbles = '';
 			$scope.bubbles = [];
 			$scope.pageStyle = '';
-			$scope.panelSeparator = ScriptService.setting('panelSeparator');
-			$scope.useLayerGroups = ScriptService.setting('useLayerGroups');
-			$scope.mergeBubbles = ScriptService.setting('mergeBubbles');
+			$scope.panelSeparator = SettingsService.setting('panelSeparator');
+			$scope.useLayerGroups = SettingsService.setting('useLayerGroups');
+			$scope.mergeBubbles = SettingsService.setting('mergeBubbles');
 			$scope.styleSet = StylesService.getStyleSet();
 			$scope.selectedStyleset = $scope.styleSet.id;
 		};
@@ -29,10 +29,10 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 			try {
 				let result = window.cep.fs.readFile(filepath, cep.encoding.UTF8);
 				if (result.err === 0) {
-					ScriptService.setting('lastOpenedScript', filepath);
+					SettingsService.setting('lastOpenedScript', filepath);
 					$scope.filename = Utils.extractFilename(filepath);
 					$scope.scriptContent = result.data;
-					$scope.pageNumbers = ScriptService.getPageNumbers($scope.scriptContent);
+					$scope.pageNumbers = tbHelper.getPageNumbers($scope.scriptContent);
 					if ($scope.pageNumbers.length > 0) {
 						if (!!!autoloadPage || page == null) {
 							ngToast.create({className: 'info', content: $scope.pageNumbers.length + ' page(s) found in file'});
@@ -53,59 +53,59 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 				}
 			}
 			catch (e) {
-				ScriptService.setting('lastOpenedScript', null);
-				ScriptService.setting('lastOpenedPage', null);
+				SettingsService.setting('lastOpenedScript', null);
+				SettingsService.setting('lastOpenedPage', null);
 				$scope.reset();
 				ngToast.create({className: 'danger', content: e});
 			}
 		};
 
 		$scope.reloadScript = function() {
-			if (!!ScriptService.setting('lastOpenedScript')) {
-				$scope.loadScript(ScriptService.setting('lastOpenedScript'), ScriptService.setting('lastOpenedPage'), true);
+			if (!!SettingsService.setting('lastOpenedScript')) {
+				$scope.loadScript(SettingsService.setting('lastOpenedScript'), SettingsService.setting('lastOpenedPage'), true);
 			}
 		};
 
 		$scope.setting = function(setting, val) {
-			$scope[setting] = ScriptService.setting(setting, val);
+			$scope[setting] = SettingsService.setting(setting, val);
 		};
 
 		$scope.loadPage = function(pageNumber) {
 			if (angular.isDefined(pageNumber) && pageNumber != null && !Utils.isEmpty($scope.scriptContent)) {
-				$scope.pageScript = ScriptService.loadPage($scope.scriptContent, pageNumber);
+				$scope.pageScript = tbHelper.loadPage($scope.scriptContent, pageNumber);
 				if ($scope.pageScript != null) {
-					let tmpPageStyle = ScriptService.getTextStyles($scope.pageScript[1], 'default_style')[0];
+					let tmpPageStyle = tbHelper.getTextStyles($scope.pageScript[1], 'default_style')[0];
 					$scope.pageStyle = ($scope.styleSet.styles.findIndex(function(one) { return one.keyword == tmpPageStyle; }) === -1)? {keyword: tmpPageStyle, inStyleSet: false} : {keyword: tmpPageStyle, inStyleSet: true};
 					$scope.$root.log('pageStyle', $scope.pageStyle);
-					$scope.pageNotes = ScriptService.getNotes($scope.pageScript[1]);
+					$scope.pageNotes = tbHelper.getNotes($scope.pageScript[1]);
 					$scope.$root.log('pageNotes', $scope.pageNotes);
 					$scope.rawBubbles = $scope.pageScript[2];
 					$scope.bubbles = [];
 					$scope.$root.log('rawBubbles', $scope.rawBubbles);
-					if (ScriptService.pageContainsText($scope.rawBubbles)) {
+					if (tbHelper.pageContainsText($scope.rawBubbles)) {
 						$scope.$root.log('contains text');
 						let lines = [];
 						let previousStyle = $scope.pageStyle.keyword;
 						lines = $scope.rawBubbles.split('\n');
 						$scope.$root.log('lines', lines);
 						lines.forEach(function(line) {
-							let notes = ScriptService.getNotes(line);
-							let skipIt = ScriptService.skipThisLine(line);
+							let notes = tbHelper.getNotes(line);
+							let skipIt = tbHelper.skipThisLine(line, $scope.panelSeparator);
 							if (skipIt === false || !!notes) {
 								let bubble = {
-									text: ScriptService.cleanLine(line),
+									text: tbHelper.cleanLine(line),
 									styles: [],
 									multibubblePart: false,
 									notes: notes
 								};
 								let tmpStyles = [];
 								if (bubble.text) {
-									if (ScriptService.isMultiBubblePart(line)) {
-										tmpStyles = ScriptService.getTextStyles(line, previousStyle);
+									if (tbHelper.isMultiBubblePart(line)) {
+										tmpStyles = tbHelper.getTextStyles(line, previousStyle);
 										bubble.multibubblePart = true;
 									}
 									else {
-										tmpStyles = ScriptService.getTextStyles(line, $scope.pageStyle.keyword);
+										tmpStyles = tbHelper.getTextStyles(line, $scope.pageStyle.keyword);
 									}
 									previousStyle = tmpStyles[0];
 									bubble.styles = tmpStyles.map(function(one) {
@@ -134,13 +134,13 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 							}
 						});
 					}
-					ScriptService.setting('lastOpenedPage', pageNumber);
+					SettingsService.setting('lastOpenedPage', pageNumber);
 					$scope.$root.log('bubbles', $scope.bubbles);
 				}
 				else {
 					ngToast.create({className: 'info', content: 'Could not find page ' + pageNumber + ' in file'});
 					$scope.selectedPage = null;
-					ScriptService.setting('lastOpenedPage', null);
+					SettingsService.setting('lastOpenedPage', null);
 					$scope.bubbles = [];
 				}
 			}
@@ -154,7 +154,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 					let idx = $scope.pageNumbers.findIndex(function(one) { return one == $scope.selectedPage; });
 					if (angular.isDefined($scope.pageNumbers[idx + inc])) {
 						$scope.selectedPage = $scope.pageNumbers[idx + inc];
-						ScriptService.setting('lastOpenedPage', $scope.selectedPage);
+						SettingsService.setting('lastOpenedPage', $scope.selectedPage);
 					}
 				}
 				else {
@@ -203,8 +203,8 @@ tb.controller('ScriptViewCtrl', ['$scope', 'ScriptService', 'StylesService', 'Ut
 
 		// autoload last openedscript
 		$timeout(function() {
-			if (!!ScriptService.setting('lastOpenedScript')) {
-				$scope.loadScript(ScriptService.setting('lastOpenedScript'), ScriptService.setting('lastOpenedPage'), true);
+			if (!!SettingsService.setting('lastOpenedScript')) {
+				$scope.loadScript(SettingsService.setting('lastOpenedScript'), SettingsService.setting('lastOpenedPage'), true);
 			}
 		}, 300);
 

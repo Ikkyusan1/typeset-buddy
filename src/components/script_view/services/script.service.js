@@ -1,64 +1,11 @@
-tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService',
-	function($rootScope, $localStorage, $q, StylesService) {
+tb.factory('ScriptService', ['$rootScope', 'SettingsService', '$q',
+	function($rootScope, SettingsService, $q) {
 		var self = this;
-
-		self.init = function() {
-			$rootScope.log('$localStorage', $localStorage);
-			if (!angular.isDefined($localStorage.panelSeparator)) self.setting('panelSeparator', '–');
-			if (!angular.isDefined($localStorage.useLayerGroups)) self.setting('useLayerGroups', true);
-			if (!angular.isDefined($localStorage.mergeBubbles)) self.setting('mergeBubbles', false);
-			if (!angular.isDefined($localStorage.lastOpenedScript)) self.setting('lastOpenedScript', '');
-		};
-
-		self.setting = function(setting, val) {
-			if (angular.isDefined(val)) $localStorage[setting] = val;
-			return $localStorage[setting];
-		};
-
-		self.getPageNumbers = function(text) {
-			return tbHelper.getPageNumbers(text);
-		};
-
-		// pageNumber can be a double page, like "006-007"
-		// returns array of matches or null
-		// [0]: the whole match
-		// [1]: undefined or a page note. Mainly used to apply a style to a whole page, like [italic]
-		// [2]: the page's bubbles.
-		// [3]: start of the next page or end
-		self.loadPage = function(text, pageNumber) {
-			let res = tbHelper.loadPage(text, pageNumber);
-			$rootScope.log('page Match', res);
-			return res;
-		};
-
-		self.pageContainsText = function(text) {
-			return tbHelper.pageContainsText(text);
-		};
-
-		self.getTextStyles = function(text, fallback) {
-			return tbHelper.getTextStyles(text, fallback);
-		};
-
-		self.getNotes = function(text) {
-			return tbHelper.getNotes(text);
-		};
-
-		self.cleanLine = function(text) {
-			return tbHelper.cleanLine(text);
-		};
-
-		self.skipThisLine = function(text) {
-			return tbHelper.skipThisLine(text, self.setting('panelSeparator'));
-		};
-
-		self.isMultiBubblePart = function(text) {
-			return tbHelper.isMultiBubblePart(text);
-		};
 
 		self.maybeTypesetToPath = function(typesetObj) {
 			let def = $q.defer();
 			let tmpObj = angular.copy(typesetObj);
-			tmpObj.useLayerGroups = self.setting('useLayerGroups');
+			tmpObj.useLayerGroups = SettingsService.setting('useLayerGroups');
 			$rootScope.log('typesetObj', tmpObj);
 			$rootScope.CSI.evalScript('tryExec("getSingleRectangleSelectionDimensions");', function(res) {
 				$rootScope.log('maybeTypesetToPath return', res);
@@ -110,7 +57,6 @@ tb.factory('ScriptService', ['$rootScope', '$localStorage', '$q', 'StylesService
 			return def.promise;
 		};
 
-		self.init();
 		return self;
 	}
 ]);

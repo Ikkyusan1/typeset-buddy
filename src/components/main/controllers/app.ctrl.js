@@ -1,11 +1,11 @@
-tb.controller('AppCtrl', ['$scope', '$localStorage', '$uibModal', 'Utils',
-	function($scope, $localStorage, $uibModal, Utils) {
+tb.controller('AppCtrl', ['$scope', 'SettingsService', 'Utils',
+	function($scope, SettingsService, Utils) {
 
 		$scope.resetLocalStorage = function() {
 			Utils.showConfirmDialog('Are you sure you reset the localstorage? Every style set will be deleted.')
 			.then(
 				function() {
-					$localStorage.$reset();
+					SettingsService.reset();
 				},
 				function() {}
 			);

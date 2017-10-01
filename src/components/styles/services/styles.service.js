@@ -1,7 +1,5 @@
 tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngToast',
 	function($rootScope, $localStorage, $q, Utils, ngToast) {
-		// localStorage location
-		// mac : ~/Library/Caches/CSXS/cep_cache/
 
 		var self = this;
 
@@ -52,7 +50,6 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 		self.getStyleSet = function(id) {
 			let styleSet = undefined;
 			if (!angular.isDefined(id)) {
-				// attempt to load last styleset
 				if (angular.isDefined($localStorage.lastOpenedStyleSet)) {
 					styleSet = self.getStyleSet($localStorage.lastOpenedStyleSet);
 				}
@@ -129,14 +126,6 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 			});
 			return def.promise;
 		};
-
-		// init
-		if (!!!$localStorage.styleSets) {
-			$localStorage.styleSets = [];
-			let defaultSet = tbHelper.getDummyStyleSet();
-			defaultSet.name = 'Default set';
-			self.saveStyleSet(defaultSet);
-		}
 
 		return self;
 	}
