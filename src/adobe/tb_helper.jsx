@@ -128,22 +128,34 @@ var tbHelper = {
 		return values;
 	},
 
+	uniqueId: function() {
+		var idStrLen = 16;
+		var idStr= '';
+		idStr += (new Date()).getTime().toString(36) + '_';
+		do {
+			idStr += (Math.floor((Math.random() * 35))).toString(36);
+		} while (idStr.length < idStrLen);
+		return (idStr);
+	},
+
 	getDummyStyle: function(keyword) {
 		var dummy = {};
-		for (var prop in tbHelper.styleProps) {
-			dummy[prop] = tbHelper.styleProps[prop].def;
+		for (var prop in this.styleProps) {
+			dummy[prop] = this.styleProps[prop].def;
 		}
 		if (!!keyword) dummy.keyword = keyword;
 		return dummy;
 	},
 
-	getDummyStyleSet: function() {
+	getDummyStyleSet: function(name) {
 		var dummy = {
+			id: this.uniqueId(),
 			name: null,
 			styles: [
-				this.getDummyStyle('default_style', true)
+				this.getDummyStyle('default_style')
 			]
 		};
+		if (!!name) dummy.name = name;
 		return dummy;
 	},
 
@@ -174,8 +186,8 @@ var tbHelper = {
 	},
 
 	cleanStyle: function(style) {
-		for (var prop in tbHelper.styleProps) {
-			if (style[prop] == undefined || style[prop] === null) style[prop] = tbHelper.styleProps[prop].def;
+		for (var prop in this.styleProps) {
+			if (style[prop] == undefined || style[prop] === null) style[prop] = this.styleProps[prop].def;
 		}
 		return style;
 	},

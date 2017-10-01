@@ -27,7 +27,7 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 
 		self.cleanAndCheckStyleSet = function(styleSet) {
 			tbHelper.checkStyleSet(styleSet);
-			let idx = $localStorage.styleSets.findIndex(function(one) { return one.id == styleSet.id; });
+			let idx = (!angular.isDefined(styleSet.id))? -1 : $localStorage.styleSets.findIndex(function(one) { return one.id == styleSet.id; });
 			let existingId = -1;
 			if (idx > -1) existingId = $localStorage.styleSets[idx].id;
 			for (let i = 0; i < $localStorage.styleSets.length; i++) {
@@ -37,16 +37,12 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 
 		self.saveStyleSet = function(styleSet) {
 			self.cleanAndCheckStyleSet(styleSet);
+			if (!angular.isDefined(styleSet.id)) styleSet.id = tbHelper.uniqueId();
 			let idx = $localStorage.styleSets.findIndex(function(one) { return one.id == styleSet.id; });
 			if (idx > -1) {
 				$localStorage.styleSets[idx] = angular.copy(styleSet);
 			}
 			else {
-				let maxId = -1;
-				$localStorage.styleSets.forEach(function(one) {
-					if (one.id > maxId) maxId = one.id;
-				});
-				styleSet.id = ++maxId;
 				$localStorage.styleSets.push(angular.copy(styleSet));
 			}
 			$localStorage.lastOpenedStyleSet = styleSet.id;
@@ -78,7 +74,7 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 
 		self.deleteStyleSet = function(id) {
 			let idx = $localStorage.styleSets.findIndex(function(one) { return one.id == id; });
-			if ($localStorage.styleSets[idx].id === 0) {
+			if ($localStorage.styleSets[idx].name == 'Default set') {
 				ngToast.create({className: 'danger', content: 'Cannot delete default style set'});
 				return false;
 			}
