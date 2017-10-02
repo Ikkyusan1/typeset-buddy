@@ -23,6 +23,7 @@ app.bringToFront();
 #include './tb_helper.jsx'
 
 var selectedFiles = [];
+var styleSet, textReplaceRules = null;
 var useLayerGroups, skipSfxs, panelSeparator, noPrompt;
 
 var capitalizationValues = tbHelper.styleProps.capitalization.values;
@@ -110,7 +111,8 @@ function run() {
 				useLayerGroups: useLayerGroups.value,
 				skipSfxs: skipSfxs.value,
 				promptEvery: promptEvery,
-				noPrompt: noPrompt.value
+				noPrompt: noPrompt.value,
+				textReplaceRules: textReplaceRules
 			};
 			if (typesetFiles(fileList, editScriptPath.text, editTargetFolderPath.text, styleSet, options) == 'done') alert('Done');
 		}
@@ -156,6 +158,14 @@ with(dlg) {
 			btnStyleSetPath = add('button', undefined, 'Style set file');
 			btnStyleSetPath.alignment = ['right', 'center'];
 			btnStyleSetPath.minimumSize.width = minWidthBtn;
+		}
+		rowTextReplaceRules = add('group', undefined, undefined);
+		rowTextReplaceRules.alignChildren = ['fill', 'center'];
+		with(rowTextReplaceRules) {
+			editTextReplaceRulesPath = add('edittext', undefined, '', {readonly: false});
+			btnTextReplaceRulesPath = add('button', undefined, 'Text replace rules');
+			btnTextReplaceRulesPath.alignment = ['right', 'center'];
+			btnTextReplaceRulesPath.minimumSize.width = minWidthBtn;
 		}
 		rowTargetFolder = add('group', undefined, undefined);
 		rowTargetFolder.alignChildren = ['fill', 'center'];
@@ -226,7 +236,7 @@ btnScriptPath.onClick = function() {
 	if (file != null) {
 		editScriptPath.text = editScriptPath.helpTip = file.fsName;
 	}
-}
+};
 
 btnStyleSetPath.onClick = function() {
 	var file = File.openDialog('Select style set file', jsonFilter, false);
@@ -252,18 +262,50 @@ btnStyleSetPath.onClick = function() {
 			editStyleSetPath.text = editStyleSetPath.helpTip = '';
 		}
 	}
-}
+};
+
+btnTextReplaceRulesPath.onClick = function() {
+	var file = File.openDialog('Select text replace rules file', jsonFilter, false);
+	if (file != null) {
+		try {
+			var fileOK = file.open('r');
+			if(fileOK){
+				fileOK.encoding = 'UTF8';
+				var content;
+				content = file.read();
+				rules = JSON.parse(content);
+				if (rules.textReplaceRules != undefined) {
+					textReplaceRules = tbHelper.cleanTextReplaceRules(rules.textReplaceRules);
+				}
+				else if (Array.isArray(rules)) {
+					textReplaceRules = tbHelper.cleanTextReplaceRules(rules);
+				}
+				editTextReplaceRulesPath.text = editTextReplaceRulesPath.helpTip = file.fsName;
+				file.close();
+			}
+			else {
+				throw('Failed to open file');
+			}
+		}
+		catch (e) {
+			alert(e);
+			textReplaceRules = null;
+			editTextReplaceRulesPath.text = editTextReplaceRulesPath.helpTip = '';
+		}
+	}
+};
+
 
 btnTargetFolderPath.onClick = function() {
 	var folder = Folder.selectDialog('Select target folder', null, false);
 	if (folder != null) {
 		editTargetFolderPath.text = editTargetFolderPath.helpTip = folder.fsName;
 	}
-}
+};
 
-btnExportStyleProps.onClick = function() { exportStyleProps(); }
+btnExportStyleProps.onClick = function() { exportStyleProps(); };
 
-btnRun.onClick = function() {	run(); }
+btnRun.onClick = function() {	run(); };
 
 dlg.center();
 dlg.show();

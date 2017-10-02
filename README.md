@@ -75,6 +75,10 @@ If you don't (or can't) use the TB Extension and have to create your style set f
 - the fontName property of each style actually corresponds to the font's postScriptName in Photoshop.
 
 
+## Text replace rules format
+If you don't (or can't) use the TB Extension and have to create your text replace rules manually, look at the provided example. You can use regular expressions or simple strings.
+
+
 ## PSD file naming convention
 The files (aka the pages) must be numbered to be processed with TB Robot. The page number is the last part of the filename (before the extension, of course). It must be preceded with a space, or an hyphen, or an underscore. Double pages are allowed, their number is separated by an hyphen. Each page number is three or four digits long. e.g. :
 ```

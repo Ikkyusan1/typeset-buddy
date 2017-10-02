@@ -130,7 +130,7 @@ var tbHelper = {
 		return [
 			{
 				id: this.uniqueId(),
-				pattern: '(‘|’)',
+				pattern: '‘|’',
 				to: '\'',
 				regex: true,
 				regexG: true,

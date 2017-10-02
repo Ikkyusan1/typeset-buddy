@@ -196,11 +196,9 @@ gulp.task('copyCommonFiles', function(){
 		path.join(__dirname, 'README.md'),
 		path.join(__dirname, 'example/**/*')
 	];
-	if(checkFilesExist(files)){
-		return gulp.src(files, {base: '.'})
-		.pipe(plumber())
-		.pipe(gulp.dest(distDirectory));
-	}
+	return gulp.src(files, {base: '.'})
+	.pipe(plumber())
+	.pipe(gulp.dest(distDirectory));
 });
 
 gulp.task('sign', function(){

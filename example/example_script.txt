@@ -81,6 +81,7 @@ This line contains smart quotes: ‘ ’ “ ”.
 Here is a question and exclamation mark: ?!
 Ellipsis: …
 Too many dots: .......
+Multiply this cat! <- cat will have an "s".
 
 
 END#

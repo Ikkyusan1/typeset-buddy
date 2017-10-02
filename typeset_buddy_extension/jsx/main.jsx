@@ -427,6 +427,9 @@ function typesetFiles(fileList, scriptPath, targetFolder, styleSet, options) {
 												throw 'Style '+ lineStyle +'not found and default_style not found either... (page '+ pageNumber +')';
 											}
 										}
+										if (!!options.textReplaceRules) {
+											cleanedText = tbHelper.replaceText(cleanedText, options.textReplaceRules);
+										}
 										var typesetObj = {
 											text: cleanedText,
 											style: style,

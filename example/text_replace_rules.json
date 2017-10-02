@@ -1,7 +1,7 @@
 {
   "textReplaceRules": [
     {
-      "pattern": "(‘|’)",
+      "pattern": "‘|’",
       "to": "'",
       "regex": true,
       "regexG": true,
@@ -31,6 +31,14 @@
     {
       "pattern": "…",
       "to": "...",
+      "regex": true,
+      "regexG": true,
+      "regexI": false,
+      "active": true
+    },
+    {
+      "pattern": "(cat)",
+      "to": "$1s",
       "regex": true,
       "regexG": true,
       "regexI": false,
