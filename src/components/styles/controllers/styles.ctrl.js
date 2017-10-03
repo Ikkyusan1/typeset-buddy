@@ -1,5 +1,5 @@
-tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToast', 'Utils', '$uibModal',
-	function($scope, StylesService, ScriptService, ngToast, Utils, $uibModal) {
+tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToast', 'Utils', 'Applier',
+	function($scope, StylesService, ScriptService, ngToast, Utils, Applier) {
 
 		$scope.clearStyleFilter = function(){
 			$scope.styleFilter = undefined;
@@ -189,7 +189,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 		$scope.applyStyleSelectedLayers = function(style, resize) {
 			let tmpStyle = angular.copy(style);
 			tmpStyle.noResize = !!!resize;
-			StylesService.actionSelectedLayers('applyStyle', tmpStyle)
+			Applier.actionSelectedLayers('applyStyle', tmpStyle)
 			.then(
 				function() {
 					ngToast.create({className: 'success', content: 'Done'});
@@ -202,7 +202,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 
 		$scope.setStyle = function(style) {
 			let tmpStyle = angular.copy(style);
-			StylesService.setStyle(tmpStyle)
+			Applier.setStyle(tmpStyle)
 			.then(
 				function() {
 
@@ -214,7 +214,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 		};
 
 		$scope.actionSelectedLayers = function(action, param) {
-			StylesService.actionSelectedLayers(action, param)
+			Applier.actionSelectedLayers(action, param)
 			.then(
 				function() {
 					ngToast.create({className: 'success', content: 'Done'});
