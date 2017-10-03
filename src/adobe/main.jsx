@@ -316,6 +316,11 @@ function toggleFauxItalicActiveLayer() {
 	textItem.fauxItalic = !textItem.fauxItalic;
 }
 
+function replaceTextActiveLayer(rules) {
+	var textItem = app.activeDocument.activeLayer.textItem;
+	textItem.contents = tbHelper.replaceText(textItem.contents, rules);
+}
+
 function createTextLayer(text, position) {
 	var p = (!!position)? position : [20, 20];
 	var textLayer = app.activeDocument.artLayers.add();
@@ -515,4 +520,9 @@ function toggleFauxBoldSelectedLayers() {
 
 function toggleFauxItalicSelectedLayers() {
 	return actionSelectedLayers('toggleFauxItalicActiveLayer', 'Toggle faux italic');
+}
+
+function replaceTextSelectedLayers(rules) {
+	var tmpRules = tbHelper.cleanTextReplaceRules(rules);
+	return actionSelectedLayers('replaceTextActiveLayer', 'Replace text', tmpRules);
 }

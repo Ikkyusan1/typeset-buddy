@@ -616,6 +616,58 @@ tb.controller('AppCtrl', ['$scope', 'SettingsService', 'Utils',
 	}
 ]);
 
+tb.factory('Applier', ['$rootScope', '$localStorage', '$q',
+	function($rootScope, $localStorage, $q) {
+		var self = this;
+
+		self.setStyle = function(style) {
+			let def = $q.defer();
+				$rootScope.$root.CSI.evalScript('tryExec("setStyle", '+ JSON.stringify(style) +');', function(res) {
+				$rootScope.log('setStyle return', res);
+				if (res === 'no_document') {
+					def.reject('No document.');
+				}
+				else if (res === 'done') {
+					def.resolve();
+				}
+				else {
+					def.reject(res);
+				}
+			});
+			return def.promise;
+		};
+
+		self.actionSelectedLayers = function(action, param) {
+			let def = $q.defer();
+			let actionString = '"'+ action + 'SelectedLayers"';
+			if (angular.isDefined(param)) {
+				actionString += ', '+ JSON.stringify(param);
+			}
+			$rootScope.$root.CSI.evalScript('tryExec('+ actionString +');', function(res) {
+				$rootScope.log(actionString + ' return', res);
+				if (res === 'no_document') {
+					def.reject('No document.');
+				}
+				else if (res === 'no_selected_layers') {
+					def.reject('Could not retrieve the selected layers.');
+				}
+				else if (res === 'not_text_layer') {
+					def.reject('Not a text layer.');
+				}
+				else if (res === 'done') {
+					def.resolve();
+				}
+				else {
+					def.reject(res);
+				}
+			});
+			return def.promise;
+		};
+
+		return self;
+	}
+]);
+
 tb.factory('SettingsService', ['$rootScope', '$localStorage', '$q',
 	function($rootScope, $localStorage, $q) {
 		var self = this;
@@ -1154,8 +1206,8 @@ tb.config(['$stateProvider',
 	}
 ]);
 
-tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToast', 'Utils', '$uibModal',
-	function($scope, StylesService, ScriptService, ngToast, Utils, $uibModal) {
+tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToast', 'Utils', 'Applier',
+	function($scope, StylesService, ScriptService, ngToast, Utils, Applier) {
 
 		$scope.clearStyleFilter = function(){
 			$scope.styleFilter = undefined;
@@ -1345,7 +1397,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 		$scope.applyStyleSelectedLayers = function(style, resize) {
 			let tmpStyle = angular.copy(style);
 			tmpStyle.noResize = !!!resize;
-			StylesService.actionSelectedLayers('applyStyle', tmpStyle)
+			Applier.actionSelectedLayers('applyStyle', tmpStyle)
 			.then(
 				function() {
 					ngToast.create({className: 'success', content: 'Done'});
@@ -1358,7 +1410,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 
 		$scope.setStyle = function(style) {
 			let tmpStyle = angular.copy(style);
-			StylesService.setStyle(tmpStyle)
+			Applier.setStyle(tmpStyle)
 			.then(
 				function() {
 
@@ -1370,7 +1422,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 		};
 
 		$scope.actionSelectedLayers = function(action, param) {
-			StylesService.actionSelectedLayers(action, param)
+			Applier.actionSelectedLayers(action, param)
 			.then(
 				function() {
 					ngToast.create({className: 'success', content: 'Done'});
@@ -1668,50 +1720,6 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 			}
 		};
 
-		self.setStyle = function(style) {
-			let def = $q.defer();
-				$rootScope.$root.CSI.evalScript('tryExec("setStyle", '+ JSON.stringify(style) +');', function(res) {
-				$rootScope.log('setStyle return', res);
-				if (res === 'no_document') {
-					def.reject('No document.');
-				}
-				else if (res === 'done') {
-					def.resolve();
-				}
-				else {
-					def.reject(res);
-				}
-			});
-			return def.promise;
-		};
-
-		self.actionSelectedLayers = function(action, param) {
-			let def = $q.defer();
-			let actionString = '"'+ action + 'SelectedLayers"';
-			if (angular.isDefined(param)) {
-				actionString += ', '+ JSON.stringify(param);
-			}
-			$rootScope.$root.CSI.evalScript('tryExec('+ actionString +');', function(res) {
-				$rootScope.log(actionString + ' return', res);
-				if (res === 'no_document') {
-					def.reject('No document.');
-				}
-				else if (res === 'no_selected_layers') {
-					def.reject('Could not retrieve the selected layers.');
-				}
-				else if (res === 'not_text_layer') {
-					def.reject('Not a text layer.');
-				}
-				else if (res === 'done') {
-					def.resolve();
-				}
-				else {
-					def.reject(res);
-				}
-			});
-			return def.promise;
-		};
-
 		return self;
 	}
 ]);
@@ -1735,8 +1743,8 @@ tb.config(['$stateProvider',
 	}
 ]);
 
-tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'ngToast', '$timeout', 'clipboard',
-	function($scope, SettingsService, Utils, ngToast, $timeout, clipboard) {
+tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'ngToast', 'Applier',
+	function($scope, SettingsService, Utils, ngToast, Applier) {
 
 		$scope.textReplaceRules = SettingsService.setting('textReplaceRules');
 
@@ -1801,6 +1809,18 @@ tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'ngToas
 
 		$scope.appendDefaults = function() {
 			$scope.textReplaceRules = $scope.textReplaceRules.concat(tbHelper.getDefaultTextReplaceRules());
+		};
+
+		$scope.replaceTextSelectedLayers = function() {
+			Applier.actionSelectedLayers('replaceText', $scope.textReplaceRules)
+			.then(
+				function() {
+					ngToast.create({className: 'success', content: 'Done'});
+				},
+				function(err) {
+					ngToast.create({className: 'danger', content: err});
+				}
+			);
 		};
 
 		$scope.$watch('textReplaceRules', function(newVal, oldVal) {

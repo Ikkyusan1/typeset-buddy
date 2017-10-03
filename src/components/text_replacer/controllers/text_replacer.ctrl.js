@@ -1,5 +1,5 @@
-tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'ngToast', '$timeout', 'clipboard',
-	function($scope, SettingsService, Utils, ngToast, $timeout, clipboard) {
+tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'ngToast', 'Applier',
+	function($scope, SettingsService, Utils, ngToast, Applier) {
 
 		$scope.textReplaceRules = SettingsService.setting('textReplaceRules');
 
@@ -64,6 +64,18 @@ tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'ngToas
 
 		$scope.appendDefaults = function() {
 			$scope.textReplaceRules = $scope.textReplaceRules.concat(tbHelper.getDefaultTextReplaceRules());
+		};
+
+		$scope.replaceTextSelectedLayers = function() {
+			Applier.actionSelectedLayers('replaceText', $scope.textReplaceRules)
+			.then(
+				function() {
+					ngToast.create({className: 'success', content: 'Done'});
+				},
+				function(err) {
+					ngToast.create({className: 'danger', content: err});
+				}
+			);
 		};
 
 		$scope.$watch('textReplaceRules', function(newVal, oldVal) {
