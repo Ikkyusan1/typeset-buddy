@@ -4,7 +4,7 @@
 			<label class="">
 				<span>Script</span>
 			</label>
-			<input type="text" class="topcoat-text-input" readonly="true" ng-model="filename" ng-click="browseScript()" uib-tooltip="{{filename}}" tooltip-popup-delay="500" tooltip-placement="bottom">
+			<input type="text" class="topcoat-text-input" readonly="true" ng-model="filename" ng-click="browseScript()" uib-tooltip="{{filename}}" placeholder="Click here to load a script" tooltip-popup-delay="500" tooltip-placement="bottom">
 		</div>
 	</div>
 	<div class="col-md-1 col-xs-1 flex-input">
@@ -23,7 +23,7 @@
 
 	<div class="col-md-1 col-xs-1 flex-input">
 		<div class="btn-group" uib-dropdown is-open="status.isopen">
-			<button class="topcoat-button" uib-dropdown-toggle>
+			<button class="topcoat-button" uib-dropdown-toggle uib-tooltip="Options" tooltip-popup-delay="1000" tooltip-placement="bottom">
 				<span class="glyphicon glyphicon-cog"></span>
 			</button>
 			<ul class="dropdown-menu dropdown-menu-right" uib-dropdown-menu role="menu" aria-labelledby="single-button">
