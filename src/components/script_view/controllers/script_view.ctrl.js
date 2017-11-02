@@ -117,7 +117,6 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 										return (idx === -1 )? {keyword: one, inStyleSet: false} : {keyword: one, inStyleSet: true};
 									});
 								}
-
 								if ($scope.mergeBubbles && bubble.multibubblePart == true) {
 									let p = $scope.bubbles[$scope.bubbles.length -1];
 									p.merged = true;
@@ -173,25 +172,16 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 				style = {keyword: $scope.selectedForcedStyle, inStyleSet: true};
 			}
 			if (!style.inStyleSet) {
-				ngToast.create({className: 'danger', content: 'Style "'+ style.keyword +'" not found in styleset'});
+				ngToast.create({className: 'danger', content: 'Style "'+ style.keyword +'" not found in styleset. Fallback to default_style.'});
+				style = 'default_style';
 			}
-			else {
-				let stylePreset = $scope.styleSet.styles.find(function(one) { return one.keyword == style.keyword; });
-				if (!!!stylePreset) stylePreset = $scope.styleSet.styles[0];
-				let text = bubble.text;
-				if (!!bubble.siblings) {
-					bubble.siblings.forEach(function(sibling){
-						text += '\r' + sibling.text;
-					});
-				}
-				let typesetObj = {text: text, style: stylePreset};
-				ScriptService.maybeTypesetToPath(typesetObj)
-				.then(
-					function() {},
-					function(err) {
-						ngToast.create({className: 'danger', content: err});
-					}
-				);
+			let stylePreset = $scope.styleSet.styles.find(function(one) { return one.keyword == style.keyword; });
+			if (!!!stylePreset) stylePreset = $scope.styleSet.styles[0];
+			let text = bubble.text;
+			if (!!bubble.siblings) {
+				bubble.siblings.forEach(function(sibling){
+					text += '\r' + sibling.text;
+				});
 			}
 		};
 
