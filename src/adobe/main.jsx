@@ -119,18 +119,23 @@ function reselectLayers(idx) {
 	}
 }
 
-function tryExec(functionName, obj) {
+function tryExec(functionName) {
 	if (app.documents.length === 0) return 'no_document';
 	setPrefs();
 	saveState();
 	try {
 		var res;
-		if(obj != undefined) {
-			res = eval(functionName + '('+ JSON.stringify(obj) +')');
+		var evalString = arguments[0] + '(';
+		if (arguments.length > 1) {
+			for (var i = 1; i < arguments.length; i++) {
+				if (arguments[i] != undefined) {
+					if (i > 1) evalString += ',';
+					evalString += JSON.stringify(arguments[i]);
+				}
+			}
 		}
-		else {
-			res = eval(functionName + '()');
-		}
+		evalString += ')';
+		res = eval(evalString);
 		resetPrefs;
 		return res;
 	}
