@@ -51,16 +51,16 @@
 <div class="no-shrink row pb header">
 	<div class="col-lg-4 col-md-4 col-xs-4">
 		<label>Page</label>
-		<button class="topcoat-icon-button--quiet" ng-disabled="!!!pageNumbers.length">
-			<span class="glyphicon glyphicon-minus" ng-click="incPageNumber(false)"></span>
+		<button class="topcoat-icon-button--quiet" ng-click="incPageNumber(false)" ng-disabled="!!!pageNumbers.length">
+			<span class="glyphicon glyphicon-minus"></span>
 		</button>
 
 			<select ng-options="pageNumber as pageNumber for pageNumber in pageNumbers" ng-model="selectedPage" ng-disabled="!!!pageNumbers.length">
 
 			</select>
 
-		<button class="topcoat-icon-button--quiet" ng-disabled="!!!pageNumbers.length">
-			<span class="glyphicon glyphicon-plus" ng-click="incPageNumber(true)"></span>
+		<button class="topcoat-icon-button--quiet" ng-click="incPageNumber(true)" ng-disabled="!!!pageNumbers.length">
+			<span class="glyphicon glyphicon-plus"></span>
 		</button>
 	</div>
 	<div class="col-lg-4 col-md-4 col-xs-4">
@@ -89,25 +89,25 @@
 			</button>
 		</div>
 		<div class="col-lg-10 col-md-9 col-xs-9" ng-if="!!!bubble.panelSeparator">
-			<div class="selectable bubble-content" ng-if="!!bubble.text">{{bubble.text}}<button class="topcoat-button clipbutton">
-					<span class="glyphicon glyphicon-copy" ng-click="toClipboard(bubble.text)"></span>
+			<div class="selectable bubble-content" ng-if="!!bubble.text">{{bubble.text}}<button class="topcoat-button clipbutton" ng-click="toClipboard(bubble.text)">
+					<span class="glyphicon glyphicon-copy"></span>
 				</button>
 			</div>
 			<div class="bubble-note selectable" ng-repeat="note in bubble.notes">
 				{{note}}
-				<button class="topcoat-button clipbutton">
-					<span class="glyphicon glyphicon-copy" ng-click="toClipboard(bubble.notes)"></span>
+				<button class="topcoat-button clipbutton" ng-click="toClipboard(bubble.notes)">
+					<span class="glyphicon glyphicon-copy"></span>
 				</button>
 			</div>
 			<div class="bubble-sibling" ng-repeat="sibling in bubble.siblings">
-				<div class="selectable bubble-content">{{sibling.text}}<button class="topcoat-button clipbutton">
-						<span class="glyphicon glyphicon-copy" ng-click="toClipboard(sibling.text)"></span>
+				<div class="selectable bubble-content">{{sibling.text}}<button class="topcoat-button clipbutton" ng-click="toClipboard(sibling.text)">
+						<span class="glyphicon glyphicon-copy"></span>
 					</button>
 				</div>
 				<div class="bubble-note selectable" ng-repeat="note in sibling.notes">
 					{{note}}
-					<button class="topcoat-button clipbutton">
-						<span class="glyphicon glyphicon-copy" ng-click="toClipboard(note)"></span>
+					<button class="topcoat-button clipbutton" ng-click="toClipboard(note)">
+						<span class="glyphicon glyphicon-copy"></span>
 					</button>
 				</div>
 			</div>
