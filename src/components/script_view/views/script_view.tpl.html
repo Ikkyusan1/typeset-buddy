@@ -38,6 +38,9 @@
 				<li role="menu-item" class="dropdown-header">Merge multibubbles</li>
 				<li role="menu-item" ng-class="{'active': mergeBubbles === true}" ng-click="setting('mergeBubbles', true)"><span>Yes</span></li>
 				<li role="menu-item" ng-class="{'active': mergeBubbles === false}" ng-click="setting('mergeBubbles', false)" ><span>No</span></li>
+				<li role="menu-item" class="dropdown-header">Skip SFXs ("sfx" keyword)</li>
+				<li role="menu-item" ng-class="{'active': skipSfxs === true}" ng-click="setting('skipSfxs', true)"><span>Yes</span></li>
+				<li role="menu-item" ng-class="{'active': skipSfxs === false}" ng-click="setting('skipSfxs', false)" ><span>No</span></li>
 				<li role="menu-item" class="dropdown-header">Text replacement</li>
 				<li role="menu-item" ng-class="{'active': textReplace === true}" ng-click="setting('textReplace', true)"><span>Enabled</span></li>
 				<li role="menu-item" ng-class="{'active': textReplace === false}" ng-click="setting('textReplace', false)" ><span>Disabled</span></li>
@@ -71,6 +74,11 @@
 	<div class="col-lg-5 col-md-5 col-xs-5">
 		<label>Force</label>
 		<tb-style-selector styleset="selectedStyleset" selected-value="selectedForcedStyle"></tb-style-selector>
+		<div class="pull-right">
+			<button class="topcoat-button" ng-click="typesetPage()" uib-tooltip="Typeset all bubbles at once" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
+				<span class="glyphicon glyphicon-bed"></span>
+			</button>
+		</div>
 	</div>
 
 </div>

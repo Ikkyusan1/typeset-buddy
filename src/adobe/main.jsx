@@ -376,6 +376,53 @@ function typesetEX(typesetObj) {
 	}
 }
 
+function typesetPage(pageScript, styleSet, options) {
+	var bubbles = pageScript[2];
+	if (tbHelper.pageContainsText(bubbles)) {
+		// page's global style, forced to defaults_style if none is set.
+		var pageStyle = tbHelper.getTextStyles(pageScript[1], 'default_style')[0];
+		var previousStyle = pageStyle;
+		var lines = bubbles.split('\n');
+		var n = 0;
+		for (var i = 0; i < lines.length; i++) {
+			var line = lines[i];
+			if (tbHelper.skipThisLine(line, options.panelSeparator) === false) {
+				// line style will be the last thing that's between single brackets
+				// but if we're dealing with a double-bubble part, fallback on previous style if no style is defined for this bubble
+				var lineStyle = (tbHelper.isMultiBubblePart(line))? tbHelper.getTextStyles(line, previousStyle).pop() : tbHelper.getTextStyles(line, pageStyle).pop();
+				var cleanedText = tbHelper.cleanLine(line);
+				if (options.skipSfxs && lineStyle == 'sfx') continue;
+				else {
+					n++;
+					var style;
+					try {
+						style = tbHelper.getStyleFromStyleSet(styleSet, lineStyle);
+					}
+					catch (e) {
+						try {
+							style = tbHelper.getStyleFromStyleSet(styleSet, 'default_style');
+						}
+						catch (e) {
+							throw 'Style '+ lineStyle +'not found and default_style not found either... (page '+ pageNumber +')';
+						}
+					}
+					if (!!options.textReplaceRules) {
+						cleanedText = tbHelper.replaceText(cleanedText, options.textReplaceRules);
+					}
+					var typesetObj = {
+						text: cleanedText,
+						style: style,
+						position: [20*n, 20*n],
+						useLayerGroups: options.useLayerGroups
+					};
+					typesetEX(typesetObj);
+				}
+				previousStyle = lineStyle;
+			}
+		}
+	}
+}
+
 function typesetFiles(fileList, scriptPath, targetFolder, styleSet, options) {
 	try {
 		if (!!!fileList.length) throw 'Need files';
@@ -405,53 +452,12 @@ function typesetFiles(fileList, scriptPath, targetFolder, styleSet, options) {
 					}
 					var pageScript = tbHelper.loadPage(text, pageNumber);
 					if (!pageScript) {
-						if (!options.noPrompt) alert(fileList[i].toString() + ' has no corresponding page in the translation script');
+						if (!options.noPrompt) {
+							if (confirm(fileList[i].toString() + ' has no corresponding page in the translation script.\nContinue to typeset?', false) == false) break;
+						}
 					}
 					else {
-						var bubbles = pageScript[2];
-						if (tbHelper.pageContainsText(bubbles)) {
-							// page's global style, forced to defaults_style if none is set.
-							var pageStyle = tbHelper.getTextStyles(pageScript[1], 'default_style')[0];
-							var previousStyle = pageStyle;
-							var lines = bubbles.split('\n');
-							var n = 0;
-							for (var j = 0; j < lines.length; j++) {
-								var line = lines[j];
-								if (tbHelper.skipThisLine(line, options.panelSeparator) === false) {
-									// line style will be the last thing that's between single brackets
-									// but if we're dealing with a double-bubble part, fallback on previous style if no style is defined for this bubble
-									var lineStyle = (tbHelper.isMultiBubblePart(line))? tbHelper.getTextStyles(line, previousStyle).pop() : tbHelper.getTextStyles(line, pageStyle).pop();
-									var cleanedText = tbHelper.cleanLine(line);
-									if (options.skipSfxs && lineStyle == 'sfx') continue;
-									else {
-										n++;
-										var style;
-										try {
-											style = tbHelper.getStyleFromStyleSet(styleSet, lineStyle);
-										}
-										catch (e) {
-											try {
-												style = tbHelper.getStyleFromStyleSet(styleSet, 'default_style');
-											}
-											catch (e) {
-												throw 'Style '+ lineStyle +'not found and default_style not found either... (page '+ pageNumber +')';
-											}
-										}
-										if (!!options.textReplaceRules) {
-											cleanedText = tbHelper.replaceText(cleanedText, options.textReplaceRules);
-										}
-										var typesetObj = {
-											text: cleanedText,
-											style: style,
-											position: [20*n, 20*n],
-											useLayerGroups: options.useLayerGroups
-										};
-										typesetEX(typesetObj);
-									}
-									previousStyle = lineStyle;
-								}
-							}
-						}
+						typesetPage(pageScript, styleSet, options);
 					}
 					var saveFile = new File(editTargetFolderPath.text + '/' + app.activeDocument.name);
 					app.activeDocument.saveAs(saveFile);

@@ -57,6 +57,29 @@ tb.factory('ScriptService', ['$rootScope', 'SettingsService', '$q',
 			return def.promise;
 		};
 
+		self.typesetPage = function(pageScript, styleSet){
+			let def = $q.defer();
+			let options = {
+				panelSeparator: SettingsService.setting('panelSeparator'),
+				useLayerGroups: SettingsService.setting('useLayerGroups'),
+				skipSfxs: SettingsService.setting('skipSfxs'),
+				textReplaceRules: (SettingsService.setting('textReplace'))? textReplaceRules : []
+			};
+			$rootScope.$root.CSI.evalScript('tryExec("typesetPage", ' + JSON.stringify(pageScript) + ',' + JSON.stringify(styleSet) + ',' + JSON.stringify(options) + ');', function(res) {
+				$rootScope.log('typesetPage return', res);
+				if (res === 'no_document') {
+					def.reject('No document');
+				}
+				else if(res === 'done') {
+					def.resolve();
+				}
+				else {
+					def.reject(res)
+				}
+			});
+			return def.promise;
+		};
+
 		return self;
 	}
 ]);

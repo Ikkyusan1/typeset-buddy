@@ -14,6 +14,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			$scope.panelSeparator = SettingsService.setting('panelSeparator');
 			$scope.useLayerGroups = SettingsService.setting('useLayerGroups');
 			$scope.mergeBubbles = SettingsService.setting('mergeBubbles');
+			$scope.skipSfxs = SettingsService.setting('skipSfxs');
 			$scope.textReplace = SettingsService.setting('textReplace');
 			$scope.styleSet = StylesService.getStyleSet();
 			$scope.selectedStyleset = $scope.styleSet.id;
@@ -183,6 +184,20 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 					text += '\r' + sibling.text;
 				});
 			}
+			let typesetObj = {text: text, style: stylePreset};
+			ScriptService.maybeTypesetToPath(typesetObj)
+			.then(
+				function() {},
+				function(err) {
+					ngToast.create({className: 'danger', content: err});
+				}
+			);
+		};
+
+		$scope.typesetPage = function() {
+			ScriptService.typesetPage(angular.copy($scope.pageScript), angular.copy($scope.styleSet));
+		};
+
 		};
 
 		$scope.toClipboard = function(text) {

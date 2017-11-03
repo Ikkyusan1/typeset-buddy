@@ -11,6 +11,7 @@ tb.factory('SettingsService', ['$rootScope', '$localStorage', '$q',
 			if (!angular.isDefined($localStorage.panelSeparator)) self.setting('panelSeparator', '–');
 			if (!angular.isDefined($localStorage.useLayerGroups)) self.setting('useLayerGroups', true);
 			if (!angular.isDefined($localStorage.mergeBubbles)) self.setting('mergeBubbles', false);
+			if (!angular.isDefined($localStorage.skipSfxs)) self.setting('skipSfxs', false);
 			if (!angular.isDefined($localStorage.lastOpenedScript)) self.setting('lastOpenedScript', '');
 			if (!angular.isDefined($localStorage.textReplace)) self.setting('textReplace', false);
 			if (!angular.isDefined($localStorage.textReplaceRules))
