@@ -21,9 +21,9 @@
 		</div>
 	</div>
 
-	<div class="col-md-1 col-xs-1 flex-input">
+	<div class="col-md-1 col-xs-1 flex-input text-right">
 		<div class="btn-group" uib-dropdown is-open="status.isopen">
-			<button class="topcoat-button" uib-dropdown-toggle uib-tooltip="Options" tooltip-popup-delay="1000" tooltip-placement="bottom">
+			<button class="topcoat-button" uib-dropdown-toggle uib-tooltip="Options" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
 				<span class="glyphicon glyphicon-cog"></span>
 			</button>
 			<ul class="dropdown-menu dropdown-menu-right" uib-dropdown-menu role="menu" aria-labelledby="single-button">
@@ -32,15 +32,12 @@
 				<li role="menu-item" ng-class="{'active': panelSeparator == '-'}" ng-click="setting('panelSeparator', '-')"><span>Single dash -</span></li>
 				<li role="menu-item" ng-class="{'active': panelSeparator == '--'}" ng-click="setting('panelSeparator', '--')"><span>Double dash --</span></li>
 				<li role="menu-item" ng-class="{'active': panelSeparator == '='}" ng-click="setting('panelSeparator', '=')"><span>Equal sign =</span></li>
-				<li class="divider"></li>
 				<li role="menu-item" class="dropdown-header">Use layer groups</li>
 				<li role="menu-item" ng-class="{'active': useLayerGroups === true}" ng-click="setting('useLayerGroups', true)"><span>Yes</span></li>
 				<li role="menu-item" ng-class="{'active': useLayerGroups === false}" ng-click="setting('useLayerGroups', false)" ><span>No</span></li>
-				<li class="divider"></li>
 				<li role="menu-item" class="dropdown-header">Merge multibubbles</li>
 				<li role="menu-item" ng-class="{'active': mergeBubbles === true}" ng-click="setting('mergeBubbles', true)"><span>Yes</span></li>
 				<li role="menu-item" ng-class="{'active': mergeBubbles === false}" ng-click="setting('mergeBubbles', false)" ><span>No</span></li>
-				<li class="divider"></li>
 				<li role="menu-item" class="dropdown-header">Text replacement</li>
 				<li role="menu-item" ng-class="{'active': textReplace === true}" ng-click="setting('textReplace', true)"><span>Enabled</span></li>
 				<li role="menu-item" ng-class="{'active': textReplace === false}" ng-click="setting('textReplace', false)" ><span>Disabled</span></li>
@@ -49,29 +46,30 @@
 	</div>
 </div>
 <div class="no-shrink row pb header">
-	<div class="col-lg-4 col-md-4 col-xs-4">
+	<div class="col-lg-7 col-md-7 col-xs-7">
 		<label>Page</label>
-		<button class="topcoat-icon-button--quiet" ng-click="incPageNumber(false)" ng-disabled="!!!pageNumbers.length">
-			<span class="glyphicon glyphicon-minus"></span>
-		</button>
-
-			<select ng-options="pageNumber as pageNumber for pageNumber in pageNumbers" ng-model="selectedPage" ng-disabled="!!!pageNumbers.length">
-
-			</select>
-
-		<button class="topcoat-icon-button--quiet" ng-click="incPageNumber(true)" ng-disabled="!!!pageNumbers.length">
-			<span class="glyphicon glyphicon-plus"></span>
-		</button>
+		<select ng-options="pageNumber as pageNumber for pageNumber in pageNumbers" ng-model="selectedPage" ng-disabled="!!!pageNumbers.length">
+		</select>
+		<div class="inline-flex">
+			<div class="topcoat-button-bar">
+				<div class="topcoat-button-bar__item">
+					<button class="topcoat-button-bar__button" ng-click="incPageNumber(false)" ng-disabled="!!!pageNumbers.length">
+						<span class="glyphicon glyphicon-minus"></span>
+					</button>
+				</div>
+				<div class="topcoat-button-bar__item">
+					<button class="topcoat-button-bar__button" ng-click="incPageNumber(true)" ng-disabled="!!!pageNumbers.length">
+						<span class="glyphicon glyphicon-plus"></span>
+					</button>
+				</div>
+			</div>
+		</div>
+		<span ng-if="!!selectedPage && !!bubbles.length" class="inline-flex">
+			Page style: {{pageStyle.keyword}} <span ng-if="!!!pageStyle.inStyleSet" class="small">&#9888;</span>
+		</span>
 	</div>
-	<div class="col-lg-4 col-md-4 col-xs-4">
-		<label ng-if="!!selectedPage && !!bubbles.length">
-			Page style: {{pageStyle.keyword}} <span class="glyphicon glyphicon-warning-sign" ng-if="!!!pageStyle.inStyleSet"></span>
-		</label>
-	</div>
-	<div class="col-lg-4 col-md-4 col-xs-4">
-		<label>
-			Force
-		</label>
+	<div class="col-lg-5 col-md-5 col-xs-5">
+		<label>Force</label>
 		<tb-style-selector styleset="selectedStyleset" selected-value="selectedForcedStyle"></tb-style-selector>
 	</div>
 

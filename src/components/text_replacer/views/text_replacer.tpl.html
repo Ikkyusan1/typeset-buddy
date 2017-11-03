@@ -66,12 +66,20 @@
 			<button class="topcoat-button" ng-click="removeRule(rule)">
 				<span class="glyphicon glyphicon-trash"></span>
 			</button>
-			<button class="topcoat-button" ng-click="moveRule(rule, true)">
-				<span class="glyphicon glyphicon-arrow-up"></span>
-			</button>
-			<button class="topcoat-button" ng-click="moveRule(rule)">
-				<span class="glyphicon glyphicon-arrow-down"></span>
-			</button>
+			<div class="inline-flex">
+				<div class="topcoat-button-bar">
+		  		<div class="topcoat-button-bar__item">
+						<button class="topcoat-button-bar__button" ng-click="moveRule(rule, true)">
+							<span class="glyphicon glyphicon-arrow-up"></span>
+						</button>
+					</div>
+					<div class="topcoat-button-bar__item">
+						<button class="topcoat-button-bar__button" ng-click="moveRule(rule)">
+							<span class="glyphicon glyphicon-arrow-down"></span>
+						</button>
+					</div>
+				</div>
+			</div>
 			<label class="topcoat-switch">
 				<input type="checkbox" ng-model="rule.active" ng-true-value="true" class="topcoat-switch__input">
 				<div class="topcoat-switch__toggle"></div>
