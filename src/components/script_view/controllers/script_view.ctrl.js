@@ -198,6 +198,10 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			ScriptService.typesetPage(angular.copy($scope.pageScript), angular.copy($scope.styleSet));
 		};
 
+		$scope.tbRobot = function() {
+			let extensionPath = $scope.$root.CSI.getSystemPath(SystemPath.EXTENSION) + '/jsx/';
+			let script = '$.evalFile("' + extensionPath + 'tb_robot.jsx");';
+			$scope.$root.CSI.evalScript(script, function(result) {});
 		};
 
 		$scope.toClipboard = function(text) {
