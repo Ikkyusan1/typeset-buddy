@@ -1,5 +1,10 @@
+### 0.2.1 (2017-11-03)
+TB Robot can now be run from the extension.
+Can typeset a whole page too, just like tb_robot would do it.
+
+
 ### 0.2.0 (2017-10-01)
-New: text replacement functionality
+New: text replacement functionality.
 
 
 ### 0.1.11 (2017-09-18)

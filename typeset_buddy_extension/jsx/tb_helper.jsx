@@ -411,7 +411,7 @@ var tbHelper = {
 		if (!!!text || text.length == 0) {
 			return true;
 		}
-		else if (text.charCodeAt(0) == panelSeparator.charCodeAt(0)) {
+		else if (text.charCodeAt(0) == panelSeparator.charCodeAt(0) && text.length == panelSeparator.length) {
 			return null;
 		}
 		else return false;

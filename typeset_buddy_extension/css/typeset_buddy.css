@@ -41,7 +41,17 @@ button:active {
 button:focus {
 	outline: none !important;
 	box-shadow: inset 0 1px transparent !important;
-	border: 1px solid transparent !important;
+	border: 1px solid #9daca9 !important;
+}
+
+.topcoat-button-bar__item:first-child > .topcoat-button-bar__button:focus,
+.topcoat-button-bar__item:first-child > .topcoat-button-bar__button--large:focus {
+	border-right: none !important;
+}
+
+.topcoat-button-bar__item:last-child > .topcoat-button-bar__button:focus,
+.topcoat-button-bar__item:last-child > .topcoat-button-bar__button--large:focus {
+	border-left: none !important;
 }
 
 
@@ -51,6 +61,10 @@ button .glyphicon {
 
 label {
 	margin-bottom: 0;
+}
+
+.small {
+	font-size: small;
 }
 
 .topcoat-button,
@@ -102,6 +116,11 @@ input[type="text"].ng-invalid,
 input[type="number"].ng-invalid,
 input[type="select"].ng-invalid {
 	border: solid 1px red !important;
+}
+
+input[type="text"]::-webkit-input-placeholder,
+input[type="number"]::-webkit-input-placeholder {
+	padding-top: 2px;
 }
 
 .full-width {
@@ -171,18 +190,25 @@ input[type="select"].ng-invalid {
 	font-weight: bold;
   text-transform: uppercase;
   color: #000;
+  background-color: #ddd;
   font-style: italic;
 }
 
 .dropdown-menu > .active > *:first-child {
-	color: #fff;
 	text-decoration: none;
-	background-color: #337ab7;
+	font-weight: bolder;
 	outline: 0;
 }
 
 .dropdown-menu li:not(.dropdown-header):hover {
 	background: #ddd;
+}
+
+.dropdown-menu > .active > *:first-child:after {
+  content: '\2713';
+  right: -8px;
+  float: right;
+  position: relative;
 }
 
 .alert {
@@ -310,6 +336,10 @@ tb-style-preset>div.row:first-child {
 	z-index: 1;
 }
 
+.inline-flex {
+	display: inline-flex;
+}
+
 .flex-input {
 	padding: 5px;
 }
@@ -338,7 +368,6 @@ tb-style-preset>div.row:first-child {
 	width: 100%;
 	display: block;
 	margin-left: 10px;
-	padding: 0 5px;
 }
 
 .app-container {

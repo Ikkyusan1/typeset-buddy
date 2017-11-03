@@ -417,7 +417,7 @@ var tbHelper = {
 		if (!!!text || text.length == 0) {
 			return true;
 		}
-		else if (text.charCodeAt(0) == panelSeparator.charCodeAt(0)) {
+		else if (text.charCodeAt(0) == panelSeparator.charCodeAt(0) && text.length == panelSeparator.length) {
 			return null;
 		}
 		else return false;
@@ -448,7 +448,7 @@ var tb = angular.module('tb', [
 tb.constant('CONF', {
 	appName: 'typeset_buddy', // will be replaced by package.json name when compiled
 	debug: false,	// will be true when compiled for dev environment, false otherwise
-	version: '0.2.0' // will be replaced when compiled
+	version: '0.2.1' // will be replaced when compiled
 });
 
 tb.config(['$compileProvider', '$localStorageProvider', 'ngToastProvider', 'CONF',
@@ -681,6 +681,7 @@ tb.factory('SettingsService', ['$rootScope', '$localStorage', '$q',
 			if (!angular.isDefined($localStorage.panelSeparator)) self.setting('panelSeparator', '–');
 			if (!angular.isDefined($localStorage.useLayerGroups)) self.setting('useLayerGroups', true);
 			if (!angular.isDefined($localStorage.mergeBubbles)) self.setting('mergeBubbles', false);
+			if (!angular.isDefined($localStorage.skipSfxs)) self.setting('skipSfxs', false);
 			if (!angular.isDefined($localStorage.lastOpenedScript)) self.setting('lastOpenedScript', '');
 			if (!angular.isDefined($localStorage.textReplace)) self.setting('textReplace', false);
 			if (!angular.isDefined($localStorage.textReplaceRules))
@@ -903,6 +904,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			$scope.panelSeparator = SettingsService.setting('panelSeparator');
 			$scope.useLayerGroups = SettingsService.setting('useLayerGroups');
 			$scope.mergeBubbles = SettingsService.setting('mergeBubbles');
+			$scope.skipSfxs = SettingsService.setting('skipSfxs');
 			$scope.textReplace = SettingsService.setting('textReplace');
 			$scope.styleSet = StylesService.getStyleSet();
 			$scope.selectedStyleset = $scope.styleSet.id;
@@ -1006,7 +1008,6 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 										return (idx === -1 )? {keyword: one, inStyleSet: false} : {keyword: one, inStyleSet: true};
 									});
 								}
-
 								if ($scope.mergeBubbles && bubble.multibubblePart == true) {
 									let p = $scope.bubbles[$scope.bubbles.length -1];
 									p.merged = true;
@@ -1062,26 +1063,35 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 				style = {keyword: $scope.selectedForcedStyle, inStyleSet: true};
 			}
 			if (!style.inStyleSet) {
-				ngToast.create({className: 'danger', content: 'Style "'+ style.keyword +'" not found in styleset'});
+				ngToast.create({className: 'danger', content: 'Style "'+ style.keyword +'" not found in styleset. Fallback to default_style.'});
+				style = 'default_style';
 			}
-			else {
-				let stylePreset = $scope.styleSet.styles.find(function(one) { return one.keyword == style.keyword; });
-				if (!!!stylePreset) stylePreset = $scope.styleSet.styles[0];
-				let text = bubble.text;
-				if (!!bubble.siblings) {
-					bubble.siblings.forEach(function(sibling){
-						text += '\r' + sibling.text;
-					});
+			let stylePreset = $scope.styleSet.styles.find(function(one) { return one.keyword == style.keyword; });
+			if (!!!stylePreset) stylePreset = $scope.styleSet.styles[0];
+			let text = bubble.text;
+			if (!!bubble.siblings) {
+				bubble.siblings.forEach(function(sibling){
+					text += '\r' + sibling.text;
+				});
+			}
+			let typesetObj = {text: text, style: stylePreset};
+			ScriptService.maybeTypesetToPath(typesetObj)
+			.then(
+				function() {},
+				function(err) {
+					ngToast.create({className: 'danger', content: err});
 				}
-				let typesetObj = {text: text, style: stylePreset};
-				ScriptService.maybeTypesetToPath(typesetObj)
-				.then(
-					function() {},
-					function(err) {
-						ngToast.create({className: 'danger', content: err});
-					}
-				);
-			}
+			);
+		};
+
+		$scope.typesetPage = function() {
+			ScriptService.typesetPage(angular.copy($scope.pageScript), angular.copy($scope.styleSet));
+		};
+
+		$scope.tbRobot = function() {
+			let extensionPath = $scope.$root.CSI.getSystemPath(SystemPath.EXTENSION) + '/jsx/';
+			let script = '$.evalFile("' + extensionPath + 'tb_robot.jsx");';
+			$scope.$root.CSI.evalScript(script, function(result) {});
 		};
 
 		$scope.toClipboard = function(text) {
@@ -1169,6 +1179,29 @@ tb.factory('ScriptService', ['$rootScope', 'SettingsService', '$q',
 			let def = $q.defer();
 			$rootScope.$root.CSI.evalScript('tryExec("typesetEX", ' + JSON.stringify(typesetObj) + ');', function(res) {
 				$rootScope.log('typeset return', res);
+				if (res === 'no_document') {
+					def.reject('No document');
+				}
+				else if(res === 'done') {
+					def.resolve();
+				}
+				else {
+					def.reject(res)
+				}
+			});
+			return def.promise;
+		};
+
+		self.typesetPage = function(pageScript, styleSet){
+			let def = $q.defer();
+			let options = {
+				panelSeparator: SettingsService.setting('panelSeparator'),
+				useLayerGroups: SettingsService.setting('useLayerGroups'),
+				skipSfxs: SettingsService.setting('skipSfxs'),
+				textReplaceRules: (SettingsService.setting('textReplace'))? textReplaceRules : []
+			};
+			$rootScope.$root.CSI.evalScript('tryExec("typesetPage", ' + JSON.stringify(pageScript) + ',' + JSON.stringify(styleSet) + ',' + JSON.stringify(options) + ');', function(res) {
+				$rootScope.log('typesetPage return', res);
 				if (res === 'no_document') {
 					def.reject('No document');
 				}
