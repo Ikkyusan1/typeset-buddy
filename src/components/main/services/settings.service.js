@@ -5,7 +5,9 @@ tb.factory('SettingsService', ['$rootScope', '$localStorage', '$q',
 		self.init = function() {
 			$rootScope.log('$localStorage', $localStorage);
 			if (!!!$localStorage.styleSets) {
-				$localStorage.styleSets = [tbHelper.getDummyStyleSet('Default set')];
+				let dummyStyleSet = tbHelper.getDummyStyleSet('Default set');
+				dummyStyleSet.id = 0;
+				$localStorage.styleSets = [dummyStyleSet];
 				$localStorage.lastOpenedStyleSet = $localStorage.styleSets[0].id;
 			}
 			if (!angular.isDefined($localStorage.panelSeparator)) self.setting('panelSeparator', '–');

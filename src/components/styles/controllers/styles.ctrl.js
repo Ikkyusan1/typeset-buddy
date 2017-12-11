@@ -146,7 +146,6 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 					function() {
 						if (StylesService.deleteStyleSet($scope.styleSet.id) === true) {
 							ngToast.create({className: 'success', content: 'Deleted'});
-							$scope.selectedStyleset = 0;
 						}
 					},
 					function() {}

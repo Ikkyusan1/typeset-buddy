@@ -1,5 +1,5 @@
-tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngToast',
-	function($rootScope, $localStorage, $q, Utils, ngToast) {
+tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngToast', '$timeout',
+	function($rootScope, $localStorage, $q, Utils, ngToast, $timeout) {
 
 		var self = this;
 
@@ -44,7 +44,6 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 				$localStorage.styleSets.push(angular.copy(styleSet));
 			}
 			$localStorage.lastOpenedStyleSet = styleSet.id;
-			$rootScope.$broadcast('refresh-styleset-list');
 		};
 
 		self.getStyleSet = function(id) {
@@ -55,7 +54,7 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 				}
 			}
 			else {
-				let idx = $localStorage.styleSets.findIndex(function(one) { return one.id == id; });
+				let idx = $localStorage.styleSets.findIndex(function(one) { return one.id === id; });
 				if (idx > -1) {
 					styleSet = angular.copy($localStorage.styleSets[idx]);
 				}
@@ -71,14 +70,14 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 
 		self.deleteStyleSet = function(id) {
 			let idx = $localStorage.styleSets.findIndex(function(one) { return one.id == id; });
-			if ($localStorage.styleSets[idx].name == 'Default set') {
+			if ($localStorage.styleSets[idx].id === 0) {
 				ngToast.create({className: 'danger', content: 'Cannot delete default style set'});
 				return false;
 			}
 			if (idx > -1) {
 				$localStorage.styleSets.splice(idx, 1);
 				delete $localStorage.lastOpenedStyleSet;
-				$rootScope.$broadcast('refresh-styleset-list');
+				$timeout(function(){ $rootScope.$broadcast('refresh-styleset-list'); }, 0);
 				return true;
 			}
 		};
