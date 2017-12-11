@@ -1,9 +1,13 @@
-tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToast', 'Utils', 'Applier',
-	function($scope, StylesService, ScriptService, ngToast, Utils, Applier) {
+tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToast', 'Utils', 'Applier', '$sessionStorage',
+	function($scope, StylesService, ScriptService, ngToast, Utils, Applier, $sessionStorage) {
+
+		$scope.$sessionStorage = $sessionStorage.$default({
+			styleFilter: ''
+		});
 
 		$scope.clearStyleFilter = function(){
-			$scope.styleFilter = undefined;
-		}
+			$scope.$sessionStorage.styleFilter = '';
+		};
 
 		$scope.newStyleSet = function() {
 			$scope.styleSet = tbHelper.getDummyStyleSet();
@@ -230,8 +234,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 		};
 
 		$scope.loadCurrentStyleSet = function() {
-			$scope.styleSet = StylesService.getStyleSet();
-			$scope.selectedStyleset = $scope.styleSet.id;
+			$scope.selectedStyleset = StylesService.getStyleSet().id;
 		};
 
 		$scope.loadCurrentStyleSet();
