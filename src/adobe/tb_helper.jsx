@@ -320,7 +320,7 @@ var tbHelper = {
 		// [1]: undefined or a page note. Mainly used to apply a style to a whole page, like [italic]
 		// [2]: the page's bubbles.
 		// [3]: start of the next page or end
-		var reg = new RegExp('\\b' + pageNumber + '#\\ ?(.*)?\\n([\\s\\S]*?)($|END|[\\d-]{3,9}#)');
+		var reg = new RegExp('\\b' + pageNumber + '#\\ ?(.*)?\\n([\\s\\S]*?)($|END#|[\\d-]{3,9}#)');
 		var match = reg.exec(text);
 		return (!!match)? match : null;
 	},
