@@ -103,7 +103,12 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 								let tmpStyles = [];
 								if (bubble.text) {
 									if ($scope.textReplace) {
-										bubble.text = tbHelper.replaceText(bubble.text, SettingsService.setting('textReplaceRules'));
+										try {
+											bubble.text = tbHelper.replaceText(bubble.text, SettingsService.setting('textReplaceRules'));
+										}
+										catch (e) {
+											ngToast.create({className: 'danger', content: 'Text replace error: ' + e});
+										}
 									}
 									if (tbHelper.isMultiBubblePart(line)) {
 										tmpStyles = tbHelper.getTextStyles(line, previousStyle);
@@ -204,8 +209,10 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			$scope.$root.CSI.evalScript(script, function(result) {});
 		};
 
-		$scope.toClipboard = function(text) {
+		$scope.toClipboard = function(text, type) {
 			clipboard.copyText(text);
+			let txt = (!!type && type == 'note')? 'Note copied to clipboard' : 'Content copied to clipboard';
+			ngToast.create({className: 'info', content: txt});
 		};
 
 		$scope.reset();
