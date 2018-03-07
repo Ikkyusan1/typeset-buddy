@@ -103,7 +103,12 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 								let tmpStyles = [];
 								if (bubble.text) {
 									if ($scope.textReplace) {
-										bubble.text = tbHelper.replaceText(bubble.text, SettingsService.setting('textReplaceRules'));
+										try {
+											bubble.text = tbHelper.replaceText(bubble.text, SettingsService.setting('textReplaceRules'));
+										}
+										catch (e) {
+											ngToast.create({className: 'danger', content: 'Text replace error: ' + e});
+										}
 									}
 									if (tbHelper.isMultiBubblePart(line)) {
 										tmpStyles = tbHelper.getTextStyles(line, previousStyle);

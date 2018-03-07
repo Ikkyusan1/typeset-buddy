@@ -7,7 +7,8 @@ tb.config(['$compileProvider', '$localStorageProvider', 'ngToastProvider', 'CONF
 
 		ngToastProvider.configure({
 			verticalPosition: 'bottom',
-			maxNumber: 10
+			maxNumber: 10,
+			combineDuplications: true
 		});
 	}
 ]);
