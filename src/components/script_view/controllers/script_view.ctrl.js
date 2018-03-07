@@ -209,8 +209,11 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			$scope.$root.CSI.evalScript(script, function(result) {});
 		};
 
-		$scope.toClipboard = function(text) {
+		$scope.toClipboard = function(text, type) {
 			clipboard.copyText(text);
+			let txt;
+			txt = (!!type && type == 'note')? 'Note copied to clipboard' : 'Content copied to clipboard';
+			ngToast.create({className: 'info', content: txt});
 		};
 
 		$scope.reset();
