@@ -191,7 +191,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 
 		$scope.applyStyleSelectedLayers = function(style, resize) {
 			let tmpStyle = angular.copy(style);
-			tmpStyle.noResize = !!!resize;
+			tmpStyle.autoResize = !!resize;
 			tmpStyle.language = $scope.styleSet.language;
 			Applier.actionSelectedLayers('applyStyle', tmpStyle)
 			.then(

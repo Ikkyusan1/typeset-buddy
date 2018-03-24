@@ -7,7 +7,7 @@ tb.factory('ScriptService', ['$rootScope', 'SettingsService', '$q',
 			let tmpObj = angular.copy(typesetObj);
 			tmpObj.useLayerGroups = SettingsService.setting('useLayerGroups');
 			$rootScope.log('typesetObj', tmpObj);
-			$rootScope.CSI.evalScript('tryExec("getSingleRectangleSelectionDimensions");', function(res) {
+			$rootScope.CSI.evalScript('tryExec("getSingleRectangleSelectionCoordinates");', function(res) {
 				$rootScope.log('maybeTypesetToPath return', res);
 				if (res == 'no_document') {
 					def.reject('No document');
@@ -24,16 +24,16 @@ tb.factory('ScriptService', ['$rootScope', 'SettingsService', '$q',
 				else {
 					try {
 						res = JSON.parse(res);
-						if (!angular.isDefined(res.p)) {
-							def.reject('The dimensions were malformed.');
+						if (!angular.isDefined(res.x)) {
+							def.reject('The coordinates were malformed.');
 						}
 						else {
-							tmpObj.style.dimensions = res;
+							tmpObj.coordinates = res;
 							return self.typeset(tmpObj);
 						}
 					}
 					catch (e) {
-						def.reject('Could not parse the dimensions.');
+						def.reject('Could not parse the coordinates.');
 					}
 				}
 			});
