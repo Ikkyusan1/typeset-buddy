@@ -57,22 +57,23 @@
 </div>
 
 <div class="row no-shrink pb header">
-	<div class="col-md-4 col-xs-4">
-		<label>
-			Name
+	<div class="col-md-3 col-xs-3">
+		<label uib-tooltip="Styleset name" tooltip-popup-delay="500" tooltip-placement="bottom">
 			<input type="text" class="topcoat-text-input" placeholder="Styleset name" ng-model="styleSet.name" ng-disabled="selectedStyleset === 0" ng-pattern="/[\d\w]{1,30}/">
 		</label>
 	</div>
-	<div class="col-md-5 col-xs-5">
-		<label>
-			Style filter
-			<input type="text" class="topcoat-text-input" placeholder="filter..." ng-model="$sessionStorage.styleFilter">
+	<div class="col-md-7 col-xs-7">
+		<label uib-tooltip="Spelling/Hyphen language" tooltip-popup-delay="500" tooltip-placement="bottom">
+			<language-selector class="" selected-value="styleSet.language"></language-selector>
+		</label>
+		<label uib-tooltip="Filter style list" tooltip-popup-delay="500" tooltip-placement="bottom">
+			<input type="text" class="topcoat-text-input" placeholder="Filter styles..." ng-model="$sessionStorage.styleFilter">
 		</label>
 		<button class="topcoat-button" ng-click="clearStyleFilter()" ng-if="!!$sessionStorage.styleFilter">
 			<span class="glyphicon glyphicon-remove"></span>
 		</button>
 	</div>
-	<div class="col-md-3 col-xs-3 text-right">
+	<div class="col-md-2 col-xs-2 text-right">
 		<button class="topcoat-button" ng-click="addStyle()">Add Style</button>
 	</div>
 </div>

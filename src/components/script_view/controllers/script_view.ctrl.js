@@ -181,6 +181,13 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			}
 			let stylePreset = $scope.styleSet.styles.find(function(one) { return one.keyword == style.keyword; });
 			if (!!!stylePreset) stylePreset = $scope.styleSet.styles[0];
+			if(!angular.isDefined($scope.styleSet.language)) {
+				ngToast.create({className: 'info', content: 'The styleset\'s language is not defined. Fallback to default.'});
+				stylePreset.language = tbHelper.styleProps.languages.def;
+			}
+			else{
+				stylePreset.language = $scope.styleSet.language;
+			}
 			let text = bubble.text;
 			if (!!bubble.siblings) {
 				bubble.siblings.forEach(function(sibling){
