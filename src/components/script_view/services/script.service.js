@@ -63,7 +63,7 @@ tb.factory('ScriptService', ['$rootScope', 'SettingsService', '$q',
 				panelSeparator: SettingsService.setting('panelSeparator'),
 				useLayerGroups: SettingsService.setting('useLayerGroups'),
 				skipSfxs: SettingsService.setting('skipSfxs'),
-				textReplaceRules: (SettingsService.setting('textReplace'))? textReplaceRules : []
+				textReplaceRules: (SettingsService.setting('textReplace'))? SettingsService.setting('textReplaceRules') : []
 			};
 			$rootScope.$root.CSI.evalScript('tryExec("typesetPage", ' + JSON.stringify(pageScript) + ',' + JSON.stringify(styleSet) + ',' + JSON.stringify(options) + ');', function(res) {
 				$rootScope.log('typesetPage return', res);
