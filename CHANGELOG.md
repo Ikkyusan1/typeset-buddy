@@ -1,3 +1,10 @@
+### 0.3.0 (2018-03-24)
+Use more ActionDescriptors, typeset actions are now almost twice as fast as before.
+Spelling/hyphenation langauge added to the stylesets.
+Various fixes.
+Double click on bubble content/notes to copy them to clipboard.
+
+
 ### 0.2.1 (2017-11-03)
 TB Robot can now be run from the extension.
 Can typeset a whole page too, just like tb_robot would do it.

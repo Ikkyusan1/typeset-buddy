@@ -68,33 +68,33 @@ var tbHelper = {
 		'capitalization': {
 			label: 'Capitalization',
 			values: [
-				{value: 'ALLCAPS', label: 'All caps'},
-				{value: 'NORMAL', label: 'Normal'},
-				{value: 'SMALLCAPS', label: 'Small caps'}
+				{value: 'ALLCAPS', label: 'All caps', descriptorValue: 'allCaps', descriptorType: 'string'},
+				{value: 'NORMAL', label: 'Normal', descriptorValue: 'Nrml', descriptorType: 'char'},
+				{value: 'SMALLCAPS', label: 'Small caps', descriptorValue: 'smallCaps', descriptorType: 'string'}
 			],
 			def: 'NORMAL'
 		},
 		'justification': {
 			label: 'Justification',
 			values: [
-				{value: 'CENTER', label: 'Center'},
-				{value: 'CENTERJUSTIFIED', label: 'Center justified'},
-				{value: 'FULLYJUSTIFIED', label: 'Fully justified'},
-				{value: 'LEFT', label: 'Left'},
-				{value: 'LEFTJUSTIFIED', label: 'Left justified'},
-				{value: 'RIGHT', label: 'Right'},
-				{value: 'RIGHTJUSTIFIED', label: 'Right justified'}
+				{value: 'CENTER', label: 'Center', descriptorValue: 'Cntr', descriptorType: 'char'},
+				{value: 'CENTERJUSTIFIED', label: 'Center justified', descriptorValue: 'justifyCenter', descriptorType: 'string'},
+				{value: 'FULLYJUSTIFIED', label: 'Fully justified', descriptorValue: 'JstA', descriptorType: 'char'},
+				{value: 'LEFT', label: 'Left', descriptorValue: 'Left', descriptorType: 'char'},
+				{value: 'LEFTJUSTIFIED', label: 'Left justified', descriptorValue: 'justifyLeft', descriptorType: 'string'},
+				{value: 'RIGHT', label: 'Right', descriptorValue: 'Rght', descriptorType: 'char'},
+				{value: 'RIGHTJUSTIFIED', label: 'Right justified', descriptorValue: 'justifyRight', descriptorType: 'string'}
 			],
 			def: 'CENTER'
 		},
 		'antialias': {
 			label: 'Antialias',
 			values: [
-				{value: 'CRISP', label: 'Crisp'},
-				{value: 'SHARP', label: 'Sharp'},
-				{value: 'SMOOTH', label: 'Smooth'},
-				{value: 'STRONG', label: 'Strong'},
-				{value: 'NONE', label: 'None'}
+				{value: 'CRISP', label: 'Crisp', descriptorValue: 'AnCr', descriptorType: 'char'},
+				{value: 'SHARP', label: 'Sharp', descriptorValue: 'AnSh', descriptorType: 'char'},
+				{value: 'SMOOTH', label: 'Smooth', descriptorValue: 'AnSm', descriptorType: 'char'},
+				{value: 'STRONG', label: 'Strong', descriptorValue: 'AnSt', descriptorType: 'char'},
+				{value: 'NONE', label: 'None', descriptorValue: 'Anno', descriptorType: 'char'}
 			],
 			def: 'SMOOTH'
 		},
@@ -113,10 +113,69 @@ var tbHelper = {
 		'kerning': {
 			label: 'Kerning',
 			values: [
-				{value: 'METRICS', label: 'Metrics'},
-				{value: 'OPTICAL', label: 'Optical'}
+				{value: 'METRICS', label: 'Metrics', descriptorValue: 'metricsKern', descriptorType: 'string'},
+				{value: 'OPTICAL', label: 'Optical', descriptorValue: 'opticalKern', descriptorType: 'string'}
 			],
 			def: 'METRICS'
+		},
+		languages: {
+			label: 'Spelling/Hyphen',
+			def: 'englishLanguage',
+			values: [
+				{label: 'Arabic', value: 'arabicLanguage'},
+				{label: 'Bangla India', value: 'bengaliIndiaLanguage'},
+				{label: 'Bulgarian', value: 'bulgarianLanguage'},
+				{label: 'Catalan', value: 'catalanLanguage'},
+				{label: 'Croatian', value: 'croatianLanguage'},
+				{label: 'Czech', value: 'czechLanguage'},
+				{label: 'Danish', value: 'danishLanguage'},
+				{label: 'Dutch 2005 reform', value: 'dutchLanguage'},
+				{label: 'Dutch Old Rules', value: 'kdutchLanguageOldRules'},
+				{label: 'English Canadian', value: 'canadianEnglishLanguage'},
+				{label: 'English UK', value: 'ukenglishLanguage'},
+				{label: 'English USA', value: 'englishLanguage'},
+				{label: 'Estonian', value: 'estonianLanguage'},
+				{label: 'Finnish', value: 'finnishLanguage'},
+				{label: 'French Canadian', value: 'canadianFrenchLanguage'},
+				{label: 'French', value: 'standardFrenchLanguage'},
+				{label: 'German 1996 reform', value: 'germanLanguageReformed1996'},
+				{label: 'German 2006 reform', value: 'standardGermanLanguage'},
+				{label: 'German Old Rules', value: 'oldGermanLanguage'},
+				{label: 'German Swiss 2006', value: 'swissGermanLanguage'},
+				{label: 'German Swiss', value: 'swissGermanLanguageOldRules'},
+				{label: 'Greek', value: 'greekLanguage'},
+				{label: 'Gujarati', value: 'gujaratiLanguage'},
+				{label: 'Hebrew', value: 'hebrewLanguage'},
+				{label: 'Hindi', value: 'hindiLanguage'},
+				{label: 'Hungarian', value: 'hungarianLanguage'},
+				{label: 'Italian', value: 'italianLanguage'},
+				{label: 'Kannada', value: 'kannadaLanguage'},
+				{label: 'Latvian', value: 'latvianLanguage'},
+				{label: 'Lithuanian', value: 'lithuanianLanguage'},
+				{label: 'Malayaman', value: 'malayalamLanguage'},
+				{label: 'Marathi', value: 'marathiLanguage'},
+				{label: 'Norwegian Bokmal', value: 'bokmalNorwegianLanguage'},
+				{label: 'Norwegian Nynorsk', value: 'nynorskNorwegianLanguage'},
+				{label: 'Odia', value: 'oriyaLanguage'},
+				{label: 'Polish', value: 'polishLanguage'},
+				{label: 'Portuguese Brazilian', value: 'brazilianPortugueseLanguage'},
+				{label: 'Portuguese', value: 'standardPortugueseLanguage'},
+				{label: 'Punjabi', value: 'punjabiLanguage'},
+				{label: 'Romanian', value: 'romanianLanguage'},
+				{label: 'Russian', value: 'russianLanguage'},
+				{label: 'Slovak', value: 'slovakLanguage'},
+				{label: 'Slovenian', value: 'slovenianLanguage'},
+				{label: 'Spanish', value: 'spanishLanguage'},
+				{label: 'Swedish', value: 'swedishLanguage'},
+				{label: 'Tamil', value: 'tamilLanguage'},
+				{label: 'Telugu', value: 'teluguLanguage'},
+				{label: 'Turkish', value: 'turkishLanguage'},
+				{label: 'Ukrainian', value: 'ukranianLanguage'},
+				// {label: 'Chinese', value: 'chineseLanguage'},
+				// {label: 'Icelandic', value: 'icelandicLanguage'},
+				// {label: 'Japanese', value: 'japaneseLanguage'},
+				// {label: 'Serbian', value: 'serbianLanguage'},
+			]
 		}
 	},
 
@@ -170,12 +229,8 @@ var tbHelper = {
 		];
 	},
 
-	getSylePropValues: function(prop) {
-		var values = [];
-		for (var i = 0; i < this.styleProps[prop].values.length; i++) {
-			values.push(styleProps[prop].values[i].value);
-		}
-		return values;
+	getStyleProp: function(prop, value) {
+		return this.styleProps[prop].values.find(function(one) { return one.value == value; });
 	},
 
 	uniqueId: function() {
@@ -201,6 +256,7 @@ var tbHelper = {
 		var dummy = {
 			id: this.uniqueId(),
 			name: null,
+			language: this.styleProps.languages.def,
 			styles: [
 				this.getDummyStyle('default_style')
 			]
@@ -320,7 +376,7 @@ var tbHelper = {
 		// [1]: undefined or a page note. Mainly used to apply a style to a whole page, like [italic]
 		// [2]: the page's bubbles.
 		// [3]: start of the next page or end
-		var reg = new RegExp('\\b' + pageNumber + '#\\ ?(.*)?\\n([\\s\\S]*?)($|END|[\\d-]{3,9}#)');
+		var reg = new RegExp('\\b' + pageNumber + '#\\ ?(.*)?\\n([\\s\\S]*?)($|END#|[\\d-]{3,9}#)');
 		var match = reg.exec(text);
 		return (!!match)? match : null;
 	},

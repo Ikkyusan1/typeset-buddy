@@ -74,33 +74,33 @@ var tbHelper = {
 		'capitalization': {
 			label: 'Capitalization',
 			values: [
-				{value: 'ALLCAPS', label: 'All caps'},
-				{value: 'NORMAL', label: 'Normal'},
-				{value: 'SMALLCAPS', label: 'Small caps'}
+				{value: 'ALLCAPS', label: 'All caps', descriptorValue: 'allCaps', descriptorType: 'string'},
+				{value: 'NORMAL', label: 'Normal', descriptorValue: 'Nrml', descriptorType: 'char'},
+				{value: 'SMALLCAPS', label: 'Small caps', descriptorValue: 'smallCaps', descriptorType: 'string'}
 			],
 			def: 'NORMAL'
 		},
 		'justification': {
 			label: 'Justification',
 			values: [
-				{value: 'CENTER', label: 'Center'},
-				{value: 'CENTERJUSTIFIED', label: 'Center justified'},
-				{value: 'FULLYJUSTIFIED', label: 'Fully justified'},
-				{value: 'LEFT', label: 'Left'},
-				{value: 'LEFTJUSTIFIED', label: 'Left justified'},
-				{value: 'RIGHT', label: 'Right'},
-				{value: 'RIGHTJUSTIFIED', label: 'Right justified'}
+				{value: 'CENTER', label: 'Center', descriptorValue: 'Cntr', descriptorType: 'char'},
+				{value: 'CENTERJUSTIFIED', label: 'Center justified', descriptorValue: 'justifyCenter', descriptorType: 'string'},
+				{value: 'FULLYJUSTIFIED', label: 'Fully justified', descriptorValue: 'JstA', descriptorType: 'char'},
+				{value: 'LEFT', label: 'Left', descriptorValue: 'Left', descriptorType: 'char'},
+				{value: 'LEFTJUSTIFIED', label: 'Left justified', descriptorValue: 'justifyLeft', descriptorType: 'string'},
+				{value: 'RIGHT', label: 'Right', descriptorValue: 'Rght', descriptorType: 'char'},
+				{value: 'RIGHTJUSTIFIED', label: 'Right justified', descriptorValue: 'justifyRight', descriptorType: 'string'}
 			],
 			def: 'CENTER'
 		},
 		'antialias': {
 			label: 'Antialias',
 			values: [
-				{value: 'CRISP', label: 'Crisp'},
-				{value: 'SHARP', label: 'Sharp'},
-				{value: 'SMOOTH', label: 'Smooth'},
-				{value: 'STRONG', label: 'Strong'},
-				{value: 'NONE', label: 'None'}
+				{value: 'CRISP', label: 'Crisp', descriptorValue: 'AnCr', descriptorType: 'char'},
+				{value: 'SHARP', label: 'Sharp', descriptorValue: 'AnSh', descriptorType: 'char'},
+				{value: 'SMOOTH', label: 'Smooth', descriptorValue: 'AnSm', descriptorType: 'char'},
+				{value: 'STRONG', label: 'Strong', descriptorValue: 'AnSt', descriptorType: 'char'},
+				{value: 'NONE', label: 'None', descriptorValue: 'Anno', descriptorType: 'char'}
 			],
 			def: 'SMOOTH'
 		},
@@ -119,10 +119,69 @@ var tbHelper = {
 		'kerning': {
 			label: 'Kerning',
 			values: [
-				{value: 'METRICS', label: 'Metrics'},
-				{value: 'OPTICAL', label: 'Optical'}
+				{value: 'METRICS', label: 'Metrics', descriptorValue: 'metricsKern', descriptorType: 'string'},
+				{value: 'OPTICAL', label: 'Optical', descriptorValue: 'opticalKern', descriptorType: 'string'}
 			],
 			def: 'METRICS'
+		},
+		languages: {
+			label: 'Spelling/Hyphen',
+			def: 'englishLanguage',
+			values: [
+				{label: 'Arabic', value: 'arabicLanguage'},
+				{label: 'Bangla India', value: 'bengaliIndiaLanguage'},
+				{label: 'Bulgarian', value: 'bulgarianLanguage'},
+				{label: 'Catalan', value: 'catalanLanguage'},
+				{label: 'Croatian', value: 'croatianLanguage'},
+				{label: 'Czech', value: 'czechLanguage'},
+				{label: 'Danish', value: 'danishLanguage'},
+				{label: 'Dutch 2005 reform', value: 'dutchLanguage'},
+				{label: 'Dutch Old Rules', value: 'kdutchLanguageOldRules'},
+				{label: 'English Canadian', value: 'canadianEnglishLanguage'},
+				{label: 'English UK', value: 'ukenglishLanguage'},
+				{label: 'English USA', value: 'englishLanguage'},
+				{label: 'Estonian', value: 'estonianLanguage'},
+				{label: 'Finnish', value: 'finnishLanguage'},
+				{label: 'French Canadian', value: 'canadianFrenchLanguage'},
+				{label: 'French', value: 'standardFrenchLanguage'},
+				{label: 'German 1996 reform', value: 'germanLanguageReformed1996'},
+				{label: 'German 2006 reform', value: 'standardGermanLanguage'},
+				{label: 'German Old Rules', value: 'oldGermanLanguage'},
+				{label: 'German Swiss 2006', value: 'swissGermanLanguage'},
+				{label: 'German Swiss', value: 'swissGermanLanguageOldRules'},
+				{label: 'Greek', value: 'greekLanguage'},
+				{label: 'Gujarati', value: 'gujaratiLanguage'},
+				{label: 'Hebrew', value: 'hebrewLanguage'},
+				{label: 'Hindi', value: 'hindiLanguage'},
+				{label: 'Hungarian', value: 'hungarianLanguage'},
+				{label: 'Italian', value: 'italianLanguage'},
+				{label: 'Kannada', value: 'kannadaLanguage'},
+				{label: 'Latvian', value: 'latvianLanguage'},
+				{label: 'Lithuanian', value: 'lithuanianLanguage'},
+				{label: 'Malayaman', value: 'malayalamLanguage'},
+				{label: 'Marathi', value: 'marathiLanguage'},
+				{label: 'Norwegian Bokmal', value: 'bokmalNorwegianLanguage'},
+				{label: 'Norwegian Nynorsk', value: 'nynorskNorwegianLanguage'},
+				{label: 'Odia', value: 'oriyaLanguage'},
+				{label: 'Polish', value: 'polishLanguage'},
+				{label: 'Portuguese Brazilian', value: 'brazilianPortugueseLanguage'},
+				{label: 'Portuguese', value: 'standardPortugueseLanguage'},
+				{label: 'Punjabi', value: 'punjabiLanguage'},
+				{label: 'Romanian', value: 'romanianLanguage'},
+				{label: 'Russian', value: 'russianLanguage'},
+				{label: 'Slovak', value: 'slovakLanguage'},
+				{label: 'Slovenian', value: 'slovenianLanguage'},
+				{label: 'Spanish', value: 'spanishLanguage'},
+				{label: 'Swedish', value: 'swedishLanguage'},
+				{label: 'Tamil', value: 'tamilLanguage'},
+				{label: 'Telugu', value: 'teluguLanguage'},
+				{label: 'Turkish', value: 'turkishLanguage'},
+				{label: 'Ukrainian', value: 'ukranianLanguage'},
+				// {label: 'Chinese', value: 'chineseLanguage'},
+				// {label: 'Icelandic', value: 'icelandicLanguage'},
+				// {label: 'Japanese', value: 'japaneseLanguage'},
+				// {label: 'Serbian', value: 'serbianLanguage'},
+			]
 		}
 	},
 
@@ -176,12 +235,8 @@ var tbHelper = {
 		];
 	},
 
-	getSylePropValues: function(prop) {
-		var values = [];
-		for (var i = 0; i < this.styleProps[prop].values.length; i++) {
-			values.push(styleProps[prop].values[i].value);
-		}
-		return values;
+	getStyleProp: function(prop, value) {
+		return this.styleProps[prop].values.find(function(one) { return one.value == value; });
 	},
 
 	uniqueId: function() {
@@ -207,6 +262,7 @@ var tbHelper = {
 		var dummy = {
 			id: this.uniqueId(),
 			name: null,
+			language: this.styleProps.languages.def,
 			styles: [
 				this.getDummyStyle('default_style')
 			]
@@ -326,7 +382,7 @@ var tbHelper = {
 		// [1]: undefined or a page note. Mainly used to apply a style to a whole page, like [italic]
 		// [2]: the page's bubbles.
 		// [3]: start of the next page or end
-		var reg = new RegExp('\\b' + pageNumber + '#\\ ?(.*)?\\n([\\s\\S]*?)($|END|[\\d-]{3,9}#)');
+		var reg = new RegExp('\\b' + pageNumber + '#\\ ?(.*)?\\n([\\s\\S]*?)($|END#|[\\d-]{3,9}#)');
 		var match = reg.exec(text);
 		return (!!match)? match : null;
 	},
@@ -448,7 +504,7 @@ var tb = angular.module('tb', [
 tb.constant('CONF', {
 	appName: 'typeset_buddy', // will be replaced by package.json name when compiled
 	debug: false,	// will be true when compiled for dev environment, false otherwise
-	version: '0.2.1' // will be replaced when compiled
+	version: '0.3.0' // will be replaced when compiled
 });
 
 tb.config(['$compileProvider', '$localStorageProvider', 'ngToastProvider', 'CONF',
@@ -460,7 +516,8 @@ tb.config(['$compileProvider', '$localStorageProvider', 'ngToastProvider', 'CONF
 
 		ngToastProvider.configure({
 			verticalPosition: 'bottom',
-			maxNumber: 10
+			maxNumber: 10,
+			combineDuplications: true
 		});
 	}
 ]);
@@ -675,7 +732,9 @@ tb.factory('SettingsService', ['$rootScope', '$localStorage', '$q',
 		self.init = function() {
 			$rootScope.log('$localStorage', $localStorage);
 			if (!!!$localStorage.styleSets) {
-				$localStorage.styleSets = [tbHelper.getDummyStyleSet('Default set')];
+				let dummyStyleSet = tbHelper.getDummyStyleSet('Default set');
+				dummyStyleSet.id = 0;
+				$localStorage.styleSets = [dummyStyleSet];
 				$localStorage.lastOpenedStyleSet = $localStorage.styleSets[0].id;
 			}
 			if (!angular.isDefined($localStorage.panelSeparator)) self.setting('panelSeparator', '–');
@@ -906,8 +965,8 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			$scope.mergeBubbles = SettingsService.setting('mergeBubbles');
 			$scope.skipSfxs = SettingsService.setting('skipSfxs');
 			$scope.textReplace = SettingsService.setting('textReplace');
-			$scope.styleSet = StylesService.getStyleSet();
-			$scope.selectedStyleset = $scope.styleSet.id;
+			$scope.styleSet = undefined;
+			$scope.selectedStyleset = SettingsService.setting('lastOpenedStyleSet');
 		};
 
 		$scope.browseScript = function() {
@@ -932,9 +991,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 						}
 						else {
 							$scope.selectedPage = page;
-							$scope.loadPage($scope.selectedPage);
 						}
-
 					}
 					else {
 						throw 'Did not find any page number in the translation script';
@@ -993,7 +1050,12 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 								let tmpStyles = [];
 								if (bubble.text) {
 									if ($scope.textReplace) {
-										bubble.text = tbHelper.replaceText(bubble.text, SettingsService.setting('textReplaceRules'));
+										try {
+											bubble.text = tbHelper.replaceText(bubble.text, SettingsService.setting('textReplaceRules'));
+										}
+										catch (e) {
+											ngToast.create({className: 'danger', content: 'Text replace error: ' + e});
+										}
 									}
 									if (tbHelper.isMultiBubblePart(line)) {
 										tmpStyles = tbHelper.getTextStyles(line, previousStyle);
@@ -1063,11 +1125,18 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 				style = {keyword: $scope.selectedForcedStyle, inStyleSet: true};
 			}
 			if (!style.inStyleSet) {
-				ngToast.create({className: 'danger', content: 'Style "'+ style.keyword +'" not found in styleset. Fallback to default_style.'});
+				ngToast.create({className: 'info', content: 'Style "'+ style.keyword +'" not found in styleset. Fallback to default_style.'});
 				style = 'default_style';
 			}
 			let stylePreset = $scope.styleSet.styles.find(function(one) { return one.keyword == style.keyword; });
 			if (!!!stylePreset) stylePreset = $scope.styleSet.styles[0];
+			if(!angular.isDefined($scope.styleSet.language)) {
+				ngToast.create({className: 'info', content: 'The styleset\'s language is not defined. Fallback to default.'});
+				stylePreset.language = tbHelper.styleProps.languages.def;
+			}
+			else{
+				stylePreset.language = $scope.styleSet.language;
+			}
 			let text = bubble.text;
 			if (!!bubble.siblings) {
 				bubble.siblings.forEach(function(sibling){
@@ -1094,8 +1163,10 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			$scope.$root.CSI.evalScript(script, function(result) {});
 		};
 
-		$scope.toClipboard = function(text) {
+		$scope.toClipboard = function(text, type) {
 			clipboard.copyText(text);
+			let txt = (!!type && type == 'note')? 'Note copied to clipboard' : 'Content copied to clipboard';
+			ngToast.create({className: 'info', content: txt});
 		};
 
 		$scope.reset();
@@ -1142,7 +1213,7 @@ tb.factory('ScriptService', ['$rootScope', 'SettingsService', '$q',
 			let tmpObj = angular.copy(typesetObj);
 			tmpObj.useLayerGroups = SettingsService.setting('useLayerGroups');
 			$rootScope.log('typesetObj', tmpObj);
-			$rootScope.CSI.evalScript('tryExec("getSingleRectangleSelectionDimensions");', function(res) {
+			$rootScope.CSI.evalScript('tryExec("getSingleRectangleSelectionCoordinates");', function(res) {
 				$rootScope.log('maybeTypesetToPath return', res);
 				if (res == 'no_document') {
 					def.reject('No document');
@@ -1159,16 +1230,16 @@ tb.factory('ScriptService', ['$rootScope', 'SettingsService', '$q',
 				else {
 					try {
 						res = JSON.parse(res);
-						if (!angular.isDefined(res.p)) {
-							def.reject('The dimensions were malformed.');
+						if (!angular.isDefined(res.x)) {
+							def.reject('The coordinates were malformed.');
 						}
 						else {
-							tmpObj.style.dimensions = res;
+							tmpObj.coordinates = res;
 							return self.typeset(tmpObj);
 						}
 					}
 					catch (e) {
-						def.reject('Could not parse the dimensions.');
+						def.reject('Could not parse the coordinates.');
 					}
 				}
 			});
@@ -1177,7 +1248,7 @@ tb.factory('ScriptService', ['$rootScope', 'SettingsService', '$q',
 
 		self.typeset = function(typesetObj) {
 			let def = $q.defer();
-			$rootScope.$root.CSI.evalScript('tryExec("typesetEX", ' + JSON.stringify(typesetObj) + ');', function(res) {
+			$rootScope.CSI.evalScript('tryExec("typesetEX", ' + JSON.stringify(typesetObj) + ');', function(res) {
 				$rootScope.log('typeset return', res);
 				if (res === 'no_document') {
 					def.reject('No document');
@@ -1198,9 +1269,9 @@ tb.factory('ScriptService', ['$rootScope', 'SettingsService', '$q',
 				panelSeparator: SettingsService.setting('panelSeparator'),
 				useLayerGroups: SettingsService.setting('useLayerGroups'),
 				skipSfxs: SettingsService.setting('skipSfxs'),
-				textReplaceRules: (SettingsService.setting('textReplace'))? textReplaceRules : []
+				textReplaceRules: (SettingsService.setting('textReplace'))? SettingsService.setting('textReplaceRules') : []
 			};
-			$rootScope.$root.CSI.evalScript('tryExec("typesetPage", ' + JSON.stringify(pageScript) + ',' + JSON.stringify(styleSet) + ',' + JSON.stringify(options) + ');', function(res) {
+			$rootScope.CSI.evalScript('tryExec("typesetPage", ' + JSON.stringify(pageScript) + ',' + JSON.stringify(styleSet) + ',' + JSON.stringify(options) + ');', function(res) {
 				$rootScope.log('typesetPage return', res);
 				if (res === 'no_document') {
 					def.reject('No document');
@@ -1239,12 +1310,16 @@ tb.config(['$stateProvider',
 	}
 ]);
 
-tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToast', 'Utils', 'Applier',
-	function($scope, StylesService, ScriptService, ngToast, Utils, Applier) {
+tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToast', 'Utils', 'Applier', '$sessionStorage', 'SettingsService',
+	function($scope, StylesService, ScriptService, ngToast, Utils, Applier, $sessionStorage, SettingsService) {
+
+		$scope.$sessionStorage = $sessionStorage.$default({
+			styleFilter: ''
+		});
 
 		$scope.clearStyleFilter = function(){
-			$scope.styleFilter = undefined;
-		}
+			$scope.$sessionStorage.styleFilter = '';
+		};
 
 		$scope.newStyleSet = function() {
 			$scope.styleSet = tbHelper.getDummyStyleSet();
@@ -1383,7 +1458,6 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 					function() {
 						if (StylesService.deleteStyleSet($scope.styleSet.id) === true) {
 							ngToast.create({className: 'success', content: 'Deleted'});
-							$scope.selectedStyleset = 0;
 						}
 					},
 					function() {}
@@ -1429,7 +1503,8 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 
 		$scope.applyStyleSelectedLayers = function(style, resize) {
 			let tmpStyle = angular.copy(style);
-			tmpStyle.noResize = !!!resize;
+			tmpStyle.autoResize = !!resize;
+			tmpStyle.language = $scope.styleSet.language;
 			Applier.actionSelectedLayers('applyStyle', tmpStyle)
 			.then(
 				function() {
@@ -1471,8 +1546,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 		};
 
 		$scope.loadCurrentStyleSet = function() {
-			$scope.styleSet = StylesService.getStyleSet();
-			$scope.selectedStyleset = $scope.styleSet.id;
+			$scope.selectedStyleset = SettingsService.setting('lastOpenedStyleSet');
 		};
 
 		$scope.loadCurrentStyleSet();
@@ -1485,8 +1559,8 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 	}
 ]);
 
-tb.directive('antialiasSelector', ['StylesService',
-	function(StylesService) {
+tb.directive('antialiasSelector', [
+	function() {
 		return {
 			restrict: 'E',
 			scope: {
@@ -1504,8 +1578,8 @@ tb.directive('antialiasSelector', ['StylesService',
 	}
 ]);
 
-tb.directive('capitalizationSelector', ['StylesService',
-	function(StylesService) {
+tb.directive('capitalizationSelector', [
+	function() {
 		return {
 			restrict: 'E',
 			scope: {
@@ -1547,8 +1621,8 @@ tb.directive('fontSelector', ['StylesService',
 	}
 ]);
 
-tb.directive('justificationSelector', ['StylesService',
-	function(StylesService) {
+tb.directive('justificationSelector', [
+	function() {
 		return {
 			restrict: 'E',
 			scope: {
@@ -1566,8 +1640,8 @@ tb.directive('justificationSelector', ['StylesService',
 	}
 ]);
 
-tb.directive('kerningSelector', ['StylesService',
-	function(StylesService) {
+tb.directive('kerningSelector', [
+	function() {
 		return {
 			restrict: 'E',
 			scope: {
@@ -1579,6 +1653,25 @@ tb.directive('kerningSelector', ['StylesService',
 				$scope.choices = tbHelper.styleProps.kerning.values;
 				if (!!!$scope.selectedValue) {
 					$scope.selectedValue = tbHelper.styleProps.kerning.def;
+				}
+			}
+		};
+	}
+]);
+
+tb.directive('languageSelector', [
+	function() {
+		return {
+			restrict: 'E',
+			scope: {
+				selectedValue: '='
+			},
+			replace: true,
+			template: '<select ng-options="choice.value as choice.label for choice in choices" | orderBy: \'label\'" ng-model="selectedValue"></select>',
+			link: function($scope, $elem, $attrs) {
+				$scope.choices = tbHelper.styleProps.languages.values;
+				if (!!!$scope.selectedValue) {
+					$scope.selectedValue = tbHelper.styleProps.languages.def;
 				}
 			}
 		};
@@ -1620,8 +1713,7 @@ tb.directive('tbStyleSelector', ['StylesService',
 
 				$scope.refreshStyleList = function() {
 					$scope.choices = [];
-					let tmp = StylesService.getStyleSet($scope.styleset);
-					tmp.styles.forEach(function(one) {
+					$scope.styleset.styles.forEach(function(one) {
 						$scope.choices.push(one.keyword);
 					});
 					if (!!!$scope.selectedValue) {
@@ -1668,8 +1760,8 @@ tb.directive('stylesetSelector', ['StylesService',
 	}
 ]);
 
-tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngToast',
-	function($rootScope, $localStorage, $q, Utils, ngToast) {
+tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngToast', '$timeout',
+	function($rootScope, $localStorage, $q, Utils, ngToast, $timeout) {
 
 		var self = this;
 
@@ -1714,24 +1806,21 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 				$localStorage.styleSets.push(angular.copy(styleSet));
 			}
 			$localStorage.lastOpenedStyleSet = styleSet.id;
-			$rootScope.$broadcast('refresh-styleset-list');
 		};
 
 		self.getStyleSet = function(id) {
 			let styleSet = undefined;
 			if (!angular.isDefined(id)) {
-				if (angular.isDefined($localStorage.lastOpenedStyleSet)) {
-					styleSet = self.getStyleSet($localStorage.lastOpenedStyleSet);
-				}
+				id = (angular.isDefined($localStorage.lastOpenedStyleSet))? $localStorage.lastOpenedStyleSet : -1;
 			}
-			else {
-				let idx = $localStorage.styleSets.findIndex(function(one) { return one.id == id; });
-				if (idx > -1) {
-					styleSet = angular.copy($localStorage.styleSets[idx]);
-				}
+			let idx = $localStorage.styleSets.findIndex(function(one) { return one.id === id; });
+			if (idx > -1) {
+				styleSet = angular.copy($localStorage.styleSets[idx]);
 			}
+
 			if (!!styleSet) {
 				$localStorage.lastOpenedStyleSet = styleSet.id;
+				$rootScope.log('styleSet', styleSet);
 				return styleSet;
 			}
 			else {
@@ -1741,14 +1830,14 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 
 		self.deleteStyleSet = function(id) {
 			let idx = $localStorage.styleSets.findIndex(function(one) { return one.id == id; });
-			if ($localStorage.styleSets[idx].name == 'Default set') {
+			if ($localStorage.styleSets[idx].id === 0) {
 				ngToast.create({className: 'danger', content: 'Cannot delete default style set'});
 				return false;
 			}
 			if (idx > -1) {
 				$localStorage.styleSets.splice(idx, 1);
 				delete $localStorage.lastOpenedStyleSet;
-				$rootScope.$broadcast('refresh-styleset-list');
+				$timeout(function(){ $rootScope.$broadcast('refresh-styleset-list'); }, 0);
 				return true;
 			}
 		};
