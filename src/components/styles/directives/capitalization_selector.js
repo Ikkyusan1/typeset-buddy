@@ -1,5 +1,5 @@
-tb.directive('capitalizationSelector', ['StylesService',
-	function(StylesService) {
+tb.directive('capitalizationSelector', [
+	function() {
 		return {
 			restrict: 'E',
 			scope: {

@@ -1,5 +1,5 @@
-tb.directive('antialiasSelector', ['StylesService',
-	function(StylesService) {
+tb.directive('antialiasSelector', [
+	function() {
 		return {
 			restrict: 'E',
 			scope: {

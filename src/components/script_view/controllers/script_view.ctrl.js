@@ -176,7 +176,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 				style = {keyword: $scope.selectedForcedStyle, inStyleSet: true};
 			}
 			if (!style.inStyleSet) {
-				ngToast.create({className: 'danger', content: 'Style "'+ style.keyword +'" not found in styleset. Fallback to default_style.'});
+				ngToast.create({className: 'info', content: 'Style "'+ style.keyword +'" not found in styleset. Fallback to default_style.'});
 				style = 'default_style';
 			}
 			let stylePreset = $scope.styleSet.styles.find(function(one) { return one.keyword == style.keyword; });

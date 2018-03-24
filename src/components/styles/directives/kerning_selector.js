@@ -1,5 +1,5 @@
-tb.directive('kerningSelector', ['StylesService',
-	function(StylesService) {
+tb.directive('kerningSelector', [
+	function() {
 		return {
 			restrict: 'E',
 			scope: {

@@ -1,5 +1,5 @@
-tb.directive('justificationSelector', ['StylesService',
-	function(StylesService) {
+tb.directive('justificationSelector', [
+	function() {
 		return {
 			restrict: 'E',
 			scope: {

@@ -42,7 +42,7 @@ tb.factory('ScriptService', ['$rootScope', 'SettingsService', '$q',
 
 		self.typeset = function(typesetObj) {
 			let def = $q.defer();
-			$rootScope.$root.CSI.evalScript('tryExec("typesetEX", ' + JSON.stringify(typesetObj) + ');', function(res) {
+			$rootScope.CSI.evalScript('tryExec("typesetEX", ' + JSON.stringify(typesetObj) + ');', function(res) {
 				$rootScope.log('typeset return', res);
 				if (res === 'no_document') {
 					def.reject('No document');
@@ -65,7 +65,7 @@ tb.factory('ScriptService', ['$rootScope', 'SettingsService', '$q',
 				skipSfxs: SettingsService.setting('skipSfxs'),
 				textReplaceRules: (SettingsService.setting('textReplace'))? SettingsService.setting('textReplaceRules') : []
 			};
-			$rootScope.$root.CSI.evalScript('tryExec("typesetPage", ' + JSON.stringify(pageScript) + ',' + JSON.stringify(styleSet) + ',' + JSON.stringify(options) + ');', function(res) {
+			$rootScope.CSI.evalScript('tryExec("typesetPage", ' + JSON.stringify(pageScript) + ',' + JSON.stringify(styleSet) + ',' + JSON.stringify(options) + ');', function(res) {
 				$rootScope.log('typesetPage return', res);
 				if (res === 'no_document') {
 					def.reject('No document');
