@@ -68,33 +68,33 @@ var tbHelper = {
 		'capitalization': {
 			label: 'Capitalization',
 			values: [
-				{value: 'ALLCAPS', label: 'All caps'},
-				{value: 'NORMAL', label: 'Normal'},
-				{value: 'SMALLCAPS', label: 'Small caps'}
+				{value: 'ALLCAPS', label: 'All caps', descriptorValue: 'allCaps', descriptorType: 'string'},
+				{value: 'NORMAL', label: 'Normal', descriptorValue: 'Nrml', descriptorType: 'char'},
+				{value: 'SMALLCAPS', label: 'Small caps', descriptorValue: 'smallCaps', descriptorType: 'string'}
 			],
 			def: 'NORMAL'
 		},
 		'justification': {
 			label: 'Justification',
 			values: [
-				{value: 'CENTER', label: 'Center'},
-				{value: 'CENTERJUSTIFIED', label: 'Center justified'},
-				{value: 'FULLYJUSTIFIED', label: 'Fully justified'},
-				{value: 'LEFT', label: 'Left'},
-				{value: 'LEFTJUSTIFIED', label: 'Left justified'},
-				{value: 'RIGHT', label: 'Right'},
-				{value: 'RIGHTJUSTIFIED', label: 'Right justified'}
+				{value: 'CENTER', label: 'Center', descriptorValue: 'Cntr', descriptorType: 'char'},
+				{value: 'CENTERJUSTIFIED', label: 'Center justified', descriptorValue: 'justifyCenter', descriptorType: 'string'},
+				{value: 'FULLYJUSTIFIED', label: 'Fully justified', descriptorValue: 'JstA', descriptorType: 'char'},
+				{value: 'LEFT', label: 'Left', descriptorValue: 'Left', descriptorType: 'char'},
+				{value: 'LEFTJUSTIFIED', label: 'Left justified', descriptorValue: 'justifyLeft', descriptorType: 'string'},
+				{value: 'RIGHT', label: 'Right', descriptorValue: 'Rght', descriptorType: 'char'},
+				{value: 'RIGHTJUSTIFIED', label: 'Right justified', descriptorValue: 'justifyRight', descriptorType: 'string'}
 			],
 			def: 'CENTER'
 		},
 		'antialias': {
 			label: 'Antialias',
 			values: [
-				{value: 'CRISP', label: 'Crisp'},
-				{value: 'SHARP', label: 'Sharp'},
-				{value: 'SMOOTH', label: 'Smooth'},
-				{value: 'STRONG', label: 'Strong'},
-				{value: 'NONE', label: 'None'}
+				{value: 'CRISP', label: 'Crisp', descriptorValue: 'AnCr', descriptorType: 'char'},
+				{value: 'SHARP', label: 'Sharp', descriptorValue: 'AnSh', descriptorType: 'char'},
+				{value: 'SMOOTH', label: 'Smooth', descriptorValue: 'AnSm', descriptorType: 'char'},
+				{value: 'STRONG', label: 'Strong', descriptorValue: 'AnSt', descriptorType: 'char'},
+				{value: 'NONE', label: 'None', descriptorValue: 'Anno', descriptorType: 'char'}
 			],
 			def: 'SMOOTH'
 		},
@@ -113,8 +113,8 @@ var tbHelper = {
 		'kerning': {
 			label: 'Kerning',
 			values: [
-				{value: 'METRICS', label: 'Metrics'},
-				{value: 'OPTICAL', label: 'Optical'}
+				{value: 'METRICS', label: 'Metrics', descriptorValue: 'metricsKern', descriptorType: 'string'},
+				{value: 'OPTICAL', label: 'Optical', descriptorValue: 'opticalKern', descriptorType: 'string'}
 			],
 			def: 'METRICS'
 		},
@@ -229,12 +229,8 @@ var tbHelper = {
 		];
 	},
 
-	getSylePropValues: function(prop) {
-		var values = [];
-		for (var i = 0; i < this.styleProps[prop].values.length; i++) {
-			values.push(styleProps[prop].values[i].value);
-		}
-		return values;
+	getStyleProp: function(prop, value) {
+		return this.styleProps[prop].values.find(function(one) { return one.value == value; });
 	},
 
 	uniqueId: function() {

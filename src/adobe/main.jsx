@@ -1,7 +1,7 @@
 
-cTID = function(s) { return cTID[s] || (cTID[s] = app.charIDToTypeID(s)); };
+cTID = function(s) { return app.charIDToTypeID(s); };
 sTID = function(s) { return app.stringIDToTypeID(s); };
-idTS = function(id) { return app.typeIDToStringID (id); };
+idTS = function(id) { return app.typeIDToStringID(id); };
 
 var originalPrefs = app.preferences;
 var saveState;
@@ -22,11 +22,11 @@ function undo() {
 }
 
 function saveState() {
-	savedState = app.activeDocument.activeHistoryState;
+	savedState = activeDocument.activeHistoryState;
 }
 
 function resetState() {
-	app.activeDocument.activeHistoryState = savedState;
+	activeDocument.activeHistoryState = savedState;
 }
 
 function getAppFonts() {
@@ -67,13 +67,13 @@ function getSelectedLayersIdx() {
 		ref.putEnumerated(cTID('Lyr '), cTID('Ordn'), cTID('Trgt'));
 		try {
 			activeDocument.backgroundLayer;
-			selectedLayers.push(getLayerIDfromIDX( executeActionGet(ref).getInteger(cTID('ItmI')) - 1));
+			selectedLayers.push(getLayerIDfromIDX(executeActionGet(ref).getInteger(cTID('ItmI')) - 1));
 		}
 		catch(e) {
 			selectedLayers.push(getLayerIDfromIDX(executeActionGet(ref).getInteger(cTID('ItmI'))));
 		}
-		var vis = app.activeDocument.activeLayer.visible;
-		if (vis == true) app.activeDocument.activeLayer.visible = false;
+		var vis = activeDocument.activeLayer.visible;
+		if (vis == true) activeDocument.activeLayer.visible = false;
 		var desc9 = new ActionDescriptor();
 		var list9 = new ActionList();
 		var ref9 = new ActionReference();
@@ -81,8 +81,8 @@ function getSelectedLayersIdx() {
 		list9.putReference(ref9);
 		desc9.putList(cTID('null'), list9);
 		executeAction(cTID('Shw '), desc9, DialogModes.NO);
-		if (app.activeDocument.activeLayer.visible == false) selectedLayers.shift();
-		app.activeDocument.activeLayer.visible = vis;
+		if (activeDocument.activeLayer.visible == false) selectedLayers.shift();
+		activeDocument.activeLayer.visible = vis;
 	}
 	return selectedLayers;
 };
@@ -136,11 +136,11 @@ function tryExec(functionName) {
 		}
 		evalString += ')';
 		res = eval(evalString);
-		resetPrefs;
+		resetPrefs();
 		return res;
 	}
 	catch (e) {
-		resetPrefs;
+		resetPrefs();
 		resetState();
 		if (e instanceof Object && e.reselect != undefined){
 			reselectLayers(e.reselect);
@@ -170,14 +170,14 @@ function getTransformFactor() {
 
 function getSingleRectangleSelectionDimensions() {
 	try {
-		var selections = app.activeDocument.selection;
+		var selections = activeDocument.selection;
 		try {
 			selections.makeWorkPath();
 		}
 		catch (e) {
 			return 'no_selection';
 		}
-		var wPath = app.activeDocument.pathItems['Work Path'];
+		var wPath = activeDocument.pathItems['Work Path'];
 		var dimensions = {};
 		// limit to a single path only
 		if (wPath.subPathItems.length > 1) {
@@ -296,39 +296,39 @@ function applyStyleActiveLayer(style) {
 }
 
 function adjustFontSizeActiveLayer(modifier) {
-	var textItem = app.activeDocument.activeLayer.textItem;
+	var textItem = activeDocument.activeLayer.textItem;
 	var fontSize = textItem.size;
 	textItem.size = getAdjustedSize(parseInt(fontSize) + parseInt(modifier)) + 'px';
 }
 
 function roundFontSizeActiveLayer() {
-	var textItem = app.activeDocument.activeLayer.textItem;
+	var textItem = activeDocument.activeLayer.textItem;
 	textItem.size = getAdjustedSize(Math.round(parseFloat(textItem.size))) + 'px';
 }
 
 function toggleHyphenationActiveLayer() {
-	var textItem = app.activeDocument.activeLayer.textItem;
+	var textItem = activeDocument.activeLayer.textItem;
 	textItem.hyphenation = !textItem.hyphenation;
 }
 
 function toggleFauxBoldActiveLayer() {
-	var textItem = app.activeDocument.activeLayer.textItem;
+	var textItem = activeDocument.activeLayer.textItem;
 	textItem.fauxBold = !textItem.fauxBold;
 }
 
 function toggleFauxItalicActiveLayer() {
-	var textItem = app.activeDocument.activeLayer.textItem;
+	var textItem = activeDocument.activeLayer.textItem;
 	textItem.fauxItalic = !textItem.fauxItalic;
 }
 
 function replaceTextActiveLayer(rules) {
-	var textItem = app.activeDocument.activeLayer.textItem;
+	var textItem = activeDocument.activeLayer.textItem;
 	textItem.contents = tbHelper.replaceText(textItem.contents, rules);
 }
 
 function createTextLayer(text, position) {
 	var p = (!!position)? position : [20, 20];
-	var textLayer = app.activeDocument.artLayers.add();
+	var textLayer = activeDocument.artLayers.add();
 	textLayer.kind = LayerKind.TEXT;
 	var textItem = textLayer.textItem;
 	textItem.contents = text;
@@ -338,22 +338,22 @@ function createTextLayer(text, position) {
 }
 
 function setStyle(style) {
-	app.activeDocument.suspendHistory('Set style', '\
+	activeDocument.suspendHistory('Set style', '\
 		createTextLayer(""); \
 		applyStyleActiveLayer('+ JSON.stringify(style) + '); \
-		app.activeDocument.activeLayer.remove(); \
+		activeDocument.activeLayer.remove(); \
 	');
 	return 'done';
 }
 
 function sortLayerInLayerGroup(layerGroup) {
 	var layerGroupRef;
-	var layer = app.activeDocument.activeLayer;
+	var layer = activeDocument.activeLayer;
 	try {
-		layerGroupRef = app.activeDocument.layerSets.getByName(layerGroup);
+		layerGroupRef = activeDocument.layerSets.getByName(layerGroup);
 	}
 	catch (e) {
-		layerGroupRef = app.activeDocument.layerSets.add();
+		layerGroupRef = activeDocument.layerSets.add();
 		layerGroupRef.name = layerGroup;
 	}
 	layer.move(layerGroupRef, ElementPlacement.INSIDE);
@@ -367,7 +367,7 @@ function typesetEX(typesetObj) {
 		app.activeDocument.suspendHistory('Create text layer', 'createTextLayer('+ JSON.stringify(typesetObj.text) + ', '+ JSON.stringify(position) +');');
 		app.activeDocument.suspendHistory('Apply style', 'applyStyleActiveLayer('+ JSON.stringify(style) + ');');
 		if (typesetObj.useLayerGroups && style.layerGroup) {
-			app.activeDocument.suspendHistory('Sort layer', 'sortLayerInLayerGroup("'+ style.layerGroup + '");');
+			activeDocument.suspendHistory('Sort layer', 'sortLayerInLayerGroup("'+ style.layerGroup + '");');
 		}
 		return 'done';
 	}
@@ -403,7 +403,7 @@ function typesetPage(pageScript, styleSet, options) {
 							style = tbHelper.getStyleFromStyleSet(styleSet, 'default_style');
 						}
 						catch (e) {
-							throw 'Style '+ lineStyle +'not found and default_style not found either... (page '+ pageNumber +')';
+							throw 'Style '+ lineStyle +' not found and default_style not found either... (page '+ pageNumber +')';
 						}
 					}
 					if (!!options.textReplaceRules) {
@@ -459,9 +459,9 @@ function typesetFiles(fileList, scriptPath, targetFolder, styleSet, options) {
 					else {
 						typesetPage(pageScript, styleSet, options);
 					}
-					var saveFile = new File(editTargetFolderPath.text + '/' + app.activeDocument.name);
-					app.activeDocument.saveAs(saveFile);
-					app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
+					var saveFile = new File(editTargetFolderPath.text + '/' + activeDocument.name);
+					activeDocument.saveAs(saveFile);
+					activeDocument.close(SaveOptions.DONOTSAVECHANGES);
 					psdFile = null;
 					saveFile = null;
 				}
@@ -493,9 +493,9 @@ function actionSelectedLayers(action, historyName, obj) {
 	try {
 		for (var i = 0; i < idx.length; i++) {
 			selectLayerById(idx[i]);
-			if(app.activeDocument.activeLayer.kind !== LayerKind.TEXT) throw 'not_text_layer';
+			if(activeDocument.activeLayer.kind !== LayerKind.TEXT) continue;
 			var val = (obj != undefined)? obj : {};
-			app.activeDocument.suspendHistory(historyName, action + '('+ JSON.stringify(val) +');');
+			activeDocument.suspendHistory(historyName, action + '('+ JSON.stringify(val) +');');
 		}
 		reselectLayers(idx);
 		return 'done';
