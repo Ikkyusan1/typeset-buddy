@@ -1,5 +1,5 @@
-tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToast', 'Utils', 'Applier', '$sessionStorage',
-	function($scope, StylesService, ScriptService, ngToast, Utils, Applier, $sessionStorage) {
+tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToast', 'Utils', 'Applier', '$sessionStorage', 'SettingsService',
+	function($scope, StylesService, ScriptService, ngToast, Utils, Applier, $sessionStorage, SettingsService) {
 
 		$scope.$sessionStorage = $sessionStorage.$default({
 			styleFilter: ''
@@ -233,7 +233,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 		};
 
 		$scope.loadCurrentStyleSet = function() {
-			$scope.selectedStyleset = StylesService.getStyleSet().id;
+			$scope.selectedStyleset = SettingsService.setting('lastOpenedStyleSet');
 		};
 
 		$scope.loadCurrentStyleSet();

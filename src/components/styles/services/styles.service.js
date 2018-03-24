@@ -49,18 +49,16 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 		self.getStyleSet = function(id) {
 			let styleSet = undefined;
 			if (!angular.isDefined(id)) {
-				if (angular.isDefined($localStorage.lastOpenedStyleSet)) {
-					styleSet = self.getStyleSet($localStorage.lastOpenedStyleSet);
-				}
+				id = (angular.isDefined($localStorage.lastOpenedStyleSet))? $localStorage.lastOpenedStyleSet : -1;
 			}
-			else {
-				let idx = $localStorage.styleSets.findIndex(function(one) { return one.id === id; });
-				if (idx > -1) {
-					styleSet = angular.copy($localStorage.styleSets[idx]);
-				}
+			let idx = $localStorage.styleSets.findIndex(function(one) { return one.id === id; });
+			if (idx > -1) {
+				styleSet = angular.copy($localStorage.styleSets[idx]);
 			}
+
 			if (!!styleSet) {
 				$localStorage.lastOpenedStyleSet = styleSet.id;
+				$rootScope.log('styleSet', styleSet);
 				return styleSet;
 			}
 			else {

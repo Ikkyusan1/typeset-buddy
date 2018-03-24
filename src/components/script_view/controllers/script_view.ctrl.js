@@ -16,8 +16,8 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			$scope.mergeBubbles = SettingsService.setting('mergeBubbles');
 			$scope.skipSfxs = SettingsService.setting('skipSfxs');
 			$scope.textReplace = SettingsService.setting('textReplace');
-			$scope.styleSet = StylesService.getStyleSet();
-			$scope.selectedStyleset = $scope.styleSet.id;
+			$scope.styleSet = undefined;
+			$scope.selectedStyleset = SettingsService.setting('lastOpenedStyleSet');
 		};
 
 		$scope.browseScript = function() {
@@ -42,9 +42,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 						}
 						else {
 							$scope.selectedPage = page;
-							$scope.loadPage($scope.selectedPage);
 						}
-
 					}
 					else {
 						throw 'Did not find any page number in the translation script';

@@ -12,8 +12,7 @@ tb.directive('tbStyleSelector', ['StylesService',
 
 				$scope.refreshStyleList = function() {
 					$scope.choices = [];
-					let tmp = StylesService.getStyleSet($scope.styleset);
-					tmp.styles.forEach(function(one) {
+					$scope.styleset.styles.forEach(function(one) {
 						$scope.choices.push(one.keyword);
 					});
 					if (!!!$scope.selectedValue) {
