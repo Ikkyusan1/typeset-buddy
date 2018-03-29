@@ -1,6 +1,8 @@
 tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace', 'themeManager', '$localStorage',
 	function(CONF, $transitions, $state, $stateParams, $rootScope, $trace, themeManager, $localStorage) {
 
+		$rootScope.CONF = CONF;
+
 		// convenience shortcuts
 		$rootScope.$state = $state;
 		$rootScope.$stateParams = $stateParams;

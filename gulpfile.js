@@ -269,7 +269,10 @@ gulp.task('buildJs', function(){
 	.pipe($.concat(appFileName + '.js'))
 	// .pipe($.sourcemaps.write())
 	.pipe($.replace('appNamePlaceholder', '\'' + packageFile.name + '\''))
-	.pipe($.replace('appVersionPlaceholder', '\'' + packageFile.version + '\''));
+	.pipe($.replace('appVersionPlaceholder', '\'' + packageFile.version + '\''))
+	.pipe($.replace('appAuthorPlaceholder', '\'' + packageFile.author + '\''))
+	.pipe($.replace('appHomepagePlaceholder', '\'' + packageFile.homepage + '\''))
+	.pipe($.replace('appDescriptionPlaceholder', '\'' + packageFile.description + '\''));
 
 	if(isProd) {
 		stream.pipe($.replace('appDebugPlaceholder', 'false'));

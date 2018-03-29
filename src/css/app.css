@@ -63,8 +63,10 @@ label {
 	margin-bottom: 0;
 }
 
-.small {
-	font-size: small;
+.wordwrap {
+	white-space: pre-wrap;
+	word-wrap: initial;
+	word-break: initial;
 }
 
 .topcoat-button,

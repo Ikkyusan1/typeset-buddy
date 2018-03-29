@@ -27,5 +27,9 @@ tb.controller('AppCtrl', ['$scope', 'SettingsService', 'Utils',
   		if (a.order > b.order) return 1;
   		return 0;
 		});
+
+		$scope.goToHomepage = function() {
+			window.cep.util.openURLInDefaultBrowser($scope.$root.CONF.homepage);
+		}
 	}
 ]);

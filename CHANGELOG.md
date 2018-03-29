@@ -1,6 +1,6 @@
 ### 0.3.0 (2018-03-24)
 Use more ActionDescriptors, typeset actions are now almost twice as fast as before.
-Spelling/hyphenation langauge added to the stylesets.
+New: Spelling/hyphenation language added to the stylesets.
 Various fixes.
 Double click on bubble content/notes to copy them to clipboard.
 
@@ -25,7 +25,7 @@ Some refactoring.
 
 
 ### 0.1.9 (2017-07-30)
-Added standalone scripts to allow the user to create Photoshop actions and associate shortcuts to them.
+Added standalone scripts to allow the user to create Photoshop  actions and associate shortcuts to them.
 Minor tweaks.
 
 

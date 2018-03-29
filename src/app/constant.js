@@ -1,5 +1,9 @@
+// these placeholders will be replaced when compiled
 tb.constant('CONF', {
-	appName: appNamePlaceholder, // will be replaced by package.json name when compiled
-	debug: appDebugPlaceholder,	// will be true when compiled for dev environment, false otherwise
-	version: appVersionPlaceholder // will be replaced when compiled
+	appName: appNamePlaceholder,
+	debug: appDebugPlaceholder,
+	version: appVersionPlaceholder,
+	author: appAuthorPlaceholder,
+	homepage: appHomepagePlaceholder,
+	description: appDescriptionPlaceholder
 });

@@ -501,10 +501,14 @@ var tb = angular.module('tb', [
 	'angular-clipboard'
 ]);
 
+// these placeholders will be replaced when compiled
 tb.constant('CONF', {
-	appName: 'typeset_buddy', // will be replaced by package.json name when compiled
-	debug: false,	// will be true when compiled for dev environment, false otherwise
-	version: '0.3.0' // will be replaced when compiled
+	appName: 'typeset_buddy',
+	debug: false,
+	version: '0.3.0',
+	author: 'Ikkyusan',
+	homepage: 'https://github.com/ikkyusan1/typeset-buddy',
+	description: 'A typesetting tool for Photoshop CC'
 });
 
 tb.config(['$compileProvider', '$localStorageProvider', 'ngToastProvider', 'CONF',
@@ -524,6 +528,8 @@ tb.config(['$compileProvider', '$localStorageProvider', 'ngToastProvider', 'CONF
 
 tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace', 'themeManager', '$localStorage',
 	function(CONF, $transitions, $state, $stateParams, $rootScope, $trace, themeManager, $localStorage) {
+
+		$rootScope.CONF = CONF;
 
 		// convenience shortcuts
 		$rootScope.$state = $state;
@@ -623,9 +629,17 @@ tb.config(['$stateProvider', '$urlRouterProvider', '$localStorageProvider',
 			controller: 'AppCtrl',
 			templateUrl: 'app.tpl.html',
 		})
-		$stateProvider
+		.state('about', {
+			url: 'about',
+			parent: 'app',
+			views: {
+				app: {
+					templateUrl: 'about.tpl.html'
+				}
+			}
+		})
 		.state('log_view', {
-			url: '/log_view',
+			url: 'log_view',
 			parent: 'app',
 			views: {
 				app: {
@@ -670,6 +684,10 @@ tb.controller('AppCtrl', ['$scope', 'SettingsService', 'Utils',
   		if (a.order > b.order) return 1;
   		return 0;
 		});
+
+		$scope.goToHomepage = function() {
+			window.cep.util.openURLInDefaultBrowser($scope.$root.CONF.homepage);
+		}
 	}
 ]);
 

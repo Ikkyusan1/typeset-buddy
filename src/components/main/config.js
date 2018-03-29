@@ -11,9 +11,17 @@ tb.config(['$stateProvider', '$urlRouterProvider', '$localStorageProvider',
 			controller: 'AppCtrl',
 			templateUrl: 'app.tpl.html',
 		})
-		$stateProvider
+		.state('about', {
+			url: 'about',
+			parent: 'app',
+			views: {
+				app: {
+					templateUrl: 'about.tpl.html'
+				}
+			}
+		})
 		.state('log_view', {
-			url: '/log_view',
+			url: 'log_view',
 			parent: 'app',
 			views: {
 				app: {
