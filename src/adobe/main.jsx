@@ -48,9 +48,8 @@ function getSelectedLayersIdx() {
 	var desc = executeActionGet(ref);
 	if (desc.hasKey(sTID('targetLayers'))) {
 		desc = desc.getList(sTID('targetLayers'));
-		var c = desc.count
-		var selectedLayers = new Array();
-		for (var i=0;i<c;i++) {
+		var c = desc.count;
+		for (var i = 0; i < c; i++) {
 			try {
 				activeDocument.backgroundLayer;
 				selectedLayers.push(getLayerIDfromIDX(desc.getReference(i).getIndex()));
@@ -217,8 +216,8 @@ function getBasicTextboxWidth(fontSize) {
 
 function getGeometryFromCoords(coords){
 	return {
-		x: (100*coords[0][0]/parseInt(activeDocument.height)),
-		y: (100*coords[0][1]/parseInt(activeDocument.width)),
+		x: (100 * coords[0][0] / parseInt(activeDocument.width)),
+		y: (100 * coords[0][1] / parseInt(activeDocument.height)),
 		w: coords[1][0] - coords[0][0],
 		h: coords[2][1] - coords[0][1]
 	};
@@ -281,7 +280,7 @@ function applyStyleActiveLayer(style, autoResize) {
 	actionAliasing.putReference(cTID('null'), actionAliasingRef);
 	actionAliasing.putEnumerated(cTID('T   '), cTID('Annt'), convertStylePropValue('antialias', style.antialias));
 	executeAction(cTID('setd'), actionAliasing, DialogModes.NO);
-	if (autoResize || !!style.autoResize) resizeActiveLayer(style);
+	if (!!autoResize || !!style.autoResize) resizeActiveLayer(style);
 }
 
 function adjustFontSizeActiveLayer(modifier) {

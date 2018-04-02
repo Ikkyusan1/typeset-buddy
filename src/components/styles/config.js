@@ -13,7 +13,6 @@ tb.config(['$stateProvider',
 					templateUrl: 'styles.tpl.html',
 				}
 			}
-
 		});
 	}
 ]);

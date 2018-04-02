@@ -2,7 +2,7 @@ tb.controller('AppCtrl', ['$scope', 'SettingsService', 'Utils',
 	function($scope, SettingsService, Utils) {
 
 		$scope.resetLocalStorage = function() {
-			Utils.showConfirmDialog('Are you sure you reset the localstorage? Every style set will be deleted.')
+			Utils.showConfirmDialog('Are you sure you wish to reset the localstorage? Every style set will be deleted.')
 			.then(
 				function() {
 					SettingsService.reset();
