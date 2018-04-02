@@ -42,6 +42,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 						}
 						else {
 							$scope.selectedPage = page;
+							$scope.loadPage(page);
 						}
 					}
 					else {
