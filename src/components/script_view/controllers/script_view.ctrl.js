@@ -103,7 +103,9 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 								if (bubble.text) {
 									if ($scope.textReplace) {
 										try {
-											bubble.text = tbHelper.replaceText(bubble.text, SettingsService.setting('textReplaceRules'));
+											let replaced = tbHelper.replaceText(bubble.text, SettingsService.setting('textReplaceRules'));
+											if (bubble.text != replaced) bubble.replaced = true;
+											bubble.text = replaced;
 										}
 										catch (e) {
 											ngToast.create({className: 'danger', content: 'Text replace error: ' + e});

@@ -98,7 +98,7 @@
 			</button>
 		</div>
 		<div class="col-lg-10 col-md-9 col-xs-9" ng-if="!!!bubble.panelSeparator">
-			<div class="selectable bubble-content" ng-if="!!bubble.text" ng-dblclick="toClipboard(bubble.text)">{{bubble.text}}</div>
+			<div class="selectable bubble-content" ng-if="!!bubble.text" ng-dblclick="toClipboard(bubble.text)">{{bubble.text}}<span class="clipbutton glyphicon glyphicon-registration-mark" ng-if="bubble.replaced" uib-tooltip="Some text has been replaced on this bubble" tooltip-popup-delay="500" tooltip-placement="left"></span></div>
 			<div class="bubble-note selectable" ng-repeat="note in bubble.notes" ng-dblclick="toClipboard(bubble.notes, 'note')">{{note}}</div>
 			<div class="bubble-sibling" ng-repeat="sibling in bubble.siblings">
 				<div class="selectable bubble-content" ng-dblclick="toClipboard(sibling.text)">{{sibling.text}}</div>
