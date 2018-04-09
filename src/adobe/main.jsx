@@ -148,24 +148,6 @@ function tryExec(functionName) {
 	}
 }
 
-// WTF, Adobe, seriously. We shouldn't even need this.
-function getTransformFactor() {
-	try {
-		var ref = new ActionReference();
-		ref.putEnumerated(cTID('Lyr '), cTID('Ordn'), cTID('Trgt'));
-		var desc = executeActionGet(ref).getObjectValue(sTID('textKey'));
-		var textSize =  desc.getList(sTID('textStyleRange')).getObjectValue(0).getObjectValue(sTID('textStyle')).getDouble(sTID('size'));
-		if (desc.hasKey(sTID('transform'))) {
-			var mFactor = desc.getObjectValue(sTID('transform')).getUnitDoubleValue(sTID('yy'));
-			return mFactor;
-		}
-		return 1;
-	}
-	catch (e) {
-		throw 'Error during the retrieval of the transform factor.';
-	}
-}
-
 function getSingleRectangleSelectionCoordinates() {
 	try {
 		var selections = activeDocument.selection;
@@ -204,9 +186,6 @@ function getSingleRectangleSelectionCoordinates() {
 }
 
 function getAdjustedSize(size) {
-	// var t = getTransformFactor();
-	// var ar = activeDocument.resolution;
-	// return size / (getTransformFactor() * activeDocument.resolution / 72);
 	return size / (activeDocument.resolution / 72);
 }
 
