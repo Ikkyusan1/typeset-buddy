@@ -1330,8 +1330,8 @@ tb.config(['$stateProvider',
 	}
 ]);
 
-tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToast', 'Utils', 'Applier', '$sessionStorage', 'SettingsService',
-	function($scope, StylesService, ScriptService, ngToast, Utils, Applier, $sessionStorage, SettingsService) {
+tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'Applier', '$sessionStorage', 'SettingsService',
+	function($scope, StylesService, ngToast, Utils, Applier, $sessionStorage, SettingsService) {
 
 		$scope.$sessionStorage = $sessionStorage.$default({
 			styleFilter: ''
@@ -1383,21 +1383,26 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ScriptService', 'ngToas
 		$scope.extendStyleSet = function() {
 			let result = window.cep.fs.showOpenDialogEx(false, false, 'Select script file', '', Utils.getValidFileSuffix('*.txt'), undefined, false);
 			if (angular.isDefined(result.data[0])) {
+				console.log('a');
 				let filehandle = window.cep.fs.readFile(result.data[0]);
+				console.log('b');
 				if (filehandle.err === 0) {
 					let scriptContent = filehandle.data;
-					let pageNumbers = ScriptService.getPageNumbers(scriptContent);
+					let pageNumbers = tbHelper.getPageNumbers(scriptContent);
+					console.log('c');
 					let candidates = [];
 					if (pageNumbers.length > 0) {
 						pageNumbers.forEach(function(pageNumber) {
-							let pageScript = ScriptService.loadPage(scriptContent, pageNumber);
+							let pageScript = tbHelper.loadPage(scriptContent, pageNumber);
+							console.log('d');
 							if (pageScript != null) {
 								let pageStyles = [];
-								pageStyles.push(ScriptService.getTextStyles(pageScript[1], 'default_style')[0]);
-								if (ScriptService.pageContainsText(pageScript[2])) {
+								pageStyles.push(tbHelper.getTextStyles(pageScript[1], 'default_style')[0]);
+								console.log('e');
+								if (tbHelper.pageContainsText(pageScript[2])) {
 									let lines = pageScript[2].split('\n');
 									lines.forEach(function(line) {
-										let lineStyles = ScriptService.getTextStyles(line, 'default_style');
+										let lineStyles = tbHelper.getTextStyles(line, 'default_style');
 										pageStyles = pageStyles.concat(lineStyles.filter(function(item) {
 											return pageStyles.indexOf(item) < 0;
 										}));

@@ -1,6 +1,7 @@
 ### 0.3.1 (2018-04-09)
 Fix layer position when using marquee.
 Fix page refresh on script reload.
+Fix keywords retrieval.
 Make bubbles with replaced text visible.
 Place typesetted layers closer to the center of the image.
 Minor tweaks.
