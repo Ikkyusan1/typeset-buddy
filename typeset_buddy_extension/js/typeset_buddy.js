@@ -505,7 +505,7 @@ var tb = angular.module('tb', [
 tb.constant('CONF', {
 	appName: 'typeset_buddy',
 	debug: false,
-	version: '0.3.0',
+	version: '0.3.1',
 	author: 'Ikkyusan',
 	homepage: 'https://github.com/ikkyusan1/typeset-buddy',
 	description: 'A typesetting tool for Photoshop CC'
@@ -1009,6 +1009,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 						}
 						else {
 							$scope.selectedPage = page;
+							$scope.loadPage(page);
 						}
 					}
 					else {
@@ -1069,7 +1070,9 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 								if (bubble.text) {
 									if ($scope.textReplace) {
 										try {
-											bubble.text = tbHelper.replaceText(bubble.text, SettingsService.setting('textReplaceRules'));
+											let replaced = tbHelper.replaceText(bubble.text, SettingsService.setting('textReplaceRules'));
+											if (bubble.text != replaced) bubble.replaced = true;
+											bubble.text = replaced;
 										}
 										catch (e) {
 											ngToast.create({className: 'danger', content: 'Text replace error: ' + e});

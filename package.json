@@ -7,7 +7,7 @@
     "type" : "git",
     "url" : "https://github.com/ikkyusan1/typeset-buddy.git"
   },
-  "version": "0.3.0",
+  "version": "0.3.1",
   "devDependencies": {
     "babel-preset-es2015": "^6.22.0",
     "bower": "^1.8.0",

@@ -1,3 +1,11 @@
+### 0.3.1 (2018-04-09)
+Fix layer position when using marquee.
+Fix page refresh on script reload.
+Make bubbles with replaced text visible.
+Place typesetted layers closer to the center of the image.
+Minor tweaks.
+
+
 ### 0.3.0 (2018-03-24)
 Use more ActionDescriptors, typeset actions are now almost twice as fast as before.
 New: Spelling/hyphenation language added to the stylesets.

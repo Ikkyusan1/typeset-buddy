@@ -148,24 +148,6 @@ function tryExec(functionName) {
 	}
 }
 
-// WTF, Adobe, seriously. We shouldn't even need this.
-function getTransformFactor() {
-	try {
-		var ref = new ActionReference();
-		ref.putEnumerated(cTID('Lyr '), cTID('Ordn'), cTID('Trgt'));
-		var desc = executeActionGet(ref).getObjectValue(sTID('textKey'));
-		var textSize =  desc.getList(sTID('textStyleRange')).getObjectValue(0).getObjectValue(sTID('textStyle')).getDouble(sTID('size'));
-		if (desc.hasKey(sTID('transform'))) {
-			var mFactor = desc.getObjectValue(sTID('transform')).getUnitDoubleValue(sTID('yy'));
-			return mFactor;
-		}
-		return 1;
-	}
-	catch (e) {
-		throw 'Error during the retrieval of the transform factor.';
-	}
-}
-
 function getSingleRectangleSelectionCoordinates() {
 	try {
 		var selections = activeDocument.selection;
@@ -204,10 +186,7 @@ function getSingleRectangleSelectionCoordinates() {
 }
 
 function getAdjustedSize(size) {
-	// var t = getTransformFactor();
-	// var ar = activeDocument.resolution;
-	// return size / (getTransformFactor() * activeDocument.resolution / 72);
-	return size / (activeDocument.resolution / 72);
+	return parseInt(size) / (activeDocument.resolution / 72);
 }
 
 function getBasicTextboxWidth(fontSize) {
@@ -225,8 +204,8 @@ function getGeometryFromCoords(coords){
 
 function getLayerDimensions(layer) {
 	return {
-		width: getAdjustedSize(layer.bounds[2] - layer.bounds[0]),
-		height: getAdjustedSize(layer.bounds[3] - layer.bounds[1])
+		width: parseInt(getAdjustedSize(layer.bounds[2] - layer.bounds[0])),
+		height: parseInt(getAdjustedSize(layer.bounds[3] - layer.bounds[1]))
 	};
 }
 
@@ -241,7 +220,8 @@ function getRealTextLayerDimensions(textLayer) {
 
 function adjustTextLayerHeight(textLayer) {
 	var dimensions = getRealTextLayerDimensions(textLayer);
-	textLayer.textItem.height = dimensions.height + 5; // add a little to keep some leeway
+	textLayer.textItem.width = dimensions.width + 7; // add a little to keep some leeway
+	textLayer.textItem.height = dimensions.height + 7; // add a little to keep some leeway
 }
 
 function resizeActiveLayer() {
@@ -440,7 +420,7 @@ function typesetPage(pageScript, styleSet, options) {
 					var typesetObj = {
 						text: cleanedText,
 						style: style,
-						coordinates: {x: n, y: n, w: 20, h: 20},
+						coordinates: {x: 30+n, y: 30+n, w: 20, h: 20},
 						autoResize: true,
 						useLayerGroups: options.useLayerGroups
 					};
