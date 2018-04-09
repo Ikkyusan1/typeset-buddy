@@ -186,7 +186,7 @@ function getSingleRectangleSelectionCoordinates() {
 }
 
 function getAdjustedSize(size) {
-	return size / (activeDocument.resolution / 72);
+	return parseInt(size) / (activeDocument.resolution / 72);
 }
 
 function getBasicTextboxWidth(fontSize) {
@@ -204,8 +204,8 @@ function getGeometryFromCoords(coords){
 
 function getLayerDimensions(layer) {
 	return {
-		width: getAdjustedSize(layer.bounds[2] - layer.bounds[0]),
-		height: getAdjustedSize(layer.bounds[3] - layer.bounds[1])
+		width: parseInt(getAdjustedSize(layer.bounds[2] - layer.bounds[0])),
+		height: parseInt(getAdjustedSize(layer.bounds[3] - layer.bounds[1]))
 	};
 }
 
@@ -220,7 +220,8 @@ function getRealTextLayerDimensions(textLayer) {
 
 function adjustTextLayerHeight(textLayer) {
 	var dimensions = getRealTextLayerDimensions(textLayer);
-	textLayer.textItem.height = dimensions.height + 5; // add a little to keep some leeway
+	textLayer.textItem.width = dimensions.width + 7; // add a little to keep some leeway
+	textLayer.textItem.height = dimensions.height + 7; // add a little to keep some leeway
 }
 
 function resizeActiveLayer() {
