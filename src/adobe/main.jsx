@@ -440,7 +440,7 @@ function typesetPage(pageScript, styleSet, options) {
 					var typesetObj = {
 						text: cleanedText,
 						style: style,
-						coordinates: {x: n, y: n, w: 20, h: 20},
+						coordinates: {x: 30+n, y: 30+n, w: 20, h: 20},
 						autoResize: true,
 						useLayerGroups: options.useLayerGroups
 					};
