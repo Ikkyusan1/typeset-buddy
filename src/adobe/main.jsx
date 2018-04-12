@@ -430,6 +430,7 @@ function typesetPage(pageScript, styleSet, options) {
 			}
 		}
 	}
+	return 'done';
 }
 
 function typesetFiles(fileList, scriptPath, targetFolder, styleSet, options) {
