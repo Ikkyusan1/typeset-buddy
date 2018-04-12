@@ -366,8 +366,8 @@ function typesetEX(typesetObj) {
 		var style = typesetObj.style;
 		if (!!!typesetObj.coordinates) {
 			typesetObj.coordinates = {
-				x: 10,
-				y: 10,
+				x: 45,
+				y: 45,
 				w: 20,
 				h: 20
 			};
