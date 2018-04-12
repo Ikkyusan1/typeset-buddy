@@ -58,6 +58,7 @@ tb.factory('ScriptService', ['$rootScope', 'SettingsService', '$q',
 		};
 
 		self.typesetPage = function(pageScript, styleSet){
+			let start = new Date();
 			let def = $q.defer();
 			let options = {
 				panelSeparator: SettingsService.setting('panelSeparator'),
@@ -71,6 +72,7 @@ tb.factory('ScriptService', ['$rootScope', 'SettingsService', '$q',
 					def.reject('No document');
 				}
 				else if(res === 'done') {
+					$rootScope.log('duration', new Date() - start);
 					def.resolve();
 				}
 				else {

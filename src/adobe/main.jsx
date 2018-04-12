@@ -202,24 +202,21 @@ function getGeometryFromCoords(coords){
 	};
 }
 
-function getLayerDimensions(layer) {
+function getLayerDimension(textLayer) {
+	var ref = new ActionReference();
+	ref.putEnumerated(cTID('Lyr '), cTID('Ordn'), cTID('Trgt'));
+	var descBounds = executeActionGet(ref).getObjectValue(sTID('bounds'));
+	// width and height need to be adjusted... yet another weird thing
 	return {
-		width: parseInt(getAdjustedSize(layer.bounds[2] - layer.bounds[0])),
-		height: parseInt(getAdjustedSize(layer.bounds[3] - layer.bounds[1]))
+		x: descBounds.getUnitDoubleValue(sTID('left')),
+		y: descBounds.getUnitDoubleValue(sTID('top')),
+		width: getAdjustedSize(descBounds.getUnitDoubleValue(sTID('width'))),
+		height: getAdjustedSize(descBounds.getUnitDoubleValue(sTID('height')))
 	};
 }
 
-function getRealTextLayerDimensions(textLayer) {
-	duplicateActiveLayer();
-	rasterizeActiveLayer();
-	var textLayerCopy = activeDocument.activeLayer;
-	var dimensions = getLayerDimensions(textLayerCopy);
-	textLayerCopy.remove();
-	return dimensions;
-}
-
 function adjustTextLayerHeight(textLayer) {
-	var dimensions = getRealTextLayerDimensions(textLayer);
+	var dimensions = getLayerDimension(textLayer);
 	textLayer.textItem.width = dimensions.width + 7; // add a little to keep some leeway
 	textLayer.textItem.height = dimensions.height + 7; // add a little to keep some leeway
 }
@@ -308,23 +305,6 @@ function setColorActiveLayer(color) {
 	colorDesc.putObject(cTID('Clr '), cTID('RGBC'), c);
 	actionColor.putObject(cTID('T   '), cTID('TxtS'), colorDesc);
 	executeAction(cTID('setd'), actionColor, DialogModes.NO);
-}
-
-function duplicateActiveLayer() {
-	var duplicateAction = new ActionDescriptor();
-	var duplicateActionRef = new ActionReference();
-	duplicateActionRef.putEnumerated(cTID('Lyr '), cTID('Ordn'), cTID('Trgt'));
-	duplicateAction.putReference(cTID('null'), duplicateActionRef);
-	executeAction(cTID('Dplc'), duplicateAction, DialogModes.NO);
-}
-
-function rasterizeActiveLayer() {
-	var rasterizeAction = new ActionDescriptor();
-	var rasterizeActionRef = new ActionReference();
-	rasterizeActionRef.putEnumerated(cTID('Lyr '), cTID('Ordn'), cTID('Trgt'));
-	rasterizeAction.putReference(cTID('null'), rasterizeActionRef);
-	rasterizeAction.putEnumerated(cTID('What'), sTID('rasterizeItem'), cTID('Type'));
-	executeAction(sTID('rasterizeLayer'), rasterizeAction, DialogModes.NO);
 }
 
 function createTextLayer(text, position) {
