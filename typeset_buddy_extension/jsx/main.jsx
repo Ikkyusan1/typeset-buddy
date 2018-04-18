@@ -202,24 +202,21 @@ function getGeometryFromCoords(coords){
 	};
 }
 
-function getLayerDimensions(layer) {
+function getActiveLayerDimension() {
+	var ref = new ActionReference();
+	ref.putEnumerated(cTID('Lyr '), cTID('Ordn'), cTID('Trgt'));
+	var descBounds = executeActionGet(ref).getObjectValue(sTID('bounds'));
+	// width and height need to be adjusted... yet another weird thing
 	return {
-		width: parseInt(getAdjustedSize(layer.bounds[2] - layer.bounds[0])),
-		height: parseInt(getAdjustedSize(layer.bounds[3] - layer.bounds[1]))
+		x: descBounds.getUnitDoubleValue(sTID('left')),
+		y: descBounds.getUnitDoubleValue(sTID('top')),
+		width: getAdjustedSize(descBounds.getUnitDoubleValue(sTID('width'))),
+		height: getAdjustedSize(descBounds.getUnitDoubleValue(sTID('height')))
 	};
 }
 
-function getRealTextLayerDimensions(textLayer) {
-	duplicateActiveLayer();
-	rasterizeActiveLayer();
-	var textLayerCopy = activeDocument.activeLayer;
-	var dimensions = getLayerDimensions(textLayerCopy);
-	textLayerCopy.remove();
-	return dimensions;
-}
-
 function adjustTextLayerHeight(textLayer) {
-	var dimensions = getRealTextLayerDimensions(textLayer);
+	var dimensions = getActiveLayerDimension();
 	textLayer.textItem.width = dimensions.width + 7; // add a little to keep some leeway
 	textLayer.textItem.height = dimensions.height + 7; // add a little to keep some leeway
 }
@@ -310,23 +307,6 @@ function setColorActiveLayer(color) {
 	executeAction(cTID('setd'), actionColor, DialogModes.NO);
 }
 
-function duplicateActiveLayer() {
-	var duplicateAction = new ActionDescriptor();
-	var duplicateActionRef = new ActionReference();
-	duplicateActionRef.putEnumerated(cTID('Lyr '), cTID('Ordn'), cTID('Trgt'));
-	duplicateAction.putReference(cTID('null'), duplicateActionRef);
-	executeAction(cTID('Dplc'), duplicateAction, DialogModes.NO);
-}
-
-function rasterizeActiveLayer() {
-	var rasterizeAction = new ActionDescriptor();
-	var rasterizeActionRef = new ActionReference();
-	rasterizeActionRef.putEnumerated(cTID('Lyr '), cTID('Ordn'), cTID('Trgt'));
-	rasterizeAction.putReference(cTID('null'), rasterizeActionRef);
-	rasterizeAction.putEnumerated(cTID('What'), sTID('rasterizeItem'), cTID('Type'));
-	executeAction(sTID('rasterizeLayer'), rasterizeAction, DialogModes.NO);
-}
-
 function createTextLayer(text, position) {
 	var p = (!!position)? position : [20, 20];
 	var textLayer = activeDocument.artLayers.add();
@@ -336,6 +316,14 @@ function createTextLayer(text, position) {
 	textItem.position = p;
 	textLayer = null;
 	textItem = null;
+}
+
+function createEmptyLayer() {
+	var action = new ActionDescriptor();
+	var ref = new ActionReference();
+	ref.putClass(cTID('Lyr '));
+	action.putReference(cTID('null'), ref);
+	executeAction(cTID('Mk  '), action, DialogModes.NO);
 }
 
 function setStyle(style) {
@@ -366,8 +354,8 @@ function typesetEX(typesetObj) {
 		var style = typesetObj.style;
 		if (!!!typesetObj.coordinates) {
 			typesetObj.coordinates = {
-				x: 10,
-				y: 10,
+				x: 45,
+				y: 45,
 				w: 20,
 				h: 20
 			};
@@ -430,6 +418,7 @@ function typesetPage(pageScript, styleSet, options) {
 			}
 		}
 	}
+	return 'done';
 }
 
 function typesetFiles(fileList, scriptPath, targetFolder, styleSet, options) {
@@ -583,6 +572,7 @@ function prepareParagraphStyleParams(style) {
 }
 
 function typeset(params) {
+	createEmptyLayer();
 	var typesetActionDescriptor = new ActionDescriptor();
 	var layerActionReference = new ActionReference();
 	layerActionReference.putClass(cTID('TxLr'));
@@ -630,7 +620,6 @@ function typeset(params) {
 	layerDescriptor.putList(sTID('paragraphStyleRange'), paragraphStyleRangeActionList);
 	// Finally create the layer
 	typesetActionDescriptor.putObject(cTID('Usng'), cTID('TxLr'), layerDescriptor);
-	typesetActionDescriptor.putInteger(cTID('LyrI'), 3);
 	executeAction(cTID('Mk  '), typesetActionDescriptor, DialogModes.NO);
 	// Autoresize. Or not.
 	if (params.autoResize) resizeActiveLayer();

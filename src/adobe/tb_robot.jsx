@@ -114,7 +114,10 @@ function run() {
 				noPrompt: noPrompt.value,
 				textReplaceRules: textReplaceRules
 			};
-			if (typesetFiles(fileList, editScriptPath.text, editTargetFolderPath.text, styleSet, options) == 'done') alert('Done');
+			var start = new Date();
+			if (typesetFiles(fileList, editScriptPath.text, editTargetFolderPath.text, styleSet, options) == 'done') {
+				alert('Done. Processed in : '+ ((new Date() - start)/1000) +'s');
+			}
 		}
 	}
 	catch (e) {

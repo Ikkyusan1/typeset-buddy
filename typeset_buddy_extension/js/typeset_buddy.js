@@ -505,7 +505,7 @@ var tb = angular.module('tb', [
 tb.constant('CONF', {
 	appName: 'typeset_buddy',
 	debug: false,
-	version: '0.3.1',
+	version: '0.3.2',
 	author: 'Ikkyusan',
 	homepage: 'https://github.com/ikkyusan1/typeset-buddy',
 	description: 'A typesetting tool for Photoshop CC'
@@ -1285,6 +1285,7 @@ tb.factory('ScriptService', ['$rootScope', 'SettingsService', '$q',
 		};
 
 		self.typesetPage = function(pageScript, styleSet){
+			let start = new Date();
 			let def = $q.defer();
 			let options = {
 				panelSeparator: SettingsService.setting('panelSeparator'),
@@ -1298,6 +1299,7 @@ tb.factory('ScriptService', ['$rootScope', 'SettingsService', '$q',
 					def.reject('No document');
 				}
 				else if(res === 'done') {
+					$rootScope.log('duration', new Date() - start);
 					def.resolve();
 				}
 				else {

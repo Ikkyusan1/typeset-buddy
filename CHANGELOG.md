@@ -1,3 +1,10 @@
+### 0.3.2 (2018-04-19)
+Fix positionning when typesetting a single bubble.
+Fix a problem when typesetting when current active layer is empty.
+Faster dimensions retrieval.
+We're now 65% faster than v0.2.x
+
+
 ### 0.3.1 (2018-04-09)
 Fix layer position when using marquee.
 Fix page refresh on script reload.
