@@ -202,7 +202,7 @@ function getGeometryFromCoords(coords){
 	};
 }
 
-function getLayerDimension(textLayer) {
+function getActiveLayerDimension() {
 	var ref = new ActionReference();
 	ref.putEnumerated(cTID('Lyr '), cTID('Ordn'), cTID('Trgt'));
 	var descBounds = executeActionGet(ref).getObjectValue(sTID('bounds'));
@@ -216,7 +216,7 @@ function getLayerDimension(textLayer) {
 }
 
 function adjustTextLayerHeight(textLayer) {
-	var dimensions = getLayerDimension(textLayer);
+	var dimensions = getActiveLayerDimension();
 	textLayer.textItem.width = dimensions.width + 7; // add a little to keep some leeway
 	textLayer.textItem.height = dimensions.height + 7; // add a little to keep some leeway
 }
