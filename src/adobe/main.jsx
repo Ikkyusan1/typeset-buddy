@@ -318,6 +318,14 @@ function createTextLayer(text, position) {
 	textItem = null;
 }
 
+function createEmptyLayer() {
+	var action = new ActionDescriptor();
+	var ref = new ActionReference();
+	ref.putClass(cTID('Lyr '));
+	action.putReference(cTID('null'), ref);
+	executeAction(cTID('Mk  '), action, DialogModes.NO);
+}
+
 function setStyle(style) {
 	activeDocument.suspendHistory('Set style', '\
 		createTextLayer(""); \
@@ -564,6 +572,7 @@ function prepareParagraphStyleParams(style) {
 }
 
 function typeset(params) {
+	createEmptyLayer();
 	var typesetActionDescriptor = new ActionDescriptor();
 	var layerActionReference = new ActionReference();
 	layerActionReference.putClass(cTID('TxLr'));
@@ -611,7 +620,6 @@ function typeset(params) {
 	layerDescriptor.putList(sTID('paragraphStyleRange'), paragraphStyleRangeActionList);
 	// Finally create the layer
 	typesetActionDescriptor.putObject(cTID('Usng'), cTID('TxLr'), layerDescriptor);
-	typesetActionDescriptor.putInteger(cTID('LyrI'), 3);
 	executeAction(cTID('Mk  '), typesetActionDescriptor, DialogModes.NO);
 	// Autoresize. Or not.
 	if (params.autoResize) resizeActiveLayer();
