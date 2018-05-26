@@ -377,14 +377,24 @@ var tbHelper = {
 
 	loadPage: function(text, pageNumber) {
 		// pageNumber can be a double page, like "006-007"
-		// returns array of matches or null
+		// regexp matches are :
 		// [0]: the whole match
 		// [1]: undefined or a page note. Mainly used to apply a style to a whole page, like [italic]
-		// [2]: the page's bubbles.
-		// [3]: start of the next page or end
-		var reg = new RegExp('\\b' + pageNumber + '#\\ ?(.*)?\\n([\\s\\S]*?)($|END#|[\\d-]{3,9}#)');
+		// [2]: line ending
+		// [3]: the page's bubbles.
+		// [4]: start of the next page or end
+		var reg = new RegExp('\\b' + pageNumber + '#\\ ?(.*)?(\\r\\n|\\n|\\r)([\\s\\S]*?)($|END#|[\\d-]{3,9}#)');
 		var match = reg.exec(text);
-		return (!!match)? match : null;
+		if (!!!match) return null;
+		else {
+			return {
+				wholeMatch: match[0],
+				pageNote: match[1],
+				lineEnding: match[2],
+				rawBubbles: match[3],
+				next: match[4]
+			}
+		}
 	},
 
 	pageContainsText: function(text) {
@@ -505,7 +515,7 @@ var tb = angular.module('tb', [
 tb.constant('CONF', {
 	appName: 'typeset_buddy',
 	debug: false,
-	version: '0.3.2',
+	version: '0.3.3',
 	author: 'Ikkyusan',
 	homepage: 'https://github.com/ikkyusan1/typeset-buddy',
 	description: 'A typesetting tool for Photoshop CC'
@@ -973,9 +983,8 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			$scope.scriptContent = '';
 			$scope.pageContent = '';
 			$scope.pageNumbers = [];
-			$scope.pageScript = '';
+			$scope.pageScript = null;
 			$scope.pageNotes = '';
-			$scope.rawBubbles = '';
 			$scope.bubbles = [];
 			$scope.pageStyle = '';
 			$scope.panelSeparator = SettingsService.setting('panelSeparator');
@@ -1003,8 +1012,8 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 					$scope.scriptContent = result.data;
 					$scope.pageNumbers = tbHelper.getPageNumbers($scope.scriptContent);
 					if ($scope.pageNumbers.length > 0) {
+						ngToast.create({className: 'info', content: $scope.pageNumbers.length + ' page(s) found in file'});
 						if (!!!autoloadPage || page == null) {
-							ngToast.create({className: 'info', content: $scope.pageNumbers.length + ' page(s) found in file'});
 							$scope.selectedPage = $scope.pageNumbers[0];
 						}
 						else {
@@ -1042,19 +1051,18 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			if (angular.isDefined(pageNumber) && pageNumber != null && !Utils.isEmpty($scope.scriptContent)) {
 				$scope.pageScript = tbHelper.loadPage($scope.scriptContent, pageNumber);
 				if ($scope.pageScript != null) {
-					let tmpPageStyle = tbHelper.getTextStyles($scope.pageScript[1], 'default_style')[0];
+					let tmpPageStyle = tbHelper.getTextStyles($scope.pageScript.pageNote, 'default_style')[0];
 					$scope.pageStyle = ($scope.styleSet.styles.findIndex(function(one) { return one.keyword == tmpPageStyle; }) === -1)? {keyword: tmpPageStyle, inStyleSet: false} : {keyword: tmpPageStyle, inStyleSet: true};
 					$scope.$root.log('pageStyle', $scope.pageStyle);
-					$scope.pageNotes = tbHelper.getNotes($scope.pageScript[1]);
+					$scope.pageNotes = tbHelper.getNotes($scope.pageScript.pageNote);
 					$scope.$root.log('pageNotes', $scope.pageNotes);
-					$scope.rawBubbles = $scope.pageScript[2];
 					$scope.bubbles = [];
-					$scope.$root.log('rawBubbles', $scope.rawBubbles);
-					if (tbHelper.pageContainsText($scope.rawBubbles)) {
+					$scope.$root.log('rawBubbles', $scope.pageScript.rawBubbles);
+					if (tbHelper.pageContainsText($scope.pageScript.rawBubbles)) {
 						$scope.$root.log('contains text');
 						let lines = [];
 						let previousStyle = $scope.pageStyle.keyword;
-						lines = $scope.rawBubbles.split('\n');
+						lines = $scope.pageScript.rawBubbles.split($scope.pageScript.lineEnding);
 						$scope.$root.log('lines', lines);
 						lines.forEach(function(line) {
 							let notes = tbHelper.getNotes(line);
@@ -1385,24 +1393,19 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 		$scope.extendStyleSet = function() {
 			let result = window.cep.fs.showOpenDialogEx(false, false, 'Select script file', '', Utils.getValidFileSuffix('*.txt'), undefined, false);
 			if (angular.isDefined(result.data[0])) {
-				console.log('a');
 				let filehandle = window.cep.fs.readFile(result.data[0]);
-				console.log('b');
 				if (filehandle.err === 0) {
 					let scriptContent = filehandle.data;
 					let pageNumbers = tbHelper.getPageNumbers(scriptContent);
-					console.log('c');
 					let candidates = [];
 					if (pageNumbers.length > 0) {
 						pageNumbers.forEach(function(pageNumber) {
 							let pageScript = tbHelper.loadPage(scriptContent, pageNumber);
-							console.log('d');
 							if (pageScript != null) {
 								let pageStyles = [];
-								pageStyles.push(tbHelper.getTextStyles(pageScript[1], 'default_style')[0]);
-								console.log('e');
-								if (tbHelper.pageContainsText(pageScript[2])) {
-									let lines = pageScript[2].split('\n');
+								pageStyles.push(tbHelper.getTextStyles(pageScript.pageNote, 'default_style')[0]);
+								if (tbHelper.pageContainsText(pageScript.rawBubbles)) {
+									let lines = pageScript.rawBubbles.split(pageScript.lineEnding);
 									lines.forEach(function(line) {
 										let lineStyles = tbHelper.getTextStyles(line, 'default_style');
 										pageStyles = pageStyles.concat(lineStyles.filter(function(item) {

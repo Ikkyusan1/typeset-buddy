@@ -1,3 +1,7 @@
+### 0.3.3 (2018-05-26)
+Fix: properly handle line endings
+
+
 ### 0.3.2 (2018-04-19)
 Fix positionning when typesetting a single bubble.
 Fix a problem when typesetting when current active layer is empty.

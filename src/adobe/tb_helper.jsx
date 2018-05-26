@@ -371,14 +371,24 @@ var tbHelper = {
 
 	loadPage: function(text, pageNumber) {
 		// pageNumber can be a double page, like "006-007"
-		// returns array of matches or null
+		// regexp matches are :
 		// [0]: the whole match
 		// [1]: undefined or a page note. Mainly used to apply a style to a whole page, like [italic]
-		// [2]: the page's bubbles.
-		// [3]: start of the next page or end
-		var reg = new RegExp('\\b' + pageNumber + '#\\ ?(.*)?\\n([\\s\\S]*?)($|END#|[\\d-]{3,9}#)');
+		// [2]: line ending
+		// [3]: the page's bubbles.
+		// [4]: start of the next page or end
+		var reg = new RegExp('\\b' + pageNumber + '#\\ ?(.*)?(\\r\\n|\\n|\\r)([\\s\\S]*?)($|END#|[\\d-]{3,9}#)');
 		var match = reg.exec(text);
-		return (!!match)? match : null;
+		if (!!!match) return null;
+		else {
+			return {
+				wholeMatch: match[0],
+				pageNote: match[1],
+				lineEnding: match[2],
+				rawBubbles: match[3],
+				next: match[4]
+			}
+		}
 	},
 
 	pageContainsText: function(text) {

@@ -373,12 +373,11 @@ function typesetEX(typesetObj) {
 }
 
 function typesetPage(pageScript, styleSet, options) {
-	var bubbles = pageScript[2];
-	if (tbHelper.pageContainsText(bubbles)) {
+	if (tbHelper.pageContainsText(pageScript.rawBubbles)) {
 		// page's global style, forced to defaults_style if none is set.
-		var pageStyle = tbHelper.getTextStyles(pageScript[1], 'default_style')[0];
+		var pageStyle = tbHelper.getTextStyles(pageScript.pageNote, 'default_style')[0];
 		var previousStyle = pageStyle;
-		var lines = bubbles.split('\n');
+		var lines = pageScript.rawBubbles.split(pageScript.lineEnding);
 		var n = 0;
 		for (var i = 0; i < lines.length; i++) {
 			var line = lines[i];
@@ -449,7 +448,7 @@ function typesetFiles(fileList, scriptPath, targetFolder, styleSet, options) {
 						continue;
 					}
 					var pageScript = tbHelper.loadPage(text, pageNumber);
-					if (!pageScript) {
+					if (pageScript == null) {
 						if (!options.noPrompt) {
 							if (confirm(fileList[i].toString() + ' has no corresponding page in the translation script.\nContinue to typeset?', false) == false) break;
 						}

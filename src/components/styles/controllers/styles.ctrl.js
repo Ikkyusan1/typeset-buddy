@@ -61,9 +61,9 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 							let pageScript = tbHelper.loadPage(scriptContent, pageNumber);
 							if (pageScript != null) {
 								let pageStyles = [];
-								pageStyles.push(tbHelper.getTextStyles(pageScript[1], 'default_style')[0]);
-								if (tbHelper.pageContainsText(pageScript[2])) {
-									let lines = pageScript[2].split('\n');
+								pageStyles.push(tbHelper.getTextStyles(pageScript.pageNote, 'default_style')[0]);
+								if (tbHelper.pageContainsText(pageScript.rawBubbles)) {
+									let lines = pageScript.rawBubbles.split(pageScript.lineEnding);
 									lines.forEach(function(line) {
 										let lineStyles = tbHelper.getTextStyles(line, 'default_style');
 										pageStyles = pageStyles.concat(lineStyles.filter(function(item) {

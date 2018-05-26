@@ -6,9 +6,8 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			$scope.scriptContent = '';
 			$scope.pageContent = '';
 			$scope.pageNumbers = [];
-			$scope.pageScript = '';
+			$scope.pageScript = null;
 			$scope.pageNotes = '';
-			$scope.rawBubbles = '';
 			$scope.bubbles = [];
 			$scope.pageStyle = '';
 			$scope.panelSeparator = SettingsService.setting('panelSeparator');
@@ -36,8 +35,8 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 					$scope.scriptContent = result.data;
 					$scope.pageNumbers = tbHelper.getPageNumbers($scope.scriptContent);
 					if ($scope.pageNumbers.length > 0) {
+						ngToast.create({className: 'info', content: $scope.pageNumbers.length + ' page(s) found in file'});
 						if (!!!autoloadPage || page == null) {
-							ngToast.create({className: 'info', content: $scope.pageNumbers.length + ' page(s) found in file'});
 							$scope.selectedPage = $scope.pageNumbers[0];
 						}
 						else {
@@ -75,19 +74,18 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			if (angular.isDefined(pageNumber) && pageNumber != null && !Utils.isEmpty($scope.scriptContent)) {
 				$scope.pageScript = tbHelper.loadPage($scope.scriptContent, pageNumber);
 				if ($scope.pageScript != null) {
-					let tmpPageStyle = tbHelper.getTextStyles($scope.pageScript[1], 'default_style')[0];
+					let tmpPageStyle = tbHelper.getTextStyles($scope.pageScript.pageNote, 'default_style')[0];
 					$scope.pageStyle = ($scope.styleSet.styles.findIndex(function(one) { return one.keyword == tmpPageStyle; }) === -1)? {keyword: tmpPageStyle, inStyleSet: false} : {keyword: tmpPageStyle, inStyleSet: true};
 					$scope.$root.log('pageStyle', $scope.pageStyle);
-					$scope.pageNotes = tbHelper.getNotes($scope.pageScript[1]);
+					$scope.pageNotes = tbHelper.getNotes($scope.pageScript.pageNote);
 					$scope.$root.log('pageNotes', $scope.pageNotes);
-					$scope.rawBubbles = $scope.pageScript[2];
 					$scope.bubbles = [];
-					$scope.$root.log('rawBubbles', $scope.rawBubbles);
-					if (tbHelper.pageContainsText($scope.rawBubbles)) {
+					$scope.$root.log('rawBubbles', $scope.pageScript.rawBubbles);
+					if (tbHelper.pageContainsText($scope.pageScript.rawBubbles)) {
 						$scope.$root.log('contains text');
 						let lines = [];
 						let previousStyle = $scope.pageStyle.keyword;
-						lines = $scope.rawBubbles.split('\n');
+						lines = $scope.pageScript.rawBubbles.split($scope.pageScript.lineEnding);
 						$scope.$root.log('lines', lines);
 						lines.forEach(function(line) {
 							let notes = tbHelper.getNotes(line);
