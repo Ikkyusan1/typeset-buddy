@@ -118,6 +118,14 @@ var tbHelper = {
 			],
 			def: 'METRICS'
 		},
+		'textOrientation': {
+			label: 'Text orientation',
+			values: [
+				{value: 'HORIZONTAL', label: 'Horizontal', descriptorValue: 'Hrzn', descriptorType: 'char'},
+				{value: 'VERTICAL', label: 'Vertical', descriptorValue: 'Vrtc', descriptorType: 'char'}
+			],
+			def: 'HORIZONTAL'
+		},
 		languages: {
 			label: 'Spelling/Hyphen',
 			def: 'englishLanguage',

@@ -83,6 +83,10 @@ Ellipsis: …
 Too many dots: .......
 Multiply this cat! <- cat will have an "s".
 
+012# [japanese_style] [[asian text to be typesetted vertically]]
+組版（くみはん）とは、印刷の一工程であって、文字や図版などの要素を配置し、紙面を構成すること。組み付けともいう。
+// 本来は活版印刷の用語であり、文字どおり版を物理的に組むこと、活字を並べて結束糸で縛ったものを「組み版」と呼んだことに由来する。
+
 
 END#
 

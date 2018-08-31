@@ -120,12 +120,20 @@
 </div>
 <div class="row m0">
 	<div class="col-md-4 col-xs-4">
+		<div class="input-flex">
+			<label>
+				<span>Text orientation</span>
+				<text-orientation-selector selected-value="preset.textOrientation"></text-orientation-selector>
+			</label>
+		</div>
+	</div>
+	<div class="col-md-4 col-xs-4">
 		<label class="input-flex">
 			<span>Layer group</span>
 			<input type="text" class="topcoat-text-input" placeholder="Layer group" ng-model="preset.layerGroup" >
 		</label>
 	</div>
-	<div class="col-md-8 col-xs-8 text-right">
+	<div class="col-md-4 col-xs-4 text-right">
 		<button class="topcoat-button" ng-click="setAction()" uib-tooltip="Just set the style parameters" tooltip-popup-delay="500" tooltip-placement="bottom-right">
 			<span class="glyphicon glyphicon-text-color"></span>
 		</button>
