@@ -57,6 +57,7 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 
 		$rootScope.toast = function(toast) {
 			if (toast.className == 'danger') toast.dismissOnTimeout = false;
+			toast.timeout = 6000;
 			ngToast.create(toast);
 		};
 
