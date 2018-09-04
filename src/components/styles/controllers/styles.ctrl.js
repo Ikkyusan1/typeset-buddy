@@ -144,8 +144,13 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'Utils', 'Applier', '$se
 				Utils.showConfirmDialog('Are you sure you want to delete the style set "'+ $scope.styleSet.name +'" ?')
 				.then(
 					function() {
-						if (StylesService.deleteStyleSet($scope.styleSet.id) === true) {
-							$scope.toast({className: 'success', content: 'Deleted'});
+						try {
+							if (StylesService.deleteStyleSet($scope.styleSet.id) === true) {
+								$scope.toast({className: 'success', content: 'Deleted'});
+							}
+						}
+						catch (e) {
+							$scope.toast({className: 'danger', content: e});
 						}
 					},
 					function() {}

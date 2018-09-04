@@ -69,15 +69,15 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', '$tim
 		self.deleteStyleSet = function(id) {
 			let idx = $localStorage.styleSets.findIndex(function(one) { return one.id == id; });
 			if ($localStorage.styleSets[idx].id === 0) {
-				$rootScope.toast({className: 'danger', content: 'Cannot delete default style set'});
-				return false;
+				throw 'Cannot delete default style set';
 			}
-			if (idx > -1) {
-				$localStorage.styleSets.splice(idx, 1);
-				delete $localStorage.lastOpenedStyleSet;
-				$timeout(function(){ $rootScope.$broadcast('refresh-styleset-list'); }, 0);
-				return true;
+			if (idx == -1 ) {
+				throw 'Styleset not found';
 			}
+			$localStorage.styleSets.splice(idx, 1);
+			delete $localStorage.lastOpenedStyleSet;
+			$timeout(function(){ $rootScope.$broadcast('refresh-styleset-list'); }, 0);
+			return true;
 		};
 
 		return self;
