@@ -405,16 +405,16 @@ var tbHelper = {
 			var currentLine = this.getPageNumberLine(text, current);
 			var nextLine = this.getPageNumberLine(text, next);
 			if (current > next) {
-				throw 'Some pages are out of order: ' + next + ' (line '+ nextLine + ') appears after ' + current + ' (line ' + currentLine + ')';
+				throw 'Some pages are out of order: ' + current + ' (line ' + currentLine + ') appears before ' + next + ' (line '+ nextLine + ')';
 			}
 			else if (current == next) {
 				throw 'Duplicate page number: ' + current + ' on lines ' + currentLine + ' and ' + nextLine;
 			}
 			else if (parseInt(current) + 1 != parseInt(next)) {
-				warnings.push('There\'s a gap between ' + current + ' (line ' + currentLine + ') and ' + next + ' (line ' + nextLine + ')');
+				warnings.push('There\'s a gap between page ' + current + ' (line ' + currentLine + ') and page ' + next + ' (line ' + nextLine + ')');
 			}
 		}
-		return warnings;
+		return warnings.reverse();
 	},
 
 	getActualPageCount: function(pageNumbers) {
