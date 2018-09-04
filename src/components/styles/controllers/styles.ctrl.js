@@ -1,5 +1,5 @@
-tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'Applier', '$sessionStorage', 'SettingsService',
-	function($scope, StylesService, ngToast, Utils, Applier, $sessionStorage, SettingsService) {
+tb.controller('StylesCtrl', ['$scope', 'StylesService', 'Utils', 'Applier', '$sessionStorage', 'SettingsService',
+	function($scope, StylesService, Utils, Applier, $sessionStorage, SettingsService) {
 
 		$scope.$sessionStorage = $sessionStorage.$default({
 			styleFilter: ''
@@ -18,10 +18,10 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 			try {
 				StylesService.saveStyleSet($scope.styleSet);
 				$scope.loadCurrentStyleSet();
-				ngToast.create({className: 'success', content: 'Saved'});
+				$scope.toast({className: 'success', content: 'Saved'});
 			}
 			catch (e) {
-				ngToast.create({className: 'danger', content: e});
+				$scope.toast({className: 'danger', content: e});
 			}
 		};
 
@@ -33,7 +33,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 				if (!!result.data) {
 					let writeResult = window.cep.fs.writeFile(result.data, JSON.stringify(styleSet, null, 2), cep.encoding.UTF8);
 					if (writeResult.err != 0) {
-						ngToast.create({className: 'danger', content: 'Failed to write a file at the destination:' + result.data + ', error code:' + writeResult.err});
+						$scope.toast({className: 'danger', content: 'Failed to write a file at the destination:' + result.data + ', error code:' + writeResult.err});
 					}
 				}
 			}
@@ -79,14 +79,14 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 						candidates.forEach(function(one) {
 							$scope.maybeAddStyleToSet(one);
 						});
-						ngToast.create({className: 'success', content: 'Done'});
+						$scope.toast({className: 'success', content: 'Done'});
 					}
 					else {
-						ngToast.create({className: 'info', content: 'Did not find any page number in the script'});
+						$scope.toast({className: 'info', content: 'Did not find any page number in the script'});
 					}
 				}
 				else {
-					ngToast.create({className: 'danger', content: 'Could not read the file'});
+					$scope.toast({className: 'danger', content: 'Could not read the file'});
 				}
 			}
 		};
@@ -106,12 +106,12 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 					}
 					catch (e) {
 						$scope.styleSet = tbHelper.getDummyStyleSet();
-						ngToast.create({className: 'danger', content: 'Import error: ' + e});
+						$scope.toast({className: 'danger', content: 'Import error: ' + e});
 					}
 				}
 				else {
 					$scope.styleSet = tbHelper.getDummyStyleSet();
-					ngToast.create({className: 'danger', content: 'Could not read the file'});
+					$scope.toast({className: 'danger', content: 'Could not read the file'});
 				}
 			}
 		};
@@ -128,7 +128,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 						}
 						let writeResult = window.cep.fs.writeFile(result.data, JSON.stringify(constants, null, 2));
 						if (writeResult.err != 0) {
-							ngToast.create({className: 'danger', content: 'Failed to write a file at the destination:' + result.data + ', error code:' + writeResult.err});
+							$scope.toast({className: 'danger', content: 'Failed to write a file at the destination:' + result.data + ', error code:' + writeResult.err});
 						}
 					}
 				)
@@ -145,7 +145,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 				.then(
 					function() {
 						if (StylesService.deleteStyleSet($scope.styleSet.id) === true) {
-							ngToast.create({className: 'success', content: 'Deleted'});
+							$scope.toast({className: 'success', content: 'Deleted'});
 						}
 					},
 					function() {}
@@ -196,10 +196,10 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 			Applier.actionSelectedLayers('applyStyle', tmpStyle)
 			.then(
 				function() {
-					ngToast.create({className: 'success', content: 'Done'});
+					$scope.toast({className: 'success', content: 'Done'});
 				},
 				function(err) {
-					ngToast.create({className: 'danger', content: err});
+					$scope.toast({className: 'danger', content: err});
 				}
 			);
 		};
@@ -212,7 +212,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 
 				},
 				function(err) {
-					ngToast.create({className: 'danger', content: err});
+					$scope.toast({className: 'danger', content: err});
 				}
 			);
 		};
@@ -221,10 +221,10 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 			Applier.actionSelectedLayers(action, param)
 			.then(
 				function() {
-					ngToast.create({className: 'success', content: 'Done'});
+					$scope.toast({className: 'success', content: 'Done'});
 				},
 				function(err) {
-					ngToast.create({className: 'danger', content: err});
+					$scope.toast({className: 'danger', content: err});
 				}
 			);
 		};

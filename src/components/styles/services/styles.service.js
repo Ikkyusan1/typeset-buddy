@@ -1,5 +1,5 @@
-tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngToast', '$timeout',
-	function($rootScope, $localStorage, $q, Utils, ngToast, $timeout) {
+tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', '$timeout',
+	function($rootScope, $localStorage, $q, Utils, $timeout) {
 
 		var self = this;
 
@@ -69,7 +69,7 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 		self.deleteStyleSet = function(id) {
 			let idx = $localStorage.styleSets.findIndex(function(one) { return one.id == id; });
 			if ($localStorage.styleSets[idx].id === 0) {
-				ngToast.create({className: 'danger', content: 'Cannot delete default style set'});
+				$rootScope.toast({className: 'danger', content: 'Cannot delete default style set'});
 				return false;
 			}
 			if (idx > -1) {

@@ -1,5 +1,5 @@
-tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', 'StylesService', 'Utils', 'ngToast', '$timeout', 'clipboard',
-	function($scope, SettingsService, ScriptService, StylesService, Utils, ngToast, $timeout, clipboard) {
+tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', 'StylesService', 'Utils', '$timeout', 'clipboard',
+	function($scope, SettingsService, ScriptService, StylesService, Utils, $timeout, clipboard) {
 
 		$scope.reset = function() {
 			$scope.filename = '';
@@ -34,8 +34,15 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 					$scope.filename = Utils.extractFilename(filepath);
 					$scope.scriptContent = result.data;
 					$scope.pageNumbers = tbHelper.getPageNumbers($scope.scriptContent);
+
 					if ($scope.pageNumbers.length > 0) {
-						ngToast.create({className: 'info', content: $scope.pageNumbers.length + ' page(s) found in file'});
+						let warnings = tbHelper.checkPageNumbersSeries($scope.scriptContent, $scope.pageNumbers);
+						if (!!warnings) {
+							warnings.forEach(function(one) {
+								$scope.toast({className: 'info', content: one, dismissOnTimeout: false});
+							});
+						}
+						$scope.toast({className: 'info', content: $scope.pageNumbers.length + ' parts(s) found in file (actual page count: ' + tbHelper.getActualPageCount($scope.pageNumbers) + ')'});
 						if (!!!autoloadPage || page == null) {
 							$scope.selectedPage = $scope.pageNumbers[0];
 						}
@@ -56,7 +63,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 				SettingsService.setting('lastOpenedScript', null);
 				SettingsService.setting('lastOpenedPage', null);
 				$scope.reset();
-				ngToast.create({className: 'danger', content: e});
+				$scope.toast({className: 'danger', content: e});
 			}
 		};
 
@@ -106,7 +113,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 											bubble.text = replaced;
 										}
 										catch (e) {
-											ngToast.create({className: 'danger', content: 'Text replace error: ' + e});
+											$scope.toast({className: 'danger', content: 'Text replace error: ' + e});
 										}
 									}
 									if (tbHelper.isMultiBubblePart(line)) {
@@ -146,7 +153,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 					$scope.$root.log('bubbles', $scope.bubbles);
 				}
 				else {
-					ngToast.create({className: 'info', content: 'Could not find page ' + pageNumber + ' in file'});
+					$scope.toast({className: 'info', content: 'Could not find page ' + pageNumber + ' in file'});
 					$scope.selectedPage = null;
 					SettingsService.setting('lastOpenedPage', null);
 					$scope.bubbles = [];
@@ -177,13 +184,13 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 				style = {keyword: $scope.selectedForcedStyle, inStyleSet: true};
 			}
 			if (!style.inStyleSet) {
-				ngToast.create({className: 'info', content: 'Style "'+ style.keyword +'" not found in styleset. Fallback to default_style.'});
+				$scope.toast({className: 'info', content: 'Style "'+ style.keyword +'" not found in styleset. Fallback to default_style.'});
 				style = 'default_style';
 			}
 			let stylePreset = $scope.styleSet.styles.find(function(one) { return one.keyword == style.keyword; });
 			if (!!!stylePreset) stylePreset = $scope.styleSet.styles[0];
 			if(!angular.isDefined($scope.styleSet.language)) {
-				ngToast.create({className: 'info', content: 'The styleset\'s language is not defined. Fallback to default.'});
+				$scope.toast({className: 'info', content: 'The styleset\'s language is not defined. Fallback to default.'});
 				stylePreset.language = tbHelper.styleProps.languages.def;
 			}
 			else{
@@ -200,7 +207,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			.then(
 				function() {},
 				function(err) {
-					ngToast.create({className: 'danger', content: err});
+					$scope.toast({className: 'danger', content: err});
 				}
 			);
 		};
@@ -218,7 +225,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 		$scope.toClipboard = function(text, type) {
 			clipboard.copyText(text);
 			let txt = (!!type && type == 'note')? 'Note copied to clipboard' : 'Content copied to clipboard';
-			ngToast.create({className: 'info', content: txt});
+			$scope.toast({className: 'info', content: txt});
 		};
 
 		$scope.reset();

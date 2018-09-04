@@ -1,5 +1,5 @@
-tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace', 'themeManager', '$localStorage',
-	function(CONF, $transitions, $state, $stateParams, $rootScope, $trace, themeManager, $localStorage) {
+tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace', 'themeManager', '$localStorage', 'ngToast',
+	function(CONF, $transitions, $state, $stateParams, $rootScope, $trace, themeManager, $localStorage, ngToast) {
 
 		$rootScope.CONF = CONF;
 
@@ -53,6 +53,11 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 					console.log(what);
 				}
 			}
+		};
+
+		$rootScope.toast = function(toast) {
+			if (toast.className == 'danger') toast.dismissOnTimeout = false;
+			ngToast.create(toast);
 		};
 
 		// save last opened tab

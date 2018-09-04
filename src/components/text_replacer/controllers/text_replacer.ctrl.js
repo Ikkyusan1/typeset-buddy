@@ -1,5 +1,5 @@
-tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'ngToast', 'Applier',
-	function($scope, SettingsService, Utils, ngToast, Applier) {
+tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'Applier',
+	function($scope, SettingsService, Utils, Applier) {
 
 		$scope.textReplaceRules = SettingsService.setting('textReplaceRules');
 
@@ -29,7 +29,7 @@ tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'ngToas
 				let obj = {textReplaceRules: tmpRules};
 				let writeResult = window.cep.fs.writeFile(result.data, JSON.stringify(obj, null, 2), cep.encoding.UTF8);
 				if (writeResult.err != 0) {
-					ngToast.create({className: 'danger', content: 'Failed to write a file at the destination:' + result.data + ', error code:' + writeResult.err});
+					$scope.toast({className: 'danger', content: 'Failed to write a file at the destination:' + result.data + ', error code:' + writeResult.err});
 				}
 			}
 		};
@@ -53,11 +53,11 @@ tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'ngToas
 						$scope.textReplaceRules = $scope.textReplaceRules.concat(tbHelper.cleanTextReplaceRules(tmpRules));
 					}
 					catch (e) {
-						ngToast.create({className: 'danger', content: 'Import error: ' + e});
+						$scope.toast({className: 'danger', content: 'Import error: ' + e});
 					}
 				}
 				else {
-					ngToast.create({className: 'danger', content: 'Could not read the file'});
+					$scope.toast({className: 'danger', content: 'Could not read the file'});
 				}
 			}
 		};
@@ -70,10 +70,10 @@ tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'ngToas
 			Applier.actionSelectedLayers('replaceText', $scope.textReplaceRules)
 			.then(
 				function() {
-					ngToast.create({className: 'success', content: 'Done'});
+					$scope.toast({className: 'success', content: 'Done'});
 				},
 				function(err) {
-					ngToast.create({className: 'danger', content: err});
+					$scope.toast({className: 'danger', content: err});
 				}
 			);
 		};
