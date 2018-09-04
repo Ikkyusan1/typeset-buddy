@@ -2,6 +2,7 @@
 cTID = function(s) { return app.charIDToTypeID(s); };
 sTID = function(s) { return app.stringIDToTypeID(s); };
 idTS = function(id) { return app.typeIDToStringID(id); };
+idTC = function(id) { return app.typeIDToCharID(id); };
 
 var originalPrefs = app.preferences;
 var saveState;
@@ -189,7 +190,10 @@ function getAdjustedSize(size) {
 	return parseInt(size) / (activeDocument.resolution / 72);
 }
 
-function getBasicTextboxWidth(fontSize) {
+function getBasicTextboxDimension(fontSize, vertical) {
+	if (!!vertical) {
+		return Math.round(getAdjustedSize(fontSize) * 9);
+	}
 	return Math.round(getAdjustedSize(fontSize) * 7);
 }
 
@@ -215,19 +219,33 @@ function getActiveLayerDimension() {
 	};
 }
 
-function adjustTextLayerHeight(textLayer) {
+function adjustTextLayerDimensions(textLayer) {
 	var dimensions = getActiveLayerDimension();
 	textLayer.textItem.width = dimensions.width + 7; // add a little to keep some leeway
 	textLayer.textItem.height = dimensions.height + 7; // add a little to keep some leeway
+}
+
+function isActiveLayerVertical() {
+	var ref = new ActionReference();
+	ref.putEnumerated(cTID('TxLr'), cTID('Ordn'), cTID('Trgt'));
+	var descriptor = executeActionGet(ref);
+	var value = idTC(descriptor.getObjectValue(sTID('textKey')).getEnumerationValue(sTID('orientation')));
+	return (value == 'Vrtc');
 }
 
 function resizeActiveLayer() {
 	app.preferences.rulerUnits = Units.PIXELS;
 	var layer = activeDocument.activeLayer;
 	var textItem = layer.textItem;
-	textItem.width = getBasicTextboxWidth(textItem.size);
-	textItem.height = activeDocument.height;
-	adjustTextLayerHeight(layer);
+	if (isActiveLayerVertical()) {
+		textItem.width = activeDocument.width;
+		textItem.height = getBasicTextboxDimension(textItem.size, true);
+	}
+	else {
+		textItem.width = getBasicTextboxDimension(textItem.size);
+		textItem.height = activeDocument.height;
+	}
+	adjustTextLayerDimensions(layer);
 }
 
 function applyStyleActiveLayer(style, autoResize) {
@@ -240,6 +258,14 @@ function applyStyleActiveLayer(style, autoResize) {
 	var actionTextStyleParams = prepareTextStyleParams(style);
 	actionTextStyle.putObject(cTID('T   '), cTID('TxtS'), actionTextStyleParams);
 	executeAction(cTID('setd'), actionTextStyle, DialogModes.NO);
+	// Text orientation
+	var actionTextOrientation = new ActionDescriptor();
+	var actionTextOrientationRef = new ActionReference();
+	actionTextOrientationRef.putProperty(cTID('Prpr'), cTID('Ornt'));
+	actionTextOrientationRef.putEnumerated(cTID('TxLr'), cTID('Ordn'), cTID('Trgt'));
+	actionTextOrientation.putReference(cTID('null'), actionTextOrientationRef);
+	actionTextOrientation.putEnumerated(cTID('T   '), cTID('Ornt'), convertStylePropValue('textOrientation', style.textOrientation));
+	executeAction(cTID('setd'), actionTextOrientation, DialogModes.NO);
 	// Paragraph style
 	var actionParagraph = new ActionDescriptor();
 	var actionParagraphRef = new ActionReference();
@@ -583,11 +609,12 @@ function typeset(params) {
 	clickCoordinatesDescriptor.putUnitDouble(cTID('Hrzn'), cTID('#Prc'), params.coordinates.x);
 	clickCoordinatesDescriptor.putUnitDouble(cTID('Vrtc'), cTID('#Prc'), params.coordinates.y);
 	layerDescriptor.putObject(cTID('TxtC'), cTID('Pnt '), clickCoordinatesDescriptor);
-	// We want a horizontal box
+	// Text box
 	var shapeActionList = new ActionList();
 	var textShapeDescriptor = new ActionDescriptor();
 	textShapeDescriptor.putEnumerated(cTID('TEXT'), cTID('TEXT'), sTID('box'));
-	textShapeDescriptor.putEnumerated(cTID('Ornt'), cTID('Ornt'), cTID('Hrzn'));
+	// text orientation
+	textShapeDescriptor.putEnumerated(cTID('Ornt'), cTID('Ornt'), convertStylePropValue('textOrientation', params.style.textOrientation));
 	var shapeBoundsDescriptor = new ActionDescriptor();
 	shapeBoundsDescriptor.putDouble(cTID('Top '), 0);
 	shapeBoundsDescriptor.putDouble(cTID('Left'), 0);

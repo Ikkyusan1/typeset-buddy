@@ -118,6 +118,14 @@ var tbHelper = {
 			],
 			def: 'METRICS'
 		},
+		'textOrientation': {
+			label: 'Text orientation',
+			values: [
+				{value: 'HORIZONTAL', label: 'Horizontal', descriptorValue: 'Hrzn', descriptorType: 'char'},
+				{value: 'VERTICAL', label: 'Vertical', descriptorValue: 'Vrtc', descriptorType: 'char'}
+			],
+			def: 'HORIZONTAL'
+		},
 		languages: {
 			label: 'Spelling/Hyphen',
 			def: 'englishLanguage',
@@ -353,20 +361,73 @@ var tbHelper = {
 
 	getPageNumbers: function(text) {
 		var pageNumbers = [];
-		var regex = /\b([\d-]{3,9})#/g;
+		var regex = /^([\d-]{3,9})#/gm;
 		var match;
 		while ((match = regex.exec(text)) !== null) {
 			// failsafe to avoid infinite loops with zero-width matches
 			if (match.index === regex.lastIndex) regex.lastIndex++;
 			pageNumbers.push(match[1]);
 		}
-		pageNumbers.sort();
-		for (var i = 0; i < pageNumbers.length -1; i++) {
-			if (pageNumbers[i] == pageNumbers[i+1]) {
-				throw 'Duplicate page number: ' + pageNumbers[i];
+		return pageNumbers;
+	},
+
+	getPageNumberLine: function(text, pageNumber) {
+		var lines = [];
+		var regex = /([\d-]{3,9})#|(^).*/gm;
+		var pnregex = new RegExp('(^|-?)'+pageNumber+'(-?|$)');
+		var match;
+		while ((match = regex.exec(text)) !== null) {
+			if (match.index === regex.lastIndex) regex.lastIndex++;
+			lines.push(match[1]);
+		}
+		for (var i = 0; i < lines.length -1; i++) {
+			if (pnregex.test(lines[i])) return i+1;
+		}
+		return null;
+	},
+
+	checkPageNumbersSeries: function(text, pageNumbers) {
+		var tmp = [];
+		var warnings = [];
+		// split multipages
+		pageNumbers.forEach(function(one) {
+			if (one.indexOf('-') > 0) {
+				tmp = tmp.concat(one.split('-'));
+			}
+			else {
+				tmp.push(one);
+			}
+		});
+		// check for reverse numbering, duplicates and gaps
+		for (var i = 0; i < tmp.length -1; i++) {
+			var current = tmp[i];
+			var next = tmp[i+1];
+			var currentLine = this.getPageNumberLine(text, current);
+			var nextLine = this.getPageNumberLine(text, next);
+			if (current > next) {
+				throw 'Some pages are out of order: ' + current + ' (line ' + currentLine + ') appears before ' + next + ' (line '+ nextLine + ')';
+			}
+			else if (current == next) {
+				throw 'Duplicate page number: ' + current + ' on lines ' + currentLine + ' and ' + nextLine;
+			}
+			else if (parseInt(current) + 1 != parseInt(next)) {
+				warnings.push('There\'s a gap between page ' + current + ' (line ' + currentLine + ') and page ' + next + ' (line ' + nextLine + ')');
 			}
 		}
-		return pageNumbers;
+		return warnings.reverse();
+	},
+
+	getActualPageCount: function(pageNumbers) {
+		var count = 0;
+		pageNumbers.forEach(function(one) {
+			if (one.indexOf('-') > 0) {
+				count += one.split('-').length;
+			}
+			else {
+				count++;
+			}
+		});
+		return count;
 	},
 
 	loadPage: function(text, pageNumber) {

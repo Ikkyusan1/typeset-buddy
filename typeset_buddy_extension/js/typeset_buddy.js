@@ -124,6 +124,14 @@ var tbHelper = {
 			],
 			def: 'METRICS'
 		},
+		'textOrientation': {
+			label: 'Text orientation',
+			values: [
+				{value: 'HORIZONTAL', label: 'Horizontal', descriptorValue: 'Hrzn', descriptorType: 'char'},
+				{value: 'VERTICAL', label: 'Vertical', descriptorValue: 'Vrtc', descriptorType: 'char'}
+			],
+			def: 'HORIZONTAL'
+		},
 		languages: {
 			label: 'Spelling/Hyphen',
 			def: 'englishLanguage',
@@ -359,20 +367,73 @@ var tbHelper = {
 
 	getPageNumbers: function(text) {
 		var pageNumbers = [];
-		var regex = /\b([\d-]{3,9})#/g;
+		var regex = /^([\d-]{3,9})#/gm;
 		var match;
 		while ((match = regex.exec(text)) !== null) {
 			// failsafe to avoid infinite loops with zero-width matches
 			if (match.index === regex.lastIndex) regex.lastIndex++;
 			pageNumbers.push(match[1]);
 		}
-		pageNumbers.sort();
-		for (var i = 0; i < pageNumbers.length -1; i++) {
-			if (pageNumbers[i] == pageNumbers[i+1]) {
-				throw 'Duplicate page number: ' + pageNumbers[i];
+		return pageNumbers;
+	},
+
+	getPageNumberLine: function(text, pageNumber) {
+		var lines = [];
+		var regex = /([\d-]{3,9})#|(^).*/gm;
+		var pnregex = new RegExp('(^|-?)'+pageNumber+'(-?|$)');
+		var match;
+		while ((match = regex.exec(text)) !== null) {
+			if (match.index === regex.lastIndex) regex.lastIndex++;
+			lines.push(match[1]);
+		}
+		for (var i = 0; i < lines.length -1; i++) {
+			if (pnregex.test(lines[i])) return i+1;
+		}
+		return null;
+	},
+
+	checkPageNumbersSeries: function(text, pageNumbers) {
+		var tmp = [];
+		var warnings = [];
+		// split multipages
+		pageNumbers.forEach(function(one) {
+			if (one.indexOf('-') > 0) {
+				tmp = tmp.concat(one.split('-'));
+			}
+			else {
+				tmp.push(one);
+			}
+		});
+		// check for reverse numbering, duplicates and gaps
+		for (var i = 0; i < tmp.length -1; i++) {
+			var current = tmp[i];
+			var next = tmp[i+1];
+			var currentLine = this.getPageNumberLine(text, current);
+			var nextLine = this.getPageNumberLine(text, next);
+			if (current > next) {
+				throw 'Some pages are out of order: ' + current + ' (line ' + currentLine + ') appears before ' + next + ' (line '+ nextLine + ')';
+			}
+			else if (current == next) {
+				throw 'Duplicate page number: ' + current + ' on lines ' + currentLine + ' and ' + nextLine;
+			}
+			else if (parseInt(current) + 1 != parseInt(next)) {
+				warnings.push('There\'s a gap between page ' + current + ' (line ' + currentLine + ') and page ' + next + ' (line ' + nextLine + ')');
 			}
 		}
-		return pageNumbers;
+		return warnings.reverse();
+	},
+
+	getActualPageCount: function(pageNumbers) {
+		var count = 0;
+		pageNumbers.forEach(function(one) {
+			if (one.indexOf('-') > 0) {
+				count += one.split('-').length;
+			}
+			else {
+				count++;
+			}
+		});
+		return count;
 	},
 
 	loadPage: function(text, pageNumber) {
@@ -515,7 +576,7 @@ var tb = angular.module('tb', [
 tb.constant('CONF', {
 	appName: 'typeset_buddy',
 	debug: false,
-	version: '0.3.3',
+	version: '0.4.0',
 	author: 'Ikkyusan',
 	homepage: 'https://github.com/ikkyusan1/typeset-buddy',
 	description: 'A typesetting tool for Photoshop CC'
@@ -536,8 +597,8 @@ tb.config(['$compileProvider', '$localStorageProvider', 'ngToastProvider', 'CONF
 	}
 ]);
 
-tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace', 'themeManager', '$localStorage',
-	function(CONF, $transitions, $state, $stateParams, $rootScope, $trace, themeManager, $localStorage) {
+tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace', 'themeManager', '$localStorage', 'ngToast',
+	function(CONF, $transitions, $state, $stateParams, $rootScope, $trace, themeManager, $localStorage, ngToast) {
 
 		$rootScope.CONF = CONF;
 
@@ -591,6 +652,12 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 					console.log(what);
 				}
 			}
+		};
+
+		$rootScope.toast = function(toast) {
+			if (toast.className == 'danger') toast.dismissOnTimeout = false;
+			toast.timeout = 6000;
+			ngToast.create(toast);
 		};
 
 		// save last opened tab
@@ -975,8 +1042,8 @@ tb.config(['$stateProvider',
 	}
 ]);
 
-tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', 'StylesService', 'Utils', 'ngToast', '$timeout', 'clipboard',
-	function($scope, SettingsService, ScriptService, StylesService, Utils, ngToast, $timeout, clipboard) {
+tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', 'StylesService', 'Utils', '$timeout', 'clipboard',
+	function($scope, SettingsService, ScriptService, StylesService, Utils, $timeout, clipboard) {
 
 		$scope.reset = function() {
 			$scope.filename = '';
@@ -1011,8 +1078,15 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 					$scope.filename = Utils.extractFilename(filepath);
 					$scope.scriptContent = result.data;
 					$scope.pageNumbers = tbHelper.getPageNumbers($scope.scriptContent);
+
 					if ($scope.pageNumbers.length > 0) {
-						ngToast.create({className: 'info', content: $scope.pageNumbers.length + ' page(s) found in file'});
+						let warnings = tbHelper.checkPageNumbersSeries($scope.scriptContent, $scope.pageNumbers);
+						if (!!warnings) {
+							warnings.forEach(function(one) {
+								$scope.toast({className: 'info', content: one, dismissOnTimeout: false});
+							});
+						}
+						$scope.toast({className: 'info', content: $scope.pageNumbers.length + ' parts(s) found in file (actual page count: ' + tbHelper.getActualPageCount($scope.pageNumbers) + ')'});
 						if (!!!autoloadPage || page == null) {
 							$scope.selectedPage = $scope.pageNumbers[0];
 						}
@@ -1033,7 +1107,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 				SettingsService.setting('lastOpenedScript', null);
 				SettingsService.setting('lastOpenedPage', null);
 				$scope.reset();
-				ngToast.create({className: 'danger', content: e});
+				$scope.toast({className: 'danger', content: e});
 			}
 		};
 
@@ -1083,7 +1157,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 											bubble.text = replaced;
 										}
 										catch (e) {
-											ngToast.create({className: 'danger', content: 'Text replace error: ' + e});
+											$scope.toast({className: 'danger', content: 'Text replace error: ' + e});
 										}
 									}
 									if (tbHelper.isMultiBubblePart(line)) {
@@ -1123,7 +1197,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 					$scope.$root.log('bubbles', $scope.bubbles);
 				}
 				else {
-					ngToast.create({className: 'info', content: 'Could not find page ' + pageNumber + ' in file'});
+					$scope.toast({className: 'info', content: 'Could not find page ' + pageNumber + ' in file'});
 					$scope.selectedPage = null;
 					SettingsService.setting('lastOpenedPage', null);
 					$scope.bubbles = [];
@@ -1154,13 +1228,13 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 				style = {keyword: $scope.selectedForcedStyle, inStyleSet: true};
 			}
 			if (!style.inStyleSet) {
-				ngToast.create({className: 'info', content: 'Style "'+ style.keyword +'" not found in styleset. Fallback to default_style.'});
+				$scope.toast({className: 'info', content: 'Style "'+ style.keyword +'" not found in styleset. Fallback to default_style.'});
 				style = 'default_style';
 			}
 			let stylePreset = $scope.styleSet.styles.find(function(one) { return one.keyword == style.keyword; });
 			if (!!!stylePreset) stylePreset = $scope.styleSet.styles[0];
 			if(!angular.isDefined($scope.styleSet.language)) {
-				ngToast.create({className: 'info', content: 'The styleset\'s language is not defined. Fallback to default.'});
+				$scope.toast({className: 'info', content: 'The styleset\'s language is not defined. Fallback to default.'});
 				stylePreset.language = tbHelper.styleProps.languages.def;
 			}
 			else{
@@ -1177,7 +1251,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			.then(
 				function() {},
 				function(err) {
-					ngToast.create({className: 'danger', content: err});
+					$scope.toast({className: 'danger', content: err});
 				}
 			);
 		};
@@ -1195,7 +1269,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 		$scope.toClipboard = function(text, type) {
 			clipboard.copyText(text);
 			let txt = (!!type && type == 'note')? 'Note copied to clipboard' : 'Content copied to clipboard';
-			ngToast.create({className: 'info', content: txt});
+			$scope.toast({className: 'info', content: txt});
 		};
 
 		$scope.reset();
@@ -1340,8 +1414,8 @@ tb.config(['$stateProvider',
 	}
 ]);
 
-tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'Applier', '$sessionStorage', 'SettingsService',
-	function($scope, StylesService, ngToast, Utils, Applier, $sessionStorage, SettingsService) {
+tb.controller('StylesCtrl', ['$scope', 'StylesService', 'Utils', 'Applier', '$sessionStorage', 'SettingsService',
+	function($scope, StylesService, Utils, Applier, $sessionStorage, SettingsService) {
 
 		$scope.$sessionStorage = $sessionStorage.$default({
 			styleFilter: ''
@@ -1360,10 +1434,10 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 			try {
 				StylesService.saveStyleSet($scope.styleSet);
 				$scope.loadCurrentStyleSet();
-				ngToast.create({className: 'success', content: 'Saved'});
+				$scope.toast({className: 'success', content: 'Saved'});
 			}
 			catch (e) {
-				ngToast.create({className: 'danger', content: e});
+				$scope.toast({className: 'danger', content: e});
 			}
 		};
 
@@ -1375,7 +1449,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 				if (!!result.data) {
 					let writeResult = window.cep.fs.writeFile(result.data, JSON.stringify(styleSet, null, 2), cep.encoding.UTF8);
 					if (writeResult.err != 0) {
-						ngToast.create({className: 'danger', content: 'Failed to write a file at the destination:' + result.data + ', error code:' + writeResult.err});
+						$scope.toast({className: 'danger', content: 'Failed to write a file at the destination:' + result.data + ', error code:' + writeResult.err});
 					}
 				}
 			}
@@ -1421,14 +1495,14 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 						candidates.forEach(function(one) {
 							$scope.maybeAddStyleToSet(one);
 						});
-						ngToast.create({className: 'success', content: 'Done'});
+						$scope.toast({className: 'success', content: 'Done'});
 					}
 					else {
-						ngToast.create({className: 'info', content: 'Did not find any page number in the script'});
+						$scope.toast({className: 'info', content: 'Did not find any page number in the script'});
 					}
 				}
 				else {
-					ngToast.create({className: 'danger', content: 'Could not read the file'});
+					$scope.toast({className: 'danger', content: 'Could not read the file'});
 				}
 			}
 		};
@@ -1448,12 +1522,12 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 					}
 					catch (e) {
 						$scope.styleSet = tbHelper.getDummyStyleSet();
-						ngToast.create({className: 'danger', content: 'Import error: ' + e});
+						$scope.toast({className: 'danger', content: 'Import error: ' + e});
 					}
 				}
 				else {
 					$scope.styleSet = tbHelper.getDummyStyleSet();
-					ngToast.create({className: 'danger', content: 'Could not read the file'});
+					$scope.toast({className: 'danger', content: 'Could not read the file'});
 				}
 			}
 		};
@@ -1470,7 +1544,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 						}
 						let writeResult = window.cep.fs.writeFile(result.data, JSON.stringify(constants, null, 2));
 						if (writeResult.err != 0) {
-							ngToast.create({className: 'danger', content: 'Failed to write a file at the destination:' + result.data + ', error code:' + writeResult.err});
+							$scope.toast({className: 'danger', content: 'Failed to write a file at the destination:' + result.data + ', error code:' + writeResult.err});
 						}
 					}
 				)
@@ -1486,8 +1560,13 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 				Utils.showConfirmDialog('Are you sure you want to delete the style set "'+ $scope.styleSet.name +'" ?')
 				.then(
 					function() {
-						if (StylesService.deleteStyleSet($scope.styleSet.id) === true) {
-							ngToast.create({className: 'success', content: 'Deleted'});
+						try {
+							if (StylesService.deleteStyleSet($scope.styleSet.id) === true) {
+								$scope.toast({className: 'success', content: 'Deleted'});
+							}
+						}
+						catch (e) {
+							$scope.toast({className: 'danger', content: e});
 						}
 					},
 					function() {}
@@ -1538,10 +1617,10 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 			Applier.actionSelectedLayers('applyStyle', tmpStyle)
 			.then(
 				function() {
-					ngToast.create({className: 'success', content: 'Done'});
+					$scope.toast({className: 'success', content: 'Done'});
 				},
 				function(err) {
-					ngToast.create({className: 'danger', content: err});
+					$scope.toast({className: 'danger', content: err});
 				}
 			);
 		};
@@ -1554,7 +1633,7 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 
 				},
 				function(err) {
-					ngToast.create({className: 'danger', content: err});
+					$scope.toast({className: 'danger', content: err});
 				}
 			);
 		};
@@ -1563,10 +1642,10 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'ngToast', 'Utils', 'App
 			Applier.actionSelectedLayers(action, param)
 			.then(
 				function() {
-					ngToast.create({className: 'success', content: 'Done'});
+					$scope.toast({className: 'success', content: 'Done'});
 				},
 				function(err) {
-					ngToast.create({className: 'danger', content: err});
+					$scope.toast({className: 'danger', content: err});
 				}
 			);
 		};
@@ -1790,8 +1869,27 @@ tb.directive('stylesetSelector', ['StylesService',
 	}
 ]);
 
-tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngToast', '$timeout',
-	function($rootScope, $localStorage, $q, Utils, ngToast, $timeout) {
+tb.directive('textOrientationSelector', [
+	function() {
+		return {
+			restrict: 'E',
+			scope: {
+				selectedValue: '='
+			},
+			replace: true,
+			template: '<select ng-options="choice.value as choice.label for choice in choices" ng-model="selectedValue"></select>',
+			link: function($scope, $elem, $attrs) {
+				$scope.choices = tbHelper.styleProps.textOrientation.values;
+				if (!!!$scope.selectedValue) {
+					$scope.selectedValue = tbHelper.styleProps.textOrientation.def;
+				}
+			}
+		};
+	}
+]);
+
+tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', '$timeout',
+	function($rootScope, $localStorage, $q, Utils, $timeout) {
 
 		var self = this;
 
@@ -1861,15 +1959,15 @@ tb.factory('StylesService', ['$rootScope', '$localStorage', '$q', 'Utils', 'ngTo
 		self.deleteStyleSet = function(id) {
 			let idx = $localStorage.styleSets.findIndex(function(one) { return one.id == id; });
 			if ($localStorage.styleSets[idx].id === 0) {
-				ngToast.create({className: 'danger', content: 'Cannot delete default style set'});
-				return false;
+				throw 'Cannot delete default style set';
 			}
-			if (idx > -1) {
-				$localStorage.styleSets.splice(idx, 1);
-				delete $localStorage.lastOpenedStyleSet;
-				$timeout(function(){ $rootScope.$broadcast('refresh-styleset-list'); }, 0);
-				return true;
+			if (idx == -1 ) {
+				throw 'Styleset not found';
 			}
+			$localStorage.styleSets.splice(idx, 1);
+			delete $localStorage.lastOpenedStyleSet;
+			$timeout(function(){ $rootScope.$broadcast('refresh-styleset-list'); }, 0);
+			return true;
 		};
 
 		return self;
@@ -1895,8 +1993,8 @@ tb.config(['$stateProvider',
 	}
 ]);
 
-tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'ngToast', 'Applier',
-	function($scope, SettingsService, Utils, ngToast, Applier) {
+tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'Applier',
+	function($scope, SettingsService, Utils, Applier) {
 
 		$scope.textReplaceRules = SettingsService.setting('textReplaceRules');
 
@@ -1926,7 +2024,7 @@ tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'ngToas
 				let obj = {textReplaceRules: tmpRules};
 				let writeResult = window.cep.fs.writeFile(result.data, JSON.stringify(obj, null, 2), cep.encoding.UTF8);
 				if (writeResult.err != 0) {
-					ngToast.create({className: 'danger', content: 'Failed to write a file at the destination:' + result.data + ', error code:' + writeResult.err});
+					$scope.toast({className: 'danger', content: 'Failed to write a file at the destination:' + result.data + ', error code:' + writeResult.err});
 				}
 			}
 		};
@@ -1950,11 +2048,11 @@ tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'ngToas
 						$scope.textReplaceRules = $scope.textReplaceRules.concat(tbHelper.cleanTextReplaceRules(tmpRules));
 					}
 					catch (e) {
-						ngToast.create({className: 'danger', content: 'Import error: ' + e});
+						$scope.toast({className: 'danger', content: 'Import error: ' + e});
 					}
 				}
 				else {
-					ngToast.create({className: 'danger', content: 'Could not read the file'});
+					$scope.toast({className: 'danger', content: 'Could not read the file'});
 				}
 			}
 		};
@@ -1967,10 +2065,10 @@ tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'ngToas
 			Applier.actionSelectedLayers('replaceText', $scope.textReplaceRules)
 			.then(
 				function() {
-					ngToast.create({className: 'success', content: 'Done'});
+					$scope.toast({className: 'success', content: 'Done'});
 				},
 				function(err) {
-					ngToast.create({className: 'danger', content: err});
+					$scope.toast({className: 'danger', content: err});
 				}
 			);
 		};

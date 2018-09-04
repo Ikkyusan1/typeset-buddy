@@ -1,3 +1,8 @@
+### 0.4.0 (2018-09-05)
+Can now typeset vertical text.
+Sanity checks for page numbers.
+
+
 ### 0.3.3 (2018-05-26)
 Fix: properly handle line endings
 

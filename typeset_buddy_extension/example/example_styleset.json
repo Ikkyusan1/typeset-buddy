@@ -17,7 +17,9 @@
       "fauxItalic": false,
       "hyphenate": true,
       "kerning": "METRICS",
-      "default": true
+      "default": true,
+      "languages": "englishLanguage",
+      "textOrientation": "HORIZONTAL"
     },
     {
       "keyword": "handwritten",
@@ -34,7 +36,9 @@
       "fauxBold": false,
       "fauxItalic": false,
       "hyphenate": true,
-      "kerning": "METRICS"
+      "kerning": "METRICS",
+      "languages": "englishLanguage",
+      "textOrientation": "HORIZONTAL"
     },
     {
       "keyword": "italic",
@@ -51,7 +55,28 @@
       "fauxBold": false,
       "fauxItalic": false,
       "hyphenate": true,
-      "kerning": "METRICS"
+      "kerning": "METRICS",
+      "languages": "englishLanguage",
+      "textOrientation": "HORIZONTAL"
+    },
+    {
+      "keyword": "japanese_style",
+      "layerGroup": "Asian stuff",
+      "fontName": "Osaka",
+      "size": 25,
+      "leading": 0,
+      "tracking": 0,
+      "vScale": 100,
+      "hScale": 100,
+      "capitalization": "NORMAL",
+      "justification": "LEFT",
+      "antialias": "SMOOTH",
+      "fauxBold": false,
+      "fauxItalic": false,
+      "hyphenate": true,
+      "kerning": "METRICS",
+      "languages": "englishLanguage",
+      "textOrientation": "VERTICAL"
     },
     {
       "keyword": "newspaper",
@@ -68,7 +93,9 @@
       "fauxBold": false,
       "fauxItalic": false,
       "hyphenate": true,
-      "kerning": "METRICS"
+      "kerning": "METRICS",
+      "languages": "englishLanguage",
+      "textOrientation": "HORIZONTAL"
     },
     {
       "keyword": "nib",
@@ -85,7 +112,9 @@
       "fauxBold": false,
       "fauxItalic": false,
       "hyphenate": true,
-      "kerning": "METRICS"
+      "kerning": "METRICS",
+      "languages": "englishLanguage",
+      "textOrientation": "HORIZONTAL"
     },
     {
       "keyword": "other_style",
@@ -102,7 +131,9 @@
       "fauxBold": false,
       "fauxItalic": false,
       "hyphenate": true,
-      "kerning": "METRICS"
+      "kerning": "METRICS",
+      "languages": "englishLanguage",
+      "textOrientation": "HORIZONTAL"
     },
     {
       "keyword": "sfx",
@@ -119,7 +150,9 @@
       "fauxBold": false,
       "fauxItalic": false,
       "hyphenate": true,
-      "kerning": "METRICS"
+      "kerning": "METRICS",
+      "languages": "englishLanguage",
+      "textOrientation": "HORIZONTAL"
     },
     {
       "keyword": "sfxib",
@@ -136,7 +169,9 @@
       "fauxBold": false,
       "fauxItalic": false,
       "hyphenate": true,
-      "kerning": "METRICS"
+      "kerning": "METRICS",
+      "languages": "englishLanguage",
+      "textOrientation": "HORIZONTAL"
     },
     {
       "keyword": "yelling",
@@ -153,7 +188,10 @@
       "fauxBold": false,
       "fauxItalic": false,
       "hyphenate": true,
-      "kerning": "METRICS"
+      "kerning": "METRICS",
+      "languages": "englishLanguage",
+      "textOrientation": "HORIZONTAL"
     }
-  ]
+  ],
+  "language": "englishLanguage"
 }
