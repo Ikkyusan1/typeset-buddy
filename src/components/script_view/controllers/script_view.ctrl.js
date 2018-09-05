@@ -15,7 +15,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			$scope.mergeBubbles = SettingsService.setting('mergeBubbles');
 			$scope.skipSfxs = SettingsService.setting('skipSfxs');
 			$scope.textReplace = SettingsService.setting('textReplace');
-			$scope.styleSet = undefined;
+			$scope.styleSet = (!!$scope.styleSet)? $scope.styleSet : undefined;
 			$scope.selectedStyleset = SettingsService.setting('lastOpenedStyleSet');
 		};
 
