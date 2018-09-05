@@ -358,8 +358,8 @@ var tbHelper = {
 			return match[1];
 		}
 		else {
-			// test for 00000 format
-			reg = /^.*[-_\ ]([\d]{3,5})\.psd$/;
+			// test for 0000 format
+			reg = /^.*[-_\ ]([\d]{3,4})\.psd$/;
 			match = reg.exec(filename);
 			return (!!match && !!match[1])? match[1] : null;
 		}
@@ -367,7 +367,7 @@ var tbHelper = {
 
 	getPageNumbers: function(text) {
 		var pageNumbers = [];
-		var regex = /^([\d-]{3,9})#/gm;
+		var regex = /^(-?((\d{1,4})-*)+)#/gm;
 		var match;
 		while ((match = regex.exec(text)) !== null) {
 			// failsafe to avoid infinite loops with zero-width matches
@@ -377,49 +377,90 @@ var tbHelper = {
 		return pageNumbers;
 	},
 
-	getPageNumberLine: function(text, pageNumber) {
-		var lines = [];
-		var regex = /([\d-]{3,9})#|(^).*/gm;
-		var pnregex = new RegExp('(^|-?)'+pageNumber+'(-?|$)');
-		var match;
-		while ((match = regex.exec(text)) !== null) {
-			if (match.index === regex.lastIndex) regex.lastIndex++;
-			lines.push(match[1]);
+	getPageNumberLine: function(text, pageNumber, offset) {
+		if (typeof offset == 'undefined' || Number.isInteger(offset) && offset >= 0) {
+			var lines = [];
+			var regex = /^(-?((\d{1,4})-*)+)#|(^).*/gm;
+			var match;
+			while ((match = regex.exec(text)) !== null) {
+				if (match.index === regex.lastIndex) regex.lastIndex++;
+				lines.push(match[1]);
+			}
+			for (var i = 0; i < lines.length -1; i++) {
+				if (!!lines[i]) {
+					if (pageNumber.indexOf('-') > -1) {
+						if (pageNumber == lines[i]) {
+							if (!!!offset) return i+1;
+							else offset--;
+						}
+					}
+					else {
+						var tmp = (!!lines[i] && lines[i].indexOf('-') > 0)? lines[i].split('-') : [lines[i]];
+						for (var j =0; j < tmp.length; j++) {
+							if (pageNumber == tmp[j]) {
+								if (!!!offset) return i+1;
+								else offset--;
+							}
+						}
+					}
+				}
+			}
+			return null;
 		}
-		for (var i = 0; i < lines.length -1; i++) {
-			if (pnregex.test(lines[i])) return i+1;
-		}
-		return null;
+		else throw 'Invalid offset';
 	},
 
 	checkPageNumbersSeries: function(text, pageNumbers) {
+		var self = this;
 		var tmp = [];
 		var warnings = [];
+		var current = null;;
+		var next = null;
+		var currentLine = null;
+		var nextLine = null;
 		// split multipages
 		pageNumbers.forEach(function(one) {
-			if (one.indexOf('-') > 0) {
-				tmp = tmp.concat(one.split('-'));
+			if (one.indexOf('-') > -1) {
+				var multi = one.split('-');
+				// cehck for multiple consecutive dashes, or dash placed either at the beginning or the end of the page number
+				if (!multi.every(function(n) {return n != '';})) {
+					var line = self.getPageNumberLine(text, one);
+					throw 'There\'s an invalid page number : ' + one + '# (line ' + line + ')';
+				}
+				tmp = tmp.concat(multi);
 			}
 			else {
 				tmp.push(one);
 			}
 		});
-		// check for reverse numbering, duplicates and gaps
-		for (var i = 0; i < tmp.length -1; i++) {
-			var current = tmp[i];
-			var next = tmp[i+1];
-			var currentLine = this.getPageNumberLine(text, current);
-			var nextLine = this.getPageNumberLine(text, next);
-			if (current > next) {
-				throw 'Some pages are out of order: ' + current + ' (line ' + currentLine + ') appears before ' + next + ' (line '+ nextLine + ')';
-			}
-			else if (current == next) {
+		// check for duplicates
+		var tmp2 = [].concat(tmp);
+		tmp2 = tmp2.sort();
+		for (var i = 0; i < tmp2.length -1; i++) {
+			current = tmp2[i];
+			next = tmp2[i+1];
+			if (current == next) {
+				currentLine = self.getPageNumberLine(text, current);
+				nextLine = self.getPageNumberLine(text, next, 1);
 				throw 'Duplicate page number: ' + current + ' on lines ' + currentLine + ' and ' + nextLine;
 			}
-			else if (parseInt(current) + 1 != parseInt(next)) {
+		}
+		// check for reverse numbering, duplicates and gaps
+		for (var i = 0; i < tmp.length -1; i++) {
+			current = tmp[i];
+			next = tmp[i+1];
+			if (current > next) {
+				currentLine = self.getPageNumberLine(text, current);
+				nextLine = self.getPageNumberLine(text, next);
+				throw 'Some pages are out of order: ' + current + ' (line ' + currentLine + ') appears before ' + next + ' (line '+ nextLine + ')';
+			}
+			if (parseInt(current) + 1 != parseInt(next)) {
+				currentLine = self.getPageNumberLine(text, current);
+				nextLine = self.getPageNumberLine(text, next);
 				warnings.push('There\'s a gap between page ' + current + ' (line ' + currentLine + ') and page ' + next + ' (line ' + nextLine + ')');
 			}
 		}
+
 		return warnings.reverse();
 	},
 
@@ -1059,7 +1100,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			$scope.mergeBubbles = SettingsService.setting('mergeBubbles');
 			$scope.skipSfxs = SettingsService.setting('skipSfxs');
 			$scope.textReplace = SettingsService.setting('textReplace');
-			$scope.styleSet = undefined;
+			$scope.styleSet = (!!$scope.styleSet)? $scope.styleSet : undefined;
 			$scope.selectedStyleset = SettingsService.setting('lastOpenedStyleSet');
 		};
 

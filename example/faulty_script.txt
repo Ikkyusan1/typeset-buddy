@@ -1,0 +1,43 @@
+Title : A book in a foreign language
+Translator : Yours truly
+Base language : a language I barely understand
+
+These notes won't be taken into account by the typesetter script.
+
+
+001#
+Gaps are allowed, but signaled.
+
+
+-003#
+Dash before the page number won't work.
+
+
+004-#
+Dash after the page number won't work.
+
+
+005--006#
+Multiple consecutive dashes won't work.
+
+
+008#
+Reverse numbering won't work.
+
+
+007#
+
+
+010-011-012-013#
+Accept more than two pages as multipage.
+
+
+004#
+Duplicates won't work, no matter how far appart they may be.
+
+
+END#
+
+Everything that appears after the END anchor won't be taken into account either.
+
+
