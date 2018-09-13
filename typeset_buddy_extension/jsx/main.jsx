@@ -409,7 +409,7 @@ function typesetPage(pageScript, styleSet, options) {
 			var line = lines[i];
 			if (tbHelper.skipThisLine(line, options.panelSeparator) === false) {
 				// line style will be the last thing that's between single brackets
-				// but if we're dealing with a double-bubble part, fallback on previous style if no style is defined for this bubble
+				// but if we're dealing with a multi-bubble part, fallback on previous style if no style is defined for this part
 				var lineStyle = (tbHelper.isMultiBubblePart(line))? tbHelper.getTextStyles(line, previousStyle).pop() : tbHelper.getTextStyles(line, pageStyle).pop();
 				var cleanedText = tbHelper.cleanLine(line);
 				if (options.skipSfxs && lineStyle == 'sfx') continue;

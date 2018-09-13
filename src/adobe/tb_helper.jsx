@@ -439,7 +439,7 @@ var tbHelper = {
 				throw 'Duplicate page number: ' + current + ' on lines ' + currentLine + ' and ' + nextLine;
 			}
 		}
-		// check for reverse numbering, duplicates and gaps
+		// check for reverse numbering and gaps
 		for (var i = 0; i < tmp.length -1; i++) {
 			current = tmp[i];
 			next = tmp[i+1];
@@ -454,7 +454,6 @@ var tbHelper = {
 				warnings.push('There\'s a gap between page ' + current + ' (line ' + currentLine + ') and page ' + next + ' (line ' + nextLine + ')');
 			}
 		}
-
 		return warnings.reverse();
 	},
 

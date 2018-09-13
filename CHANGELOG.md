@@ -1,3 +1,7 @@
+### 0.4.1rc1 (2018-09-13)
+Fix attempt to allow the extension to work on Windows
+
+
 ### 0.4.0 (2018-09-05)
 Can now typeset vertical text.
 Sanity checks for page numbers.

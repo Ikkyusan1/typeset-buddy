@@ -445,7 +445,7 @@ var tbHelper = {
 				throw 'Duplicate page number: ' + current + ' on lines ' + currentLine + ' and ' + nextLine;
 			}
 		}
-		// check for reverse numbering, duplicates and gaps
+		// check for reverse numbering and gaps
 		for (var i = 0; i < tmp.length -1; i++) {
 			current = tmp[i];
 			next = tmp[i+1];
@@ -460,7 +460,6 @@ var tbHelper = {
 				warnings.push('There\'s a gap between page ' + current + ' (line ' + currentLine + ') and page ' + next + ' (line ' + nextLine + ')');
 			}
 		}
-
 		return warnings.reverse();
 	},
 
@@ -617,7 +616,7 @@ var tb = angular.module('tb', [
 tb.constant('CONF', {
 	appName: 'typeset_buddy',
 	debug: false,
-	version: '0.4.0',
+	version: '0.4.1rc1',
 	author: 'Ikkyusan',
 	homepage: 'https://github.com/ikkyusan1/typeset-buddy',
 	description: 'A typesetting tool for Photoshop CC'
