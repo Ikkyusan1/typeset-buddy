@@ -68,6 +68,16 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 		}
 		$transitions.onFinish(true, saveTab, {priority: 10});
 
+		let forbidAppState = {
+			to: function(state) { return state.name == 'app'; }
+		};
+		let redirectToLastOpenedTab = function(transition, state) {
+			let $state = transition.router.stateService;
+			let lastOpenedTab = (!!$localStorage.lastOpenedTab)? $localStorage.lastOpenedTab : 'styles';
+			return $state.target(lastOpenedTab, undefined, {location: true});
+		};
+		$transitions.onBefore(forbidAppState, redirectToLastOpenedTab);
+
 		if ($rootScope.debug == true) {
 			// trace routes if debug mode
 			$trace.enable(1);
