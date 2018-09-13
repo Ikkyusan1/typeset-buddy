@@ -272,7 +272,8 @@ gulp.task('buildJs', function(){
 	.pipe($.replace('appVersionPlaceholder', '\'' + packageFile.version + '\''))
 	.pipe($.replace('appAuthorPlaceholder', '\'' + packageFile.author + '\''))
 	.pipe($.replace('appHomepagePlaceholder', '\'' + packageFile.homepage + '\''))
-	.pipe($.replace('appDescriptionPlaceholder', '\'' + packageFile.description + '\''));
+	.pipe($.replace('appDescriptionPlaceholder', '\'' + packageFile.description + '\''))
+	.pipe($.babel({presets: ['es2015']}));
 
 	if(isProd) {
 		stream.pipe($.replace('appDebugPlaceholder', 'false'));
