@@ -37,6 +37,7 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 		}
 
 		$rootScope.os = $rootScope.CSI.getOSInformation().toLowerCase().indexOf('mac') >= 0 ? 'Mac' : 'Windows';
+		document.getElementById('tb').classList.add('os-'+ $rootScope.os.toLowerCase());
 
 		$rootScope.debug = CONF.debug;
 
