@@ -1,4 +1,4 @@
-<div class="row m0">
+<div class="row m0 hide-collapsed">
 	<div class="col-md-4 col-xs-4">
 		<label class="input-flex">
 			<span>Keyword</span>
@@ -21,7 +21,7 @@
 	</div>
 </div>
 
-<div class="row m0">
+<div class="row m0 hide-collapsed">
 	<div class="col-md-4 col-xs-4">
 		<div>
 			<label class="input-flex">
@@ -91,7 +91,7 @@
 		</div>
 	</div>
 
-	<div class="col-md-4 col-xs-4">
+	<div class="col-md-4 col-xs-4 hide-collapsed">
 		<div>
 			<label class="input-flex">
 				<span>Antialias</span>
@@ -118,7 +118,7 @@
 		</div>
 	</div>
 </div>
-<div class="row m0">
+<div class="row m0 hide-collapsed">
 	<div class="col-md-4 col-xs-4">
 		<div class="input-flex">
 			<label>
@@ -133,15 +133,21 @@
 			<input type="text" class="topcoat-text-input" placeholder="Layer group" ng-model="preset.layerGroup" >
 		</label>
 	</div>
-	<div class="col-md-4 col-xs-4 text-right">
-		<button class="topcoat-button" ng-click="setAction()" uib-tooltip="Just set the style parameters" tooltip-popup-delay="500" tooltip-placement="bottom-right">
-			<span class="glyphicon glyphicon-text-color"></span>
-		</button>
-		<button class="topcoat-button" ng-click="applyAction()" uib-tooltip="Apply style on selected text layers" tooltip-popup-delay="500" tooltip-placement="bottom-right">
-			<span class="glyphicon glyphicon-tint"></span>
-		</button>
-		<button class="topcoat-button" ng-click="applyAction({style:preset, resize:true})" uib-tooltip="Apply style on selected text layers and auto-resize them" tooltip-popup-delay="500" tooltip-placement="bottom-right">
-			<span class="glyphicon glyphicon-tint"></span>+<span class="glyphicon glyphicon-resize-small"></span>
-		</button>
+	<div class="col-md-4 col-xs-4 text-right" ng-include="'style_preset_actions.tpl.html'">
+	</div>
+</div>
+
+<div class="row m0 show-collapsed">
+	<div class="col-md-4 col-xs-4">
+		<label class="input-flex">
+			<span>{{preset.keyword}}</span>
+		</label>
+	</div>
+	<div class="col-md-4 col-xs-4">
+		<label class="input-flex">
+			<span>{{preset.fontName}}</span>
+		</label>
+	</div>
+	<div class="col-md-4 col-xs-4 text-right" ng-include="'style_preset_actions.tpl.html'">
 	</div>
 </div>

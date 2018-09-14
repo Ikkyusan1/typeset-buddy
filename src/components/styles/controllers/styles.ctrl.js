@@ -5,6 +5,13 @@ tb.controller('StylesCtrl', ['$scope', 'StylesService', 'Utils', 'Applier', '$se
 			styleFilter: ''
 		});
 
+		$scope.collapsed = SettingsService.setting('collapsedStyles');
+
+		$scope.toggleCollapsed = function(){
+			$scope.collapsed = !$scope.collapsed;
+			SettingsService.setting('collapsedStyles', $scope.collapsed);
+		}
+
 		$scope.clearStyleFilter = function(){
 			$scope.$sessionStorage.styleFilter = '';
 		};

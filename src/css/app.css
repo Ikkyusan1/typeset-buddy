@@ -505,3 +505,15 @@ button .glyphicon {
 	left: -100%;
 	margin-left: 10px;
 }
+
+.collapsed .hide-collapsed {
+	display: none;
+}
+
+.show-collapsed {
+	display: none;
+}
+
+.collapsed .show-collapsed {
+	display: inherit;
+}

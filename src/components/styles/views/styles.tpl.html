@@ -77,7 +77,7 @@
 		<button class="topcoat-button" ng-click="addStyle()">Add Style</button>
 	</div>
 </div>
-<div class="list scrollable padded">
+<div class="list scrollable padded" ng-class="{'collapsed': collapsed}">
 	<div class="list-item" ng-repeat="style in styleSet.styles |filter: {keyword: $sessionStorage.styleFilter||undefined}">
 		<tb-style-preset preset="style" remove-action="removeStyle(style)" duplicate-action="duplicateStyle(style)" apply-action="applyStyleSelectedLayers(style, resize)" set-action="setStyle(style)" ng-class="{'default-style': style.default}"></tb-style-preset>
 	</div>
@@ -88,10 +88,13 @@
 			<span class="glyphicon glyphicon-book"></span>
 		</button>
 	</div>
-	<div class="col-md-5 col-xs-5">
-
+	<div class="col-md-4 col-xs-4 text-center">
+		<button class="topcoat-button" ng-click="toggleCollapsed()" ng-switch="collapsed">
+			<span ng-switch-when="true">Expand styles</span>
+			<span ng-switch-default="">Collapse styles</span>
+		</button>
 	</div>
-	<div class="col-md-3 col-xs-3 text-right">
+	<div class="col-md-4 col-xs-4 text-right">
 		<button class="topcoat-button" ng-click="addStyle()">Add Style</button>
 	</div>
 </div>

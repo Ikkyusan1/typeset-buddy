@@ -10,6 +10,7 @@ tb.factory('SettingsService', ['$rootScope', '$localStorage', '$q',
 				$localStorage.styleSets = [dummyStyleSet];
 				$localStorage.lastOpenedStyleSet = $localStorage.styleSets[0].id;
 			}
+			if (!angular.isDefined($localStorage.stylesCollapsed)) self.setting('stylesCollapsed', false);
 			if (!angular.isDefined($localStorage.panelSeparator)) self.setting('panelSeparator', '–');
 			if (!angular.isDefined($localStorage.useLayerGroups)) self.setting('useLayerGroups', true);
 			if (!angular.isDefined($localStorage.mergeBubbles)) self.setting('mergeBubbles', false);
