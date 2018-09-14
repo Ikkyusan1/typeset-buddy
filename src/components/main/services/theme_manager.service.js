@@ -34,8 +34,9 @@ tb.factory('themeManager', ['$rootScope', 'Utils',
 			self.updateThemeWithAppSkinInfo(skinInfo);
 		};
 
-		// add event listener to change skin whenever Photoshop's skin changes
 		self.init = function() {
+			body.classList.add('os-'+ $rootScope.os.toLowerCase());
+			// add event listener to change skin whenever Photoshop's skin changes
 			self.updateThemeWithAppSkinInfo($rootScope.CSI.hostEnvironment.appSkinInfo);
 			$rootScope.CSI.addEventListener(CSInterface.THEME_COLOR_CHANGED_EVENT, self.onAppThemeColorChanged);
 		};

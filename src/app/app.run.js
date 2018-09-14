@@ -22,6 +22,8 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 			$rootScope.CSI.evalScript(script, function(result) {});
 		}
 
+		$rootScope.os = $rootScope.CSI.getOSInformation().toLowerCase().indexOf('mac') >= 0 ? 'Mac' : 'Windows';
+
 		themeManager.init();
 
 		function persist(on) {
@@ -35,9 +37,6 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 			event.extensionId = $rootScope.extensionID;
 			$rootScope.CSI.dispatchEvent(event);
 		}
-
-		$rootScope.os = $rootScope.CSI.getOSInformation().toLowerCase().indexOf('mac') >= 0 ? 'Mac' : 'Windows';
-		document.getElementById('tb').classList.add('os-'+ $rootScope.os.toLowerCase());
 
 		$rootScope.debug = CONF.debug;
 
