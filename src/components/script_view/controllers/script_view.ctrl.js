@@ -213,7 +213,13 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 		};
 
 		$scope.typesetPage = function() {
-			ScriptService.typesetPage(angular.copy($scope.pageScript), angular.copy($scope.styleSet));
+			ScriptService.typesetPage(angular.copy($scope.pageScript), angular.copy($scope.styleSet))
+			.then(
+				function() {},
+				function(err) {
+					$scope.toast({className: 'danger', content: err});
+				}
+			);
 		};
 
 		$scope.tbRobot = function() {
