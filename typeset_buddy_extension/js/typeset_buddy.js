@@ -515,7 +515,7 @@ var tb = angular.module('tb', ['templates', 'ngSanitize', 'ui.router', 'ui.boots
 tb.constant('CONF', {
 	appName: 'typeset_buddy',
 	debug: false,
-	version: '0.4.1rc1',
+	version: '0.4.1rc2',
 	author: 'Ikkyusan',
 	homepage: 'https://github.com/ikkyusan1/typeset-buddy',
 	description: 'A typesetting tool for Photoshop CC'
