@@ -1,6 +1,7 @@
 html,
 body {
 	height: 100%;
+	position: relative;
 }
 
 @font-face {
@@ -23,6 +24,15 @@ body {
 html,
 body {
 	font-size: 14px;
+}
+
+body.os-windows {
+	font-size: 12px;
+}
+
+.os-windows select {
+	padding: 0;
+	text-shadow: none;
 }
 
 select {
@@ -60,13 +70,25 @@ button .glyphicon {
 }
 
 label {
-	margin-bottom: 0;
+	margin: 0;
 }
 
 .wordwrap {
 	white-space: pre-wrap;
 	word-wrap: initial;
 	word-break: initial;
+}
+
+.app-container {
+	display: flex;
+	display: -webkit-flex;
+	flex-direction: column;
+	-webkit-flex-direction: column;
+	height: 100%;
+	max-height: 100%;
+	overflow: hidden;
+	width: 100%;
+	position: relative;
 }
 
 .topcoat-button,
@@ -82,13 +104,17 @@ label {
 
 .input-flex {
 	display: flex;
+	display: -webkit-flex;
 	flex-direction: row;
 	align-items: center;
-	align-content: flex-end;
+	-webkit-align-items: center;
+	/*align-content: flex-end;*/
+	justify-content: space-between;
+	-webkit-justify-content: space-between;
 }
 
 .input-flex > * {
-	flex-basis: 75%;
+	/*flex-basis: 75%;*/
 }
 
 .input-flex-larger > * {
@@ -278,7 +304,6 @@ tb-style-preset>div.row:first-child {
 
 .clipbutton {
 	float: right;
-	/*margin: 3px 0 0 3px;*/
 	margin: 0;
 }
 
@@ -343,16 +368,23 @@ tb-style-preset>div.row:first-child {
 }
 
 .flex-input {
-	padding: 5px;
+	padding: 0 5px;
 }
 
-.flex-input .input-wrapper {
+.input-wrapper {
 	display: flex;
+	display: -webkit-flex;
 	flex: 1;
 	align-self: stretch;
 	align-items: center;
+	-webkit-align-items: center;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+.flex-right {
+	justify-content: flex-end;
+	-webkit-justify-content: flex-end;
 }
 
 .flex-input label {
@@ -366,42 +398,41 @@ tb-style-preset>div.row:first-child {
 .flex-input input[type="text"],
 .flex-input input[type="number"],
 .flex-input select {
-	flex: 1;
-	width: 100%;
-	display: block;
 	margin-left: 10px;
-}
-
-.app-container {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-	width: 100%;
+	-webkit-flex-grow: 1;
 }
 
 .scrollable {
-	flex: 1 1 auto;
+	-webkit-flex: 1 1 100%;
 	overflow-y: auto;
-	min-height: 0px;
+	min-height: 1px;
 }
 
 .flex-col {
 	display: flex;
+	display: -webkit-flex;
 	flex-direction: column;
-	flex: 1 1 0;
+	-webkit-flex-direction: column;
+	-webkit-flex: 1 1 100%;
+	max-height: 100%;
+	overflow: hidden;
 }
 
 .flex {
 	display: flex;
+	display: -webkit-flex;
 	align-items: center;
+	-webkit-align-items: center;
 }
 
 .flex.between {
 	justify-content: space-between;
+	-webkit-justify-content: space-between;
 }
 
 .flex.around {
 	justify-content: space-around;
+	-webkit-justify-content: space-around;
 }
 
 .no-shrink {
@@ -504,4 +535,16 @@ button .glyphicon {
 .dropdown-submenu.pull-left > .dropdown-menu {
 	left: -100%;
 	margin-left: 10px;
+}
+
+.collapsed .hide-collapsed {
+	display: none;
+}
+
+.show-collapsed {
+	display: none;
+}
+
+.collapsed .show-collapsed {
+	display: inherit;
 }

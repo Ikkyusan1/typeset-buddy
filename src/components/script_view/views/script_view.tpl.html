@@ -1,18 +1,16 @@
-<div class="row no-shrink">
+<div class="row no-shrink pt">
 	<div class="col-md-5 col-xs-5 flex-input">
 		<div class="input-wrapper">
 			<label class="">
 				<span>Script</span>
 			</label>
 			<input type="text" class="topcoat-text-input" readonly="true" ng-model="filename" ng-click="browseScript()" uib-tooltip="{{filename}}" placeholder="Click here to load a script" tooltip-popup-delay="500" tooltip-placement="bottom">
+			<button class="topcoat-button" ng-click="reloadScript()" ng-if="!!filename" uib-tooltip="Reload script" tooltip-popup-delay="1000" tooltip-placement="bottom">
+				<span class="glyphicon glyphicon-repeat"></span>
+			</button>
 		</div>
 	</div>
-	<div class="col-md-1 col-xs-1 flex-input">
-		<button class="topcoat-button" ng-click="reloadScript()" ng-if="!!filename" uib-tooltip="Reload script" tooltip-popup-delay="1000" tooltip-placement="bottom">
-			<span class="glyphicon glyphicon-repeat"></span>
-		</button>
-	</div>
-	<div class="col-md-5 col-xs-5 flex-input">
+	<div class="col-md-4 col-xs-4 flex-input">
 		<div class="input-wrapper">
 			<label class="">
 				<span>Style Set</span>
@@ -21,39 +19,56 @@
 		</div>
 	</div>
 
-	<div class="col-md-1 col-xs-1 flex-input text-right">
-		<div class="btn-group" uib-dropdown is-open="status.isopen" auto-close="outsideClick">
-			<button class="topcoat-button" uib-dropdown-toggle uib-tooltip="Options" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
-				<span class="glyphicon glyphicon-cog"></span>
-			</button>
-			<ul class="dropdown-menu dropdown-menu-right" uib-dropdown-menu role="menu" aria-labelledby="single-button">
-				<li class="dropdown-header">Panel separator</li>
-				<li role="menu-item" ng-class="{'active': panelSeparator == '–'}" ng-click="setting('panelSeparator', '–')"><span>Long dash –</span></li>
-				<li role="menu-item" ng-class="{'active': panelSeparator == '-'}" ng-click="setting('panelSeparator', '-')"><span>Single dash -</span></li>
-				<li role="menu-item" ng-class="{'active': panelSeparator == '--'}" ng-click="setting('panelSeparator', '--')"><span>Double dash --</span></li>
-				<li role="menu-item" ng-class="{'active': panelSeparator == '='}" ng-click="setting('panelSeparator', '=')"><span>Equal sign =</span></li>
-				<li role="menu-item" class="dropdown-header">Use layer groups</li>
-				<li role="menu-item" ng-class="{'active': useLayerGroups === true}" ng-click="setting('useLayerGroups', true)"><span>Yes</span></li>
-				<li role="menu-item" ng-class="{'active': useLayerGroups === false}" ng-click="setting('useLayerGroups', false)" ><span>No</span></li>
-				<li role="menu-item" class="dropdown-header">Merge multibubbles</li>
-				<li role="menu-item" ng-class="{'active': mergeBubbles === true}" ng-click="setting('mergeBubbles', true)"><span>Yes</span></li>
-				<li role="menu-item" ng-class="{'active': mergeBubbles === false}" ng-click="setting('mergeBubbles', false)" ><span>No</span></li>
-				<li role="menu-item" class="dropdown-header">Skip SFXs ("sfx" keyword)</li>
-				<li role="menu-item" ng-class="{'active': skipSfxs === true}" ng-click="setting('skipSfxs', true)"><span>Yes</span></li>
-				<li role="menu-item" ng-class="{'active': skipSfxs === false}" ng-click="setting('skipSfxs', false)" ><span>No</span></li>
-				<li role="menu-item" class="dropdown-header">Text replacement</li>
-				<li role="menu-item" ng-class="{'active': textReplace === true}" ng-click="setting('textReplace', true)"><span>Enabled</span></li>
-				<li role="menu-item" ng-class="{'active': textReplace === false}" ng-click="setting('textReplace', false)" ><span>Disabled</span></li>
-			</ul>
+	<div class="col-md-3 col-xs-3 flex-input">
+		<div class="input-wrapper flex-right">
+			<div class="topcoat-button-bar">
+				<div class="topcoat-button-bar__item">
+					<button class="topcoat-button-bar__button" ng-click="typesetPage()" ng-disabled="!!!pageNumbers.length" uib-tooltip="Typeset all bubbles at once" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
+						<span class="glyphicon glyphicon-bed"></span>
+					</button>
+				</div>
+				<div class="topcoat-button-bar__item">
+					<button class="topcoat-button-bar__button" ng-click="tbRobot()" uib-tooltip="TB Robot" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
+						<span class="glyphicon glyphicon-bed"></span> +
+					</button>
+				</div>
+			</div>
+			<div class="btn-group" uib-dropdown is-open="status.isopen" auto-close="outsideClick">
+				<button class="topcoat-button" uib-dropdown-toggle uib-tooltip="Options" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
+					<span class="glyphicon glyphicon-cog"></span>
+				</button>
+				<ul class="dropdown-menu dropdown-menu-right" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+					<li class="dropdown-header">Panel separator</li>
+					<li role="menu-item" ng-class="{'active': panelSeparator == '–'}" ng-click="setting('panelSeparator', '–')"><span>Long dash –</span></li>
+					<li role="menu-item" ng-class="{'active': panelSeparator == '-'}" ng-click="setting('panelSeparator', '-')"><span>Single dash -</span></li>
+					<li role="menu-item" ng-class="{'active': panelSeparator == '--'}" ng-click="setting('panelSeparator', '--')"><span>Double dash --</span></li>
+					<li role="menu-item" ng-class="{'active': panelSeparator == '='}" ng-click="setting('panelSeparator', '=')"><span>Equal sign =</span></li>
+					<li role="menu-item" class="dropdown-header">Use layer groups</li>
+					<li role="menu-item" ng-class="{'active': useLayerGroups === true}" ng-click="setting('useLayerGroups', true)"><span>Yes</span></li>
+					<li role="menu-item" ng-class="{'active': useLayerGroups === false}" ng-click="setting('useLayerGroups', false)" ><span>No</span></li>
+					<li role="menu-item" class="dropdown-header">Merge multibubbles</li>
+					<li role="menu-item" ng-class="{'active': mergeBubbles === true}" ng-click="setting('mergeBubbles', true)"><span>Yes</span></li>
+					<li role="menu-item" ng-class="{'active': mergeBubbles === false}" ng-click="setting('mergeBubbles', false)" ><span>No</span></li>
+					<li role="menu-item" class="dropdown-header">Skip SFXs ("sfx" keyword)</li>
+					<li role="menu-item" ng-class="{'active': skipSfxs === true}" ng-click="setting('skipSfxs', true)"><span>Yes</span></li>
+					<li role="menu-item" ng-class="{'active': skipSfxs === false}" ng-click="setting('skipSfxs', false)" ><span>No</span></li>
+					<li role="menu-item" class="dropdown-header">Text replacement</li>
+					<li role="menu-item" ng-class="{'active': textReplace === true}" ng-click="setting('textReplace', true)"><span>Enabled</span></li>
+					<li role="menu-item" ng-class="{'active': textReplace === false}" ng-click="setting('textReplace', false)" ><span>Disabled</span></li>
+				</ul>
+			</div>
 		</div>
 	</div>
 </div>
-<div class="no-shrink row pb header">
-	<div class="col-lg-7 col-md-7 col-xs-7">
-		<label>Page</label>
-		<select ng-options="pageNumber as pageNumber for pageNumber in pageNumbers" ng-model="selectedPage" ng-disabled="!!!pageNumbers.length">
-		</select>
-		<div class="inline-flex">
+
+<div class="no-shrink row header pv">
+	<div class="col-lg-4 col-md-4 col-xs-4 flex-input">
+		<div class="input-wrapper">
+			<label>
+				<span>Page</span>
+			</label>
+			<select ng-options="pageNumber as pageNumber for pageNumber in pageNumbers" ng-model="selectedPage" ng-disabled="!!!pageNumbers.length">
+			</select>
 			<div class="topcoat-button-bar">
 				<div class="topcoat-button-bar__item">
 					<button class="topcoat-button-bar__button" ng-click="incPageNumber(false)" ng-disabled="!!!pageNumbers.length">
@@ -67,28 +82,27 @@
 				</div>
 			</div>
 		</div>
-		<span ng-if="!!selectedPage && !!bubbles.length" class="inline-flex">
-			Page style: {{pageStyle.keyword}} <span ng-if="!!!pageStyle.inStyleSet" class="small">&#9888;</span>
-		</span>
 	</div>
-	<div class="col-lg-5 col-md-5 col-xs-5">
-		<label>Force</label>
-		<tb-style-selector styleset="styleSet" selected-value="selectedForcedStyle"></tb-style-selector>
-		<div class="pull-right">
-			<button class="topcoat-button" ng-click="typesetPage()" uib-tooltip="Typeset all bubbles at once" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
-				<span class="glyphicon glyphicon-bed"></span>
-			</button>
-			<button class="topcoat-button" ng-click="tbRobot()" uib-tooltip="TB Robot" tooltip-popup-delay="1000" tooltip-placement="bottom-right">
-				<span class="glyphicon glyphicon-bed"></span> +
-			</button>
+	<div class="col-lg-4 col-md-4 col-xs-4 flex-input">
+		<div ng-if="!!selectedPage && !!bubbles.length" class="input-wrapper">
+			<label>Page style:&nbsp;</label>
+			<div>
+				{{pageStyle.keyword}} <span ng-if="!!!pageStyle.inStyleSet" class="small">&#9888;</span>
+			</div>
 		</div>
 	</div>
-
+	<div class="col-lg-4 col-md-4 col-xs-4 flex-input">
+		<div class="input-wrapper">
+			<label>Force</label>
+			<tb-style-selector styleset="styleSet" selected-value="selectedForcedStyle"></tb-style-selector>
+		</div>
+	</div>
 </div>
+
 <div class="page-note" ng-repeat="pageNote in pageNotes">
 	{{pageNote}}
 </div>
-<div class="list scrollable">
+<div class="list scrollable padded">
 	<div class="list-item p" ng-if="!!selectedPage && !!!bubbles.length">Nothing to typeset on this page</div>
 	<div class="list-item row bubble-item" ng-class="{'multibubble-part': !!bubble.multibubblePart, 'panel-separator': !!bubble.panelSeparator}" ng-repeat="bubble in bubbles">
 		<div class="col-lg-2 col-md-3 col-xs-3 style-buttons" ng-if="!!!bubble.panelSeparator">

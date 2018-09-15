@@ -1,18 +1,16 @@
 tb.controller('StylesCtrl', ['$scope', 'StylesService', 'Utils', 'Applier', '$sessionStorage', 'SettingsService',
 	function($scope, StylesService, Utils, Applier, $sessionStorage, SettingsService) {
 
-		$scope.$sessionStorage = $sessionStorage.$default({
-			styleFilter: ''
-		});
+		$scope.$sessionStorage = $sessionStorage.$default({styleFilter: ''});
 
 		$scope.collapsed = SettingsService.setting('collapsedStyles');
 
-		$scope.toggleCollapsed = function(){
+		$scope.toggleCollapsed = function() {
 			$scope.collapsed = !$scope.collapsed;
 			SettingsService.setting('collapsedStyles', $scope.collapsed);
-		}
+		};
 
-		$scope.clearStyleFilter = function(){
+		$scope.clearStyleFilter = function() {
 			$scope.$sessionStorage.styleFilter = '';
 		};
 

@@ -1,4 +1,4 @@
-<div class="row no-shrink pv">
+<div class="row no-shrink pt">
 	<div class="col-md-9 col-xs-9">
 		<button class="topcoat-button" ng-click="appendDefaults()">
 			Append default rules
@@ -16,7 +16,6 @@
 		</button>
 	</div>
 </div>
-
 
 <div class="row no-shrink p header">
 	<div class="col-lg-4 col-md-4 col-xs-4 text-center">
@@ -36,7 +35,8 @@
 		<span>Active</span>
 	</div>
 </div>
-<div class="list scrollable pt">
+
+<div class="list scrollable padded pt">
 	<div class="row pb" ng-repeat="rule in textReplaceRules">
 		<div class="col-lg-4 col-md-4 col-xs-4 flex between">
 			<span ng-if="rule.regex">/</span>

@@ -1,5 +1,11 @@
+### 0.4.1rc2 (2018-09-16)
+Fix redirect properly to last opened tab when on Windows.
+Fixed the UI on Windows.
+We can collapse the styles to dramatically limit the length of the list.
+
+
 ### 0.4.1rc1 (2018-09-13)
-Fix attempt to allow the extension to work on Windows
+Fix attempt to allow the extension to work on Windows.
 
 
 ### 0.4.0 (2018-09-05)

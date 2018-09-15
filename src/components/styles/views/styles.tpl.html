@@ -1,4 +1,4 @@
-<div class="no-shrink p">
+<div class="no-shrink pt ph">
 	<button class="topcoat-button" ng-click="newStyleSet()" uib-tooltip="Create a new set" tooltip-popup-delay="1000" tooltip-placement="bottom-left">
 		<span class="glyphicon glyphicon-plus"></span>
 		<!-- New -->
@@ -56,7 +56,7 @@
 	</div>
 </div>
 
-<div class="row no-shrink pb header">
+<div class="row no-shrink pv header">
 	<div class="col-md-3 col-xs-3">
 		<label uib-tooltip="Styleset name" tooltip-popup-delay="500" tooltip-placement="bottom">
 			<input type="text" class="topcoat-text-input" placeholder="Styleset name" ng-model="styleSet.name" ng-disabled="selectedStyleset === 0" ng-pattern="/[\d\w]{1,30}/">
@@ -77,11 +77,13 @@
 		<button class="topcoat-button" ng-click="addStyle()">Add Style</button>
 	</div>
 </div>
+
 <div class="list scrollable padded" ng-class="{'collapsed': collapsed}">
 	<div class="list-item" ng-repeat="style in styleSet.styles |filter: {keyword: $sessionStorage.styleFilter||undefined}">
 		<tb-style-preset preset="style" remove-action="removeStyle(style)" duplicate-action="duplicateStyle(style)" apply-action="applyStyleSelectedLayers(style, resize)" set-action="setStyle(style)" ng-class="{'default-style': style.default}"></tb-style-preset>
 	</div>
 </div>
+
 <div class="row no-shrink pv">
 	<div class="col-md-4 col-xs-4">
 		<button class="topcoat-button" ng-click="exportStyleProps()" uib-tooltip="Export available fonts and style properties" tooltip-popup-delay="1000" tooltip-placement="top-left">

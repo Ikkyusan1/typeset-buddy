@@ -91,7 +91,7 @@
 		</div>
 	</div>
 
-	<div class="col-md-4 col-xs-4 hide-collapsed">
+	<div class="col-md-4 col-xs-4">
 		<div>
 			<label class="input-flex">
 				<span>Antialias</span>
@@ -120,20 +120,18 @@
 </div>
 <div class="row m0 hide-collapsed">
 	<div class="col-md-4 col-xs-4">
-		<div class="input-flex">
-			<label>
-				<span>Text orientation</span>
-				<text-orientation-selector selected-value="preset.textOrientation"></text-orientation-selector>
-			</label>
-		</div>
+		<label class="input-flex">
+			<span>Text orientation</span>
+			<text-orientation-selector selected-value="preset.textOrientation"></text-orientation-selector>
+		</label>
 	</div>
-	<div class="col-md-4 col-xs-4">
+	<div class="col-md-5 col-xs-5">
 		<label class="input-flex">
 			<span>Layer group</span>
 			<input type="text" class="topcoat-text-input" placeholder="Layer group" ng-model="preset.layerGroup" >
 		</label>
 	</div>
-	<div class="col-md-4 col-xs-4 text-right" ng-include="'style_preset_actions.tpl.html'">
+	<div class="col-md-3 col-xs-3 text-right" ng-include="'style_preset_actions.tpl.html'">
 	</div>
 </div>
 
