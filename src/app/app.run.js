@@ -61,6 +61,10 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 			ngToast.create(toast);
 		};
 
+		$rootScope.dismissToast = function() {
+			ngToast.dismiss();
+		};
+
 		// save last opened tab
 		let saveTab = function(transition, state) {
 			$localStorage.lastOpenedTab = transition.to().name;

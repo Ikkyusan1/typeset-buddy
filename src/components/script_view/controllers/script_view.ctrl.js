@@ -27,6 +27,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 		};
 
 		$scope.loadScript = function(filepath, page, autoloadPage) {
+			$scope.dismissToast();
 			try {
 				let result = window.cep.fs.readFile(filepath, cep.encoding.UTF8);
 				if (result.err === 0) {
@@ -225,7 +226,14 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 		$scope.tbRobot = function() {
 			let extensionPath = $scope.$root.CSI.getSystemPath(SystemPath.EXTENSION) + '/jsx/';
 			let script = '$.evalFile("' + extensionPath + 'tb_robot.jsx");';
-			$scope.$root.CSI.evalScript(script, function(result) {});
+			console.log('script', script);
+			try {
+				$scope.$root.CSI.evalScript(script, function(result) { console.log('result?', result); });
+			}
+			catch (e) {
+				$scope.toast({className: 'danger', content: e});
+			}
+
 		};
 
 		$scope.toClipboard = function(text, type) {
