@@ -378,8 +378,6 @@ tb-style-preset>div.row:first-child {
 	align-self: stretch;
 	align-items: center;
 	-webkit-align-items: center;
-	overflow: hidden;
-	text-overflow: ellipsis;
 }
 
 .flex-right {
