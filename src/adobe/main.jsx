@@ -4,17 +4,21 @@ sTID = function(s) { return app.stringIDToTypeID(s); };
 idTS = function(id) { return app.typeIDToStringID(id); };
 idTC = function(id) { return app.typeIDToCharID(id); };
 
-var originalPrefs = app.preferences;
+var originalRulerUnits;
+var originalTypeUnits;
 var saveState;
 
 function setPrefs() {
-	originalPrefs = app.preferences.rulerUnits;
+	originalRulerUnits = app.preferences.rulerUnits;
+	originalTypeUnits = app.preferences.typeUnits;
 	app.preferences.rulerUnits = Units.POINTS;
+	app.preferences.typeUnits = TypeUnits.PIXELS;
 	// app.preferences.smartQuotes = false;
 }
 
 function resetPrefs() {
-	app.preferences.rulerUnits = originalPrefs;
+	app.preferences.rulerUnits = originalRulerUnits;
+	app.preferences.typeUnits = originalTypeUnits;
 }
 
 function undo() {
