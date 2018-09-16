@@ -578,7 +578,12 @@ var tbHelper = {
 		if (!!!text || text.length == 0) {
 			return true;
 		}
-		else if (text.charCodeAt(0) == panelSeparator.charCodeAt(0) && text.length == panelSeparator.length) {
+		else if (text.length == panelSeparator.length) {
+			for(var i = 0; i < panelSeparator.length; i++) {
+				if (text.charCodeAt(i) != panelSeparator.charCodeAt(i)) {
+					return false;
+				}
+			}
 			return null;
 		}
 		else return false;

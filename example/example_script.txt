@@ -34,6 +34,14 @@ Giga pudding! [yelling] [[this bubble will be written in "yelling" style, even i
 [sfx] Some sfx
 [newspaper] Tonight at eleven.
 [sfxib] Sfx in balloon.
+–
+This page has also different panel separators. Previous was longh dash.
+-
+Previous was single dash.
+--
+Previous was double dash.
+=
+Previous was equal sign.
 
 
 005#
