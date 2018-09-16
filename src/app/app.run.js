@@ -1,44 +1,20 @@
 tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace', 'themeManager', '$localStorage', 'ngToast',
 	function(CONF, $transitions, $state, $stateParams, $rootScope, $trace, themeManager, $localStorage, ngToast) {
 
-		$rootScope.CONF = CONF;
-
 		// convenience shortcuts
+		$rootScope.CONF = CONF;
+		$rootScope.debug = $rootScope.CONF.debug;
 		$rootScope.$state = $state;
 		$rootScope.$stateParams = $stateParams;
 		$rootScope.CSI = new CSInterface();
 		$rootScope.extensionID = $rootScope.CSI.getExtensionID();
-
-		// convoluted way to load the jsx files
-		let JSXs = [
-			'polyfills',
-			'tb_helper',
-		];
-
-		let extensionPath = $rootScope.CSI.getSystemPath(SystemPath.EXTENSION) + '/jsx/';
-		for (let i = 0; i < JSXs.length; i++){
-			let jsxFile =  extensionPath + JSXs[i] +'.jsx';
-			let script = '$.evalFile("' + jsxFile + '");';
-			$rootScope.CSI.evalScript(script, function(result) {});
-		}
-
 		$rootScope.os = $rootScope.CSI.getOSInformation().toLowerCase().indexOf('mac') >= 0 ? 'Mac' : 'Windows';
+		$rootScope.extensionPath = $rootScope.CSI.getSystemPath(SystemPath.EXTENSION) + '/jsx/';
 
-		themeManager.init();
-
-		function persist(on) {
-			var event;
-			if (on) {
-			  event = new CSEvent('com.adobe.PhotoshopPersistent', 'APPLICATION');
-			}
-			else {
-			  event = new CSEvent('com.adobe.PhotoshopUnPersistent', 'APPLICATION');
-			}
-			event.extensionId = $rootScope.extensionID;
-			$rootScope.CSI.dispatchEvent(event);
-		}
-
-		$rootScope.debug = CONF.debug;
+		$rootScope.loadJSX = function(filename) {
+			let script = '$.evalFile("' + $rootScope.extensionPath + filename + '");';
+			$rootScope.CSI.evalScript(script, function(result) {});
+		};
 
 		// log utility when debug mode is on
 		$rootScope.log = function(what, obj) {
@@ -65,6 +41,18 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 			ngToast.dismiss();
 		};
 
+		function persist(on) {
+			var event;
+			if (on) {
+			  event = new CSEvent('com.adobe.PhotoshopPersistent', 'APPLICATION');
+			}
+			else {
+			  event = new CSEvent('com.adobe.PhotoshopUnPersistent', 'APPLICATION');
+			}
+			event.extensionId = $rootScope.extensionID;
+			$rootScope.CSI.dispatchEvent(event);
+		}
+
 		// save last opened tab
 		let saveTab = function(transition, state) {
 			$localStorage.lastOpenedTab = transition.to().name;
@@ -72,6 +60,7 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 		}
 		$transitions.onFinish(true, saveTab, {priority: 10});
 
+		// redirect to last opened tab on Windows
 		let forbidAppState = {
 			to: function(state) { return state.name == 'app'; }
 		};
@@ -91,6 +80,10 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 		else {
 			persist(true);
 		}
+
+		$rootScope.loadJSX('polyfills.jsx');
+		$rootScope.loadJSX('tb_helper.jsx');
+		themeManager.init();
 
 		$rootScope.$watch('debug', function(newVal, oldVal) {
 			if (newVal != oldVal) {

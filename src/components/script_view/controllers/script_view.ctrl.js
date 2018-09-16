@@ -224,16 +224,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 		};
 
 		$scope.tbRobot = function() {
-			let extensionPath = $scope.$root.CSI.getSystemPath(SystemPath.EXTENSION) + '/jsx/';
-			let script = '$.evalFile("' + extensionPath + 'tb_robot.jsx");';
-			console.log('script', script);
-			try {
-				$scope.$root.CSI.evalScript(script, function(result) { console.log('result?', result); });
-			}
-			catch (e) {
-				$scope.toast({className: 'danger', content: e});
-			}
-
+			$scope.loadJSX('tb_robot.jsx');
 		};
 
 		$scope.toClipboard = function(text, type) {
