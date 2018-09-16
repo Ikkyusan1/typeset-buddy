@@ -345,18 +345,19 @@ var tbHelper = {
 	},
 
 	getFilePageNumber: function(filename) {
-		// test for 0000-0000 format
-		var reg = /^.*[-_\ ]([\d]{3,4}-[\d]{3,4})\.psd$/;
-		var match = reg.exec(filename);
-		if (!!match && !!match[1]) {
-			return match[1];
+		var regs = [
+			/^.*[-_\ ]([\d]{3,4}-[\d]{3,4}-[\d]{3,4}-[\d]{3,4})\.psd$/,
+			/^.*[-_\ ]([\d]{3,4}-[\d]{3,4}-[\d]{3,4})\.psd$/,
+			/^.*[-_\ ]([\d]{3,4}-[\d]{3,4})\.psd$/,
+			/^.*[-_\ ]([\d]{3,4})\.psd$/
+		];
+		for (var i = 0; i < regs.length; i++) {
+			var match = regs[i].exec(filename);
+			if (!!match && !!match[1]) {
+				return match[1];
+			}
 		}
-		else {
-			// test for 0000 format
-			reg = /^.*[-_\ ]([\d]{3,4})\.psd$/;
-			match = reg.exec(filename);
-			return (!!match && !!match[1])? match[1] : null;
-		}
+		return null;
 	},
 
 	getPageNumbers: function(text) {
