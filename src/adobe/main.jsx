@@ -316,9 +316,14 @@ function toggleFauxItalicActiveLayer() {
 	textItem.fauxItalic = !textItem.fauxItalic;
 }
 
-function replaceTextActiveLayer(rules) {
+function applyReplaceRulesActiveLayer(rules) {
 	var textItem = activeDocument.activeLayer.textItem;
 	textItem.contents = tbHelper.replaceText(textItem.contents, rules);
+}
+
+function replaceTextActiveLayer(text) {
+	var textItem = activeDocument.activeLayer.textItem;
+	textItem.contents = text;
 }
 
 function setColorActiveLayer(color) {
@@ -560,9 +565,13 @@ function toggleFauxItalicSelectedLayers() {
 	return actionSelectedLayers('toggleFauxItalicActiveLayer', 'Toggle faux italic');
 }
 
-function replaceTextSelectedLayers(rules) {
+function applyReplaceRulesSelectedLayers(rules) {
 	var tmpRules = tbHelper.cleanTextReplaceRules(rules);
-	return actionSelectedLayers('replaceTextActiveLayer', 'Replace text', tmpRules);
+	return actionSelectedLayers('applyReplaceRulesActiveLayer', 'Apply replace rules', tmpRules);
+}
+
+function replaceTextSelectedLayers(text) {
+	return actionSelectedLayers('replaceTextActiveLayer', 'Replace text', text);
 }
 
 function convertStylePropValue(styleProperty, value) {

@@ -1,5 +1,5 @@
-tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', 'StylesService', 'Utils', '$timeout', 'clipboard',
-	function($scope, SettingsService, ScriptService, StylesService, Utils, $timeout, clipboard) {
+tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', 'StylesService', 'Utils', '$timeout', 'clipboard', 'Applier',
+	function($scope, SettingsService, ScriptService, StylesService, Utils, $timeout, clipboard, Applier) {
 
 		$scope.reset = function() {
 			$scope.filename = '';
@@ -179,6 +179,16 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			}
 		};
 
+		$scope.prepareText = function(bubble) {
+			let text = bubble.text;
+			if (!!bubble.siblings) {
+				bubble.siblings.forEach(function(sibling){
+					text += '\r' + sibling.text;
+				});
+			}
+			return text;
+		};
+
 		$scope.typeset = function(bubble, style) {
 			if (!!$scope.selectedForcedStyle) {
 				$scope.$root.log('force style', $scope.selectedForcedStyle);
@@ -197,12 +207,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			else{
 				stylePreset.language = $scope.styleSet.language;
 			}
-			let text = bubble.text;
-			if (!!bubble.siblings) {
-				bubble.siblings.forEach(function(sibling){
-					text += '\r' + sibling.text;
-				});
-			}
+			let text = $scope.prepareText(bubble);
 			let typesetObj = {text: text, style: stylePreset};
 			ScriptService.maybeTypesetToPath(typesetObj)
 			.then(
@@ -231,6 +236,19 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 			clipboard.copyText(text);
 			let txt = (!!type && type == 'note')? 'Note copied to clipboard' : 'Content copied to clipboard';
 			$scope.toast({className: 'info', content: txt});
+		};
+
+		$scope.replaceText = function(bubble) {
+			let text = $scope.prepareText(bubble);
+			Applier.actionSelectedLayers('replaceText', text)
+			.then(
+				function() {
+					$scope.toast({className: 'success', content: 'Done'});
+				},
+				function(err) {
+					$scope.toast({className: 'danger', content: err});
+				}
+			);
 		};
 
 		$scope.reset();

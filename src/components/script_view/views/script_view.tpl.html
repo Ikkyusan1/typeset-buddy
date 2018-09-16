@@ -113,10 +113,10 @@
 			</button>
 		</div>
 		<div class="col-lg-10 col-md-9 col-xs-9" ng-if="!!!bubble.panelSeparator">
-			<div class="selectable bubble-content" ng-if="!!bubble.text" ng-dblclick="toClipboard(bubble.text)">{{bubble.text}}<span class="clipbutton glyphicon glyphicon-registration-mark" ng-if="bubble.replaced" uib-tooltip="Some text has been replaced on this bubble" tooltip-popup-delay="500" tooltip-placement="left"></span></div>
+			<div class="selectable bubble-content" ng-if="!!bubble.text"><span ng-dblclick="toClipboard(bubble.text)">{{bubble.text}}</span><span class="clipbutton glyphicon glyphicon-registration-mark" ng-if="bubble.replaced" uib-tooltip="Some text has been replaced on this bubble" tooltip-popup-delay="500" tooltip-placement="left"></span><button ng-click="replaceText(bubble)" class="topcoat-button clipbutton" uib-tooltip="Replace text on selected layers" tooltip-popup-delay="1000" tooltip-placement="bottom-right"><span class="glyphicon glyphicon-paste"></span></button></div>
 			<div class="bubble-note selectable" ng-repeat="note in bubble.notes" ng-dblclick="toClipboard(bubble.notes, 'note')">{{note}}</div>
 			<div class="bubble-sibling" ng-repeat="sibling in bubble.siblings">
-				<div class="selectable bubble-content" ng-dblclick="toClipboard(sibling.text)">{{sibling.text}}</div>
+				<div class="selectable bubble-content"><span ng-dblclick="toClipboard(sibling.text)">{{sibling.text}}<span></div>
 				<div class="bubble-note selectable" ng-repeat="sibling_note in sibling.notes" ng-dblclick="toClipboard(sibling_note, 'note')">{{sibling_note}}</div>
 			</div>
 		</div>

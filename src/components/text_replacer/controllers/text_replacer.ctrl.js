@@ -66,8 +66,8 @@ tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'Applie
 			$scope.textReplaceRules = $scope.textReplaceRules.concat(tbHelper.getDefaultTextReplaceRules());
 		};
 
-		$scope.replaceTextSelectedLayers = function() {
-			Applier.actionSelectedLayers('replaceText', $scope.textReplaceRules)
+		$scope.applyReplaceRulesSelectedLayers = function() {
+			Applier.actionSelectedLayers('applyReplaceRules', $scope.textReplaceRules)
 			.then(
 				function() {
 					$scope.toast({className: 'success', content: 'Done'});
