@@ -270,17 +270,14 @@ var tbHelper = {
 	},
 
 	getFilePageNumber: function getFilePageNumber(filename) {
-		// test for 0000-0000 format
-		var reg = /^.*[-_\ ]([\d]{3,4}-[\d]{3,4})\.psd$/;
-		var match = reg.exec(filename);
-		if (!!match && !!match[1]) {
-			return match[1];
-		} else {
-			// test for 0000 format
-			reg = /^.*[-_\ ]([\d]{3,4})\.psd$/;
-			match = reg.exec(filename);
-			return !!match && !!match[1] ? match[1] : null;
+		var regs = [/^.*[-_\ ]([\d]{1,4}-[\d]{1,4}-[\d]{1,4}-[\d]{1,4})\.psd$/, /^.*[-_\ ]([\d]{1,4}-[\d]{1,4}-[\d]{1,4})\.psd$/, /^.*[-_\ ]([\d]{1,4}-[\d]{1,4})\.psd$/, /^.*[-_\ ]([\d]{1,4})\.psd$/];
+		for (var i = 0; i < regs.length; i++) {
+			var match = regs[i].exec(filename);
+			if (!!match && !!match[1]) {
+				return match[1];
+			}
 		}
+		return null;
 	},
 
 	getPageNumbers: function getPageNumbers(text) {
@@ -492,7 +489,12 @@ var tbHelper = {
 		text = this.cleanLine(text);
 		if (!!!text || text.length == 0) {
 			return true;
-		} else if (text.charCodeAt(0) == panelSeparator.charCodeAt(0) && text.length == panelSeparator.length) {
+		} else if (text.length == panelSeparator.length) {
+			for (var i = 0; i < panelSeparator.length; i++) {
+				if (text.charCodeAt(i) != panelSeparator.charCodeAt(i)) {
+					return false;
+				}
+			}
 			return null;
 		} else return false;
 	},
@@ -515,7 +517,7 @@ var tb = angular.module('tb', ['templates', 'ngSanitize', 'ui.router', 'ui.boots
 tb.constant('CONF', {
 	appName: 'typeset_buddy',
 	debug: false,
-	version: '0.4.1rc2',
+	version: '0.4.2',
 	author: 'Ikkyusan',
 	homepage: 'https://github.com/ikkyusan1/typeset-buddy',
 	description: 'A typesetting tool for Photoshop CC'
@@ -536,40 +538,20 @@ tb.config(['$compileProvider', '$localStorageProvider', 'ngToastProvider', 'CONF
 
 tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace', 'themeManager', '$localStorage', 'ngToast', function (CONF, $transitions, $state, $stateParams, $rootScope, $trace, themeManager, $localStorage, ngToast) {
 
-	$rootScope.CONF = CONF;
-
 	// convenience shortcuts
+	$rootScope.CONF = CONF;
+	$rootScope.debug = $rootScope.CONF.debug;
 	$rootScope.$state = $state;
 	$rootScope.$stateParams = $stateParams;
 	$rootScope.CSI = new CSInterface();
 	$rootScope.extensionID = $rootScope.CSI.getExtensionID();
-
-	// convoluted way to load the jsx files
-	var JSXs = ['polyfills', 'tb_helper'];
-
-	var extensionPath = $rootScope.CSI.getSystemPath(SystemPath.EXTENSION) + '/jsx/';
-	for (var i = 0; i < JSXs.length; i++) {
-		var jsxFile = extensionPath + JSXs[i] + '.jsx';
-		var script = '$.evalFile("' + jsxFile + '");';
-		$rootScope.CSI.evalScript(script, function (result) {});
-	}
-
 	$rootScope.os = $rootScope.CSI.getOSInformation().toLowerCase().indexOf('mac') >= 0 ? 'Mac' : 'Windows';
+	$rootScope.extensionPath = $rootScope.CSI.getSystemPath(SystemPath.EXTENSION) + '/jsx/';
 
-	themeManager.init();
-
-	function persist(on) {
-		var event;
-		if (on) {
-			event = new CSEvent('com.adobe.PhotoshopPersistent', 'APPLICATION');
-		} else {
-			event = new CSEvent('com.adobe.PhotoshopUnPersistent', 'APPLICATION');
-		}
-		event.extensionId = $rootScope.extensionID;
-		$rootScope.CSI.dispatchEvent(event);
-	}
-
-	$rootScope.debug = CONF.debug;
+	$rootScope.loadJSX = function (filename) {
+		var script = '$.evalFile("' + $rootScope.extensionPath + filename + '");';
+		$rootScope.CSI.evalScript(script, function (result) {});
+	};
 
 	// log utility when debug mode is on
 	$rootScope.log = function (what, obj) {
@@ -591,6 +573,21 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 		ngToast.create(toast);
 	};
 
+	$rootScope.dismissToast = function () {
+		ngToast.dismiss();
+	};
+
+	function persist(on) {
+		var event;
+		if (on) {
+			event = new CSEvent('com.adobe.PhotoshopPersistent', 'APPLICATION');
+		} else {
+			event = new CSEvent('com.adobe.PhotoshopUnPersistent', 'APPLICATION');
+		}
+		event.extensionId = $rootScope.extensionID;
+		$rootScope.CSI.dispatchEvent(event);
+	}
+
 	// save last opened tab
 	var saveTab = function saveTab(transition, state) {
 		$localStorage.lastOpenedTab = transition.to().name;
@@ -598,6 +595,7 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 	};
 	$transitions.onFinish(true, saveTab, { priority: 10 });
 
+	// redirect to last opened tab on Windows
 	var forbidAppState = {
 		to: function to(state) {
 			return state.name == 'app';
@@ -618,6 +616,10 @@ tb.run(['CONF', '$transitions', '$state', '$stateParams', '$rootScope', '$trace'
 	} else {
 		persist(true);
 	}
+
+	$rootScope.loadJSX('polyfills.jsx');
+	$rootScope.loadJSX('tb_helper.jsx');
+	themeManager.init();
 
 	$rootScope.$watch('debug', function (newVal, oldVal) {
 		if (newVal != oldVal) {
@@ -950,7 +952,7 @@ tb.config(['$stateProvider', function ($stateProvider) {
 	});
 }]);
 
-tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', 'StylesService', 'Utils', '$timeout', 'clipboard', function ($scope, SettingsService, ScriptService, StylesService, Utils, $timeout, clipboard) {
+tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', 'StylesService', 'Utils', '$timeout', 'clipboard', 'Applier', function ($scope, SettingsService, ScriptService, StylesService, Utils, $timeout, clipboard, Applier) {
 
 	$scope.reset = function () {
 		$scope.filename = '';
@@ -978,6 +980,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 	};
 
 	$scope.loadScript = function (filepath, page, autoloadPage) {
+		$scope.dismissToast();
 		try {
 			var result = window.cep.fs.readFile(filepath, cep.encoding.UTF8);
 			if (result.err === 0) {
@@ -1124,6 +1127,16 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 		}
 	};
 
+	$scope.prepareText = function (bubble) {
+		var text = bubble.text;
+		if (!!bubble.siblings) {
+			bubble.siblings.forEach(function (sibling) {
+				text += '\r' + sibling.text;
+			});
+		}
+		return text;
+	};
+
 	$scope.typeset = function (bubble, style) {
 		if (!!$scope.selectedForcedStyle) {
 			$scope.$root.log('force style', $scope.selectedForcedStyle);
@@ -1143,12 +1156,7 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 		} else {
 			stylePreset.language = $scope.styleSet.language;
 		}
-		var text = bubble.text;
-		if (!!bubble.siblings) {
-			bubble.siblings.forEach(function (sibling) {
-				text += '\r' + sibling.text;
-			});
-		}
+		var text = $scope.prepareText(bubble);
 		var typesetObj = { text: text, style: stylePreset };
 		ScriptService.maybeTypesetToPath(typesetObj).then(function () {}, function (err) {
 			$scope.toast({ className: 'danger', content: err });
@@ -1156,19 +1164,28 @@ tb.controller('ScriptViewCtrl', ['$scope', 'SettingsService', 'ScriptService', '
 	};
 
 	$scope.typesetPage = function () {
-		ScriptService.typesetPage(angular.copy($scope.pageScript), angular.copy($scope.styleSet));
+		ScriptService.typesetPage(angular.copy($scope.pageScript), angular.copy($scope.styleSet)).then(function () {}, function (err) {
+			$scope.toast({ className: 'danger', content: err });
+		});
 	};
 
 	$scope.tbRobot = function () {
-		var extensionPath = $scope.$root.CSI.getSystemPath(SystemPath.EXTENSION) + '/jsx/';
-		var script = '$.evalFile("' + extensionPath + 'tb_robot.jsx");';
-		$scope.$root.CSI.evalScript(script, function (result) {});
+		$scope.loadJSX('tb_robot.jsx');
 	};
 
 	$scope.toClipboard = function (text, type) {
 		clipboard.copyText(text);
 		var txt = !!type && type == 'note' ? 'Note copied to clipboard' : 'Content copied to clipboard';
 		$scope.toast({ className: 'info', content: txt });
+	};
+
+	$scope.replaceText = function (bubble) {
+		var text = $scope.prepareText(bubble);
+		Applier.actionSelectedLayers('replaceText', text).then(function () {
+			$scope.toast({ className: 'success', content: 'Done' });
+		}, function (err) {
+			$scope.toast({ className: 'danger', content: err });
+		});
 	};
 
 	$scope.reset();
@@ -1890,8 +1907,8 @@ tb.controller('TextReplacerCtrl', ['$scope', 'SettingsService', 'Utils', 'Applie
 		$scope.textReplaceRules = $scope.textReplaceRules.concat(tbHelper.getDefaultTextReplaceRules());
 	};
 
-	$scope.replaceTextSelectedLayers = function () {
-		Applier.actionSelectedLayers('replaceText', $scope.textReplaceRules).then(function () {
+	$scope.applyReplaceRulesSelectedLayers = function () {
+		Applier.actionSelectedLayers('applyReplaceRules', $scope.textReplaceRules).then(function () {
 			$scope.toast({ className: 'success', content: 'Done' });
 		}, function (err) {
 			$scope.toast({ className: 'danger', content: err });

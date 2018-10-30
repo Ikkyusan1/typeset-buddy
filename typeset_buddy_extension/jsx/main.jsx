@@ -4,17 +4,21 @@ sTID = function(s) { return app.stringIDToTypeID(s); };
 idTS = function(id) { return app.typeIDToStringID(id); };
 idTC = function(id) { return app.typeIDToCharID(id); };
 
-var originalPrefs = app.preferences;
+var originalRulerUnits;
+var originalTypeUnits;
 var saveState;
 
 function setPrefs() {
-	originalPrefs = app.preferences.rulerUnits;
+	originalRulerUnits = app.preferences.rulerUnits;
+	originalTypeUnits = app.preferences.typeUnits;
 	app.preferences.rulerUnits = Units.POINTS;
+	app.preferences.typeUnits = TypeUnits.PIXELS;
 	// app.preferences.smartQuotes = false;
 }
 
 function resetPrefs() {
-	app.preferences.rulerUnits = originalPrefs;
+	app.preferences.rulerUnits = originalRulerUnits;
+	app.preferences.typeUnits = originalTypeUnits;
 }
 
 function undo() {
@@ -312,9 +316,14 @@ function toggleFauxItalicActiveLayer() {
 	textItem.fauxItalic = !textItem.fauxItalic;
 }
 
-function replaceTextActiveLayer(rules) {
+function applyReplaceRulesActiveLayer(rules) {
 	var textItem = activeDocument.activeLayer.textItem;
 	textItem.contents = tbHelper.replaceText(textItem.contents, rules);
+}
+
+function replaceTextActiveLayer(text) {
+	var textItem = activeDocument.activeLayer.textItem;
+	textItem.contents = text;
 }
 
 function setColorActiveLayer(color) {
@@ -556,9 +565,13 @@ function toggleFauxItalicSelectedLayers() {
 	return actionSelectedLayers('toggleFauxItalicActiveLayer', 'Toggle faux italic');
 }
 
-function replaceTextSelectedLayers(rules) {
+function applyReplaceRulesSelectedLayers(rules) {
 	var tmpRules = tbHelper.cleanTextReplaceRules(rules);
-	return actionSelectedLayers('replaceTextActiveLayer', 'Replace text', tmpRules);
+	return actionSelectedLayers('applyReplaceRulesActiveLayer', 'Apply replace rules', tmpRules);
+}
+
+function replaceTextSelectedLayers(text) {
+	return actionSelectedLayers('replaceTextActiveLayer', 'Replace text', text);
 }
 
 function convertStylePropValue(styleProperty, value) {

@@ -1,12 +1,14 @@
-<div class="scrollable">
-	<div class="text-center">
-		<h3>{{$root.CONF.appName}} v{{$root.CONF.version}}</h3>
-		<div>{{$root.CONF.description}}</div>
-		<div>by {{$root.CONF.author}}</div>
-		<button class="topcoat-button" ng-click="goToHomepage()">{{$root.CONF.homepage}}</button>
+<div class="no-shrink text-center header">
+	<h3>{{$root.CONF.appName}} v{{$root.CONF.version}}</h3>
+	<div>{{$root.CONF.description}}</div>
+	<div>by {{$root.CONF.author}}</div>
+	<button class="topcoat-button" ng-click="goToHomepage()">{{$root.CONF.homepage}}</button>
+
+	<div>
+		<button class="topcoat-button" ng-click="set()">set</button>
+		<button class="topcoat-button" ng-click="get()">get</button>
 	</div>
-	<div class="small">
-		<div class="ph">Changelog: </div>
-		<pre ng-include="'CHANGELOG.MD'" class="small wordwrap"></pre>
-	</div>
+</div>
+<div class="small scrollable">
+	<pre ng-include="'CHANGELOG.MD'" class="small wordwrap"></pre>
 </div>

@@ -1,3 +1,10 @@
+### 0.4.2 (2018-10-30)
+Fix dimension units.
+Improve panel separator detection.
+Extend file detection up to 4 parts multi-pages.
+Can now replace selected text layers' content with bubble content.
+
+
 ### 0.4.1rc2 (2018-09-16)
 Fix redirect properly to last opened tab when on Windows.
 Fixed the UI on Windows.
